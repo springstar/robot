@@ -44,25 +44,6 @@ func (mgr *RobotManager)add(account int, robot *Robot) {
 	mgr.robots[account] = robot
 }
 
-type RobotEventProcessor struct {
 
-}
-
-func (p *RobotEventProcessor) OnExit(fromState string, args []interface{}) {
-	
-}
-
-func (p *RobotEventProcessor) Action(action string, fromState string, toState string, args []interface{}) error {
-	return nil
-}
-
-func (p *RobotEventProcessor) OnEnter(toState string, args []interface{}) {
-	r := args[0].(*Robot)
-	r.state = toState
-}
-
-func (p *RobotEventProcessor) OnActionFailure(action string, fromState string, toState string, args []interface{}, err error) {
-	
-}
 
 

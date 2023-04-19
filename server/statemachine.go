@@ -25,3 +25,24 @@ func newDefaultStateMachine(transitions []fsm.Transition) *fsm.StateMachine {
 	return fsm
 
 }
+
+type RobotEventProcessor struct {
+
+}
+
+func (p *RobotEventProcessor) OnExit(fromState string, args []interface{}) {
+	
+}
+
+func (p *RobotEventProcessor) Action(action string, fromState string, toState string, args []interface{}) error {
+	return nil
+}
+
+func (p *RobotEventProcessor) OnEnter(toState string, args []interface{}) {
+	r := args[0].(*Robot)
+	r.state = toState
+}
+
+func (p *RobotEventProcessor) OnActionFailure(action string, fromState string, toState string, args []interface{}, err error) {
+	
+}
