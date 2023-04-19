@@ -16,6 +16,8 @@ type Server struct {
 	engine *gin.Engine
 	driver *RobotDriver
 	accountMgr *AccountManager
+	robotMgr *RobotManager
+
 }
 
 
@@ -41,8 +43,7 @@ func (serv *Server) Init() {
 		return
 	}
 
-	startAccountId := getStartAccountId(serv.cfg.ServerId)
-	serv.accountMgr = newAccountManager(startAccountId, serv.cfg.MaxNum)
+	serv.initManager()
 
 	for _, api := range apis {
 		if (api.method == "GET") {
@@ -59,6 +60,14 @@ func (serv *Server) parseConfig(content []byte) error {
 	}
 
 	return nil
+}
+
+func (serv *Server) initManager() {
+	startAccountId := getStartAccountId(serv.cfg.ServerId)
+	serv.accountMgr = newAccountManager(startAccountId, serv.cfg.MaxNum)
+
+	serv.robotMgr = newRobotManager()
+
 }
 
 func (serv *Server) Run() {

@@ -62,6 +62,6 @@ func (cmd BenchCommand) exec() {
 func (cmd BenchCommand) runRobots() {
 	for i := 0; i < cmd.count; i++ {
 		robot := newRobot()
-		robot.startup()
+		robot.startup(serv.accountMgr, serv.robotMgr, newDefaultStateMachine(defaultTransitions()))
 	}
 }
