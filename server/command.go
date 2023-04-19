@@ -60,8 +60,16 @@ func (cmd BenchCommand) exec() {
 }
 
 func (cmd BenchCommand) runRobots() {
+	accountMgr := serv.accountMgr
+	robotMgr := serv.robotMgr
+
 	for i := 0; i < cmd.count; i++ {
-		robot := newRobot()
-		robot.startup(serv.accountMgr, serv.robotMgr, newDefaultStateMachine(defaultTransitions()))
+		err, account := accountMgr.alloc()
+		if (err != nil) {
+			break
+		}
+		
+		robot := newRobot(account, robotMgr, newDefaultStateMachine(defaultTransitions()))
+		robot.startup()
 	}
 }

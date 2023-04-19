@@ -5,22 +5,29 @@ import (
 )
 
 type Robot struct {
+	mgr *RobotManager
 	account *Account
 	fsm *fsm.StateMachine
 	state string
 }
 
-func newRobot() *Robot {
-	return &Robot{}
-}
-
-func (robot *Robot) startup(accountMgr *AccountManager, robotMgr *RobotManager, fsm *fsm.StateMachine) {
-	robot.account = accountMgr.alloc()
-	if (robot.account != nil) {
-		robotMgr.add(robot.account.id, robot)		
+func newRobot(account *Account, robotMgr *RobotManager, fsm *fsm.StateMachine) *Robot {
+	r := &Robot{
+		mgr : robotMgr,
+		account : account,
+		fsm : fsm,
 	}
 
-	robot.fsm = fsm
+	if (r.account != nil) {
+		robotMgr.add(r.account.id, r)		
+	}
+
+
+
+	return r
+}
+
+func (robot *Robot) startup() {
 
 }
 
