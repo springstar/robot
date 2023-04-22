@@ -1,17 +1,23 @@
 package server
 
 import (
-	"github.com/smallnest/gofsm"
+	_ "net"
+	"fmt"
+	"context"
+	"time"
+	"github.com/springstar/robot/core"
+	"nhooyr.io/websocket"
+	_ "github.com/gobwas/ws"
 )
 
 type Robot struct {
+	conn core.NetConnection
 	mgr *RobotManager
 	account *Account
-	fsm *fsm.StateMachine
-	state string
+	fsm *RobotFsm
 }
 
-func newRobot(account *Account, robotMgr *RobotManager, fsm *fsm.StateMachine) *Robot {
+func newRobot(account *Account, robotMgr *RobotManager, fsm *RobotFsm) *Robot {
 	r := &Robot{
 		mgr : robotMgr,
 		account : account,
@@ -22,19 +28,34 @@ func newRobot(account *Account, robotMgr *RobotManager, fsm *fsm.StateMachine) *
 		robotMgr.add(r.account.id, r)		
 	}
 
-
-
 	return r
 }
 
-func (robot *Robot) startup() {
-
+func (r *Robot) startup() {
+	r.fsm.trigger("entry", "connect", r)
 }
 
-func (robot *Robot) initFsm(transitions []fsm.Transition) {
-	delegate := &fsm.DefaultDelegate{P: &RobotEventProcessor{}}
+func (r *Robot) doAction(action string) {
+	switch action {
+	case "connect":
+		r.connect()
+	default:
+		fmt.Println(action)	
+	}
+}
 
-	robot.fsm = fsm.NewStateMachine(delegate, transitions...)
+func (r *Robot) connect() {
+	r.conn = core.NewWsConnection()
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+	defer cancel()
+	
+	c, _, err := websocket.Dial(ctx, serv.cfg.Url, nil)
+	if err != nil {
+		fmt.Print("connect err ", err)
+	}
+	defer c.Close(websocket.StatusInternalError, "the sky is falling")
+
+	
 }
 
 type RobotManager struct {

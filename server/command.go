@@ -43,18 +43,18 @@ type TestCommand struct {
 
 type BenchCommand struct {
 	Command
-	batch int `start:"batch"`
-	count int `start:"count"`
-	interval int32 `start:"interval"`
-	url string `start:"url"`
+	Batch int `start:"batch"`
+	Count int `start:"count"`
+	Interval int32 `start:"interval"`
+	Url string `start:"url"`
 }
 
 func (cmd BenchCommand) repeated() int {
-	return cmd.batch
+	return cmd.Batch
 }
 
 func (cmd BenchCommand) exec() {
-	for i := 0; i < cmd.batch; i++ {
+	for i := 0; i < cmd.Batch; i++ {
 		cmd.runRobots()	
 	}
 }
@@ -63,13 +63,21 @@ func (cmd BenchCommand) runRobots() {
 	accountMgr := serv.accountMgr
 	robotMgr := serv.robotMgr
 
-	for i := 0; i < cmd.count; i++ {
+	for i := 0; i < cmd.Count; i++ {
 		err, account := accountMgr.alloc()
 		if (err != nil) {
 			break
 		}
-		
-		robot := newRobot(account, robotMgr, newDefaultStateMachine(defaultTransitions()))
+
+		robot := newRobot(account, robotMgr, newFsm())
 		robot.startup()
 	}
+}
+
+type ExitCommand struct {
+
+}
+
+func (cmd ExitCommand) exec() {
+
 }

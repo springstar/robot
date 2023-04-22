@@ -13,6 +13,7 @@ var (
 
 type Server struct {
 	cfg ServerConfig
+	exit chan struct {}
 	engine *gin.Engine
 	driver *RobotDriver
 	accountMgr *AccountManager
@@ -25,6 +26,7 @@ func NewServer() *Server {
 	serv = &Server{
 		engine : gin.Default(),
 		driver : NewDriver(),
+		exit : make(chan struct{}),
 	}
 
 	return serv

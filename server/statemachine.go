@@ -2,6 +2,7 @@ package server
 
 import (
 	"github.com/smallnest/gofsm"
+	_ "fmt"
 )
 
 var (
@@ -10,10 +11,26 @@ var (
 
 )
 
+type RobotFsm struct {
+	fsm *fsm.StateMachine
+	state string
+}
+
+func newFsm() *RobotFsm {
+	return &RobotFsm{
+		fsm: newDefaultStateMachine(defaultTransitions()),
+	}
+}
+
+func (fsm *RobotFsm) trigger(currentState string, event string, args ...interface{}) {
+	fsm.fsm.Trigger(currentState, event, args)
+}
+
 func defaultTransitions() []fsm.Transition {
 	transitions := []fsm.Transition{
-		fsm.Transition{From: "waitForConnect", Event: "connect", To: "connected", Action: "connect"},
-		fsm.Transition{From: "connected", Event: "done", To: "finished", Action: "connect"},
+		fsm.Transition{From: "entry", Event: "connect", To: "connecting", Action: "connect"},
+		fsm.Transition{From: "connecting", Event: "cok", To: "connected", Action: "on_connection_established"},
+		fsm.Transition{From: "connecting", Event: "cfail", To: "retry", Action: "retry"},
 	}
 
 	return transitions
@@ -35,12 +52,14 @@ func (p *RobotEventProcessor) OnExit(fromState string, args []interface{}) {
 }
 
 func (p *RobotEventProcessor) Action(action string, fromState string, toState string, args []interface{}) error {
+	r := args[0].(*Robot)
+	r.doAction(action)
 	return nil
 }
 
 func (p *RobotEventProcessor) OnEnter(toState string, args []interface{}) {
 	r := args[0].(*Robot)
-	r.state = toState
+	r.fsm.state = toState
 }
 
 func (p *RobotEventProcessor) OnActionFailure(action string, fromState string, toState string, args []interface{}, err error) {

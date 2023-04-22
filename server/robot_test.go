@@ -9,12 +9,12 @@ func TestFsm(t *testing.T) {
 	accountMgr := newAccountManager(1000, 2000)
 	_, account := accountMgr.alloc()
 	robotMgr := newRobotManager()
-	fsm := newDefaultStateMachine(defaultTransitions())
+	fsm := newFsm()
 	r := newRobot(account, robotMgr, fsm)
 	r.startup()
 
-	r.fsm.Trigger("waitForConnect", "connect", r)
-	assert.Equal(t, "connected", r.state)
-	r.fsm.Trigger("connected", "done", r)
-	assert.Equal(t, "finished", r.state)
+	r.fsm.trigger("entry", "connect", r)
+	assert.Equal(t, "connecting", r.fsm.state)
+	r.fsm.trigger("connecting", "cok", r)
+	assert.Equal(t, "connected", r.fsm.state)
 }
