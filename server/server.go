@@ -60,7 +60,7 @@ func (serv *Server) parseConfig(content []byte) error {
 	if err := yaml.Unmarshal([]byte(content), &serv.cfg); err != nil {
 		return err
 	}
-
+	
 	return nil
 }
 

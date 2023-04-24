@@ -3,10 +3,7 @@ package server
 import (
 	_ "net"
 	"fmt"
-	"context"
-	"time"
 	"github.com/springstar/robot/core"
-	"nhooyr.io/websocket"
 	_ "github.com/gobwas/ws"
 )
 
@@ -46,14 +43,7 @@ func (r *Robot) doAction(action string) {
 
 func (r *Robot) connect() {
 	r.conn = core.NewWsConnection()
-	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
-	defer cancel()
-	
-	c, _, err := websocket.Dial(ctx, serv.cfg.Url, nil)
-	if err != nil {
-		fmt.Print("connect err ", err)
-	}
-	defer c.Close(websocket.StatusInternalError, "the sky is falling")
+	r.conn.Connect(serv.cfg.Url)
 
 	
 }

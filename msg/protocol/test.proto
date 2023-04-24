@@ -1,0 +1,14 @@
+syntax = "proto3";
+package message;
+
+option go_package=".;gen";
+
+import "msg/protocol/user.proto";
+
+message Adress {
+    string state = 1;
+    string province = 2;
+    string city = 3;
+    int32 code = 4;
+    User user = 5;
+}
