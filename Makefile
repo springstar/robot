@@ -2,7 +2,7 @@ APP=robot
 PROTOC_GEN_GO := $(GOPATH)/bin/protoc-gen-go
 MAKEFILE_LIST=Makefile
 PROTO_DIR=msg/protocol
-STUBS_DIR=msg/gen
+STUBS_DIR=pb
 
 .PHONY: build
 build: clean
