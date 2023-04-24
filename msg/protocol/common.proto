@@ -2,3 +2,7 @@ syntax = "proto3";
 package message;
 
 option go_package=".;pb";
+
+message Player {
+    string name =1;
+}

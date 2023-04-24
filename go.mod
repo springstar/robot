@@ -4,6 +4,7 @@ go 1.14
 
 require (
 	github.com/Jeffail/tunny v0.1.4
+	github.com/bufbuild/protocompile v0.4.0 // indirect
 	github.com/bytedance/sonic v1.8.7 // indirect
 	github.com/gin-gonic/gin v1.9.0
 	github.com/go-playground/validator/v10 v10.12.0 // indirect
@@ -11,6 +12,7 @@ require (
 	github.com/goccy/go-json v0.10.2 // indirect
 	github.com/golang/protobuf v1.5.0
 	github.com/google/go-cmp v0.5.9 // indirect
+	github.com/jhump/protoreflect v1.15.1 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.4 // indirect
 	github.com/leodido/go-urn v1.2.3 // indirect
 	github.com/mattn/go-isatty v0.0.18 // indirect
