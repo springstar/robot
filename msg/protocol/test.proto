@@ -6,7 +6,7 @@ option go_package=".;pb";
 
 import "msg/protocol/user.proto";
 
-message Adress {
+message Address {
     string state = 1;
     string province = 2;
     string city = 3;

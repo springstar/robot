@@ -53,7 +53,6 @@ func TestMarshal(t *testing.T) {
    assert.Equal(t, "xiamen", ad.GetCity())
    assert.Equal(t, int32(92), ad.GetCode())
    assert.Equal(t, "ruida", ad.GetUser().GetName())
-
 	
 	
 }
