@@ -38,3 +38,8 @@ func (wsc *WebSockConn) Write(p []byte) (n int, err error) {
 	}
 	return n, nil
 }
+
+func (wsc *WebSockConn) Read() ([]byte, error) {
+	// wsc.c.Read
+	return nil, nil
+}
