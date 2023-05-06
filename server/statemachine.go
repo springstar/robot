@@ -13,6 +13,7 @@ var (
 
 type RobotFsm struct {
 	fsm *fsm.StateMachine
+
 	state string
 }
 
@@ -22,7 +23,7 @@ func newFsm() *RobotFsm {
 	}
 }
 
-func (fsm *RobotFsm) trigger(currentState string, event string, args ...interface{}) {
+func (fsm *RobotFsm) trigger(currentState string, event string, args interface{}) {
 	fsm.fsm.Trigger(currentState, event, args)
 }
 
@@ -31,6 +32,9 @@ func defaultTransitions() []fsm.Transition {
 		fsm.Transition{From: "entry", Event: "connect", To: "connecting", Action: "connect"},
 		fsm.Transition{From: "connecting", Event: "cok", To: "connected", Action: "on_connection_established"},
 		fsm.Transition{From: "connecting", Event: "cfail", To: "retry", Action: "retry"},
+		fsm.Transition{From: "connected", Event: "login", To: "trylogin", Action: "login"},
+		fsm.Transition{From: "trylogin", Event: "lok", To: "querychars", Action: "querychars"},
+		fsm.Transition{From: "trylogin", Event: "lfail", To: "disconnected", Action: "disconnected"},
 	}
 
 	return transitions

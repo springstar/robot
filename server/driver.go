@@ -24,6 +24,7 @@ func NewDriver() *RobotDriver {
 func (driver *RobotDriver) Start() {
 	numCPUs := runtime.NumCPU()
 	driver.pool = tunny.NewFunc(numCPUs, run)
+	defer driver.pool.Close()
 	driver.process()
 }
 
@@ -32,7 +33,6 @@ func run(i interface{}) interface{} {
 	cmd.exec()
 	return cmd
 }
-
 
 func (driver *RobotDriver) PostCommand(cmd iCommand) {
 	driver.cq <- cmd
@@ -46,10 +46,8 @@ func (driver *RobotDriver) process() {
 			driver.exec(cmd)
 		case <- time.Tick(SERVER_PULSE):
 			driver.pulse()
-		}
-	
-	}
-	
+		}	
+	}	
 }
 
 func (driver *RobotDriver) pulse() {

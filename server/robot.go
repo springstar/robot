@@ -4,6 +4,7 @@ import (
 	_ "net"
 	"fmt"
 	"github.com/springstar/robot/core"
+	"github.com/springstar/robot/msg"
 	_ "github.com/gobwas/ws"
 )
 
@@ -36,6 +37,8 @@ func (r *Robot) doAction(action string) {
 	switch action {
 	case "connect":
 		r.connect()
+	case "on_connection_established":
+		r.on_connection_established()
 	default:
 		fmt.Println(action)	
 	}
@@ -43,18 +46,34 @@ func (r *Robot) doAction(action string) {
 
 func (r *Robot) connect() {
 	r.conn = core.NewWsConnection()
-	r.conn.Connect(serv.cfg.Url)
+	err := r.conn.Connect(r.mgr.url)
+	if err != nil {
+		fmt.Print(err)
+		r.fsm.trigger("connecting", "cfail", r)
+	}
 
+	r.fsm.trigger("connecting", "cok", r)
 	
+}
+
+func (r *Robot) on_connection_established() {
+	msg := msg.SerializeCSLogin(111, "robot", "123456", "", 1001, 1)
+	r.conn.Write(msg)
+}
+
+func (r *Robot) loop() {
+
 }
 
 type RobotManager struct {
 	robots map[int]*Robot
+	url string
 }
 
-func newRobotManager() *RobotManager {
+func newRobotManager(url string) *RobotManager {
 	return &RobotManager{
 		robots : make(map[int]*Robot),
+		url : url,
 	}
 }
 

@@ -34,7 +34,7 @@ func TestMarshal(t *testing.T) {
 	a, _ := proto.GetExtension(options, pb.E_Msgid)
    assert.Equal(t, int32(101), *a.(*int32))
 
-   addr := &pb.Adress{
+   addr := &pb.Address{
 	State: "china",
 	Province: "fujian",
 	City:"xiamen",
@@ -46,7 +46,7 @@ func TestMarshal(t *testing.T) {
    }
 
    d, _ := proto.Marshal(addr)
-   ad := &pb.Adress{}
+   ad := &pb.Address{}
    proto.Unmarshal(d, ad)
    assert.Equal(t, "china", ad.GetState())
    assert.Equal(t, "fujian", ad.GetProvince())

@@ -52,8 +52,6 @@ func testPost(c *gin.Context) {
 		return
 	  }
 
-	  fmt.Println(cmd.Count)
-
 	serv.PostCommand(cmd)	  
 
 }

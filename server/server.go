@@ -68,7 +68,7 @@ func (serv *Server) initManager() {
 	startAccountId := getStartAccountId(serv.cfg.ServerId)
 	serv.accountMgr = newAccountManager(startAccountId, serv.cfg.MaxNum)
 
-	serv.robotMgr = newRobotManager()
+	serv.robotMgr = newRobotManager(serv.cfg.Url)
 
 }
 
