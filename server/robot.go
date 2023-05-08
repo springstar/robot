@@ -1,8 +1,11 @@
 package server
 
 import (
+	_ "bytes"
+	
 	_ "net"
 	"fmt"
+	"log"
 	"github.com/springstar/robot/core"
 	"github.com/springstar/robot/msg"
 	_ "github.com/gobwas/ws"
@@ -13,6 +16,9 @@ type Robot struct {
 	mgr *RobotManager
 	account *Account
 	fsm *RobotFsm
+	packetQ chan []*core.Packet
+	buffer *core.PacketBuffer
+	
 }
 
 func newRobot(account *Account, robotMgr *RobotManager, fsm *RobotFsm) *Robot {
@@ -20,6 +26,8 @@ func newRobot(account *Account, robotMgr *RobotManager, fsm *RobotFsm) *Robot {
 		mgr : robotMgr,
 		account : account,
 		fsm : fsm,
+		packetQ : make(chan []*core.Packet),
+		buffer : core.NewBuffer(),
 	}
 
 	if (r.account != nil) {
@@ -56,13 +64,62 @@ func (r *Robot) connect() {
 	
 }
 
+
 func (r *Robot) on_connection_established() {
-	msg := msg.SerializeCSLogin(111, "robot", "123456", "", 1001, 1)
-	r.conn.Write(msg)
+	packet := msg.SerializeCSLogin(111, "robot", "123456", "", 1001, 1)
+	r.sendPacket(packet)
+	go r.readLoop()
+	r.mainLoop()
 }
 
-func (r *Robot) loop() {
 
+func (r *Robot) readLoop() {
+	for {
+		bytes, err := r.conn.Read()
+		if (err != nil) {
+			log.Fatal(err)
+		}
+
+		if len(bytes) <= 0 {
+			continue
+		}
+
+		// add to msg buffer
+		r.buffer.Write(bytes)
+
+		// split packet from msg buffer and send to packetQ channel
+		packets := r.buffer.Read()
+		if (packets == nil) {
+			continue
+		}
+
+		r.packetQ <- packets
+		
+	}
+}
+
+func (r *Robot) dispatch(packets []*core.Packet) {
+	for _, packet := range packets {
+		fmt.Println(packet.Type)
+	}
+
+}
+
+func (r *Robot) mainLoop() {
+	for {
+		select {
+		case packets := <- r.packetQ:
+			r.dispatch(packets)
+		}
+	}
+}
+
+func (r *Robot) msgHandler() {
+
+}
+
+func (r *Robot) sendPacket(packet []byte) {
+	r.conn.Write(packet)
 }
 
 type RobotManager struct {
