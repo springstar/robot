@@ -46,21 +46,3 @@ func uint32FromBytes(b []byte) (uint32, error) {
 	return result, err
 }
 
-func Parse(msg []byte) *Packet {
-	len, err := uint32FromBytes(msg[0:4])
-	if (err != nil) {
-		return nil
-	}
-
-	msgid, err := uint32FromBytes(msg[4:8])
-	if (err != nil) {
-		return nil
-	}
-
-	return &Packet {
-		Length : len,
-		Type : msgid, 
-		Data : msg[8:],
-	}
-
-}

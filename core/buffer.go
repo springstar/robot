@@ -34,10 +34,16 @@ func (b *PacketBuffer) Read() []*Packet {
 		if b.buf.Len() < int(len) || len == 0 {
 			break
 		}
-		
+
 		slice := make([]byte, len)
 		b.buf.Read(slice)
-		packet := Parse(slice)
+
+		msgid, err := uint32FromBytes(slice[4:8])
+		if (err != nil) {
+			return nil
+		}
+	
+		packet := NewPacket(msgid, slice[8:])
 		packets = append(packets, packet)
 	}
 
