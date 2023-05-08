@@ -40,6 +40,11 @@ func (wsc *WebSockConn) Write(p []byte) (n int, err error) {
 }
 
 func (wsc *WebSockConn) Read() ([]byte, error) {
-	// wsc.c.Read
-	return nil, nil
+	_, bytes, err := wsc.c.Read(context.Background())
+	if (err != nil) {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	return bytes, nil
 }
