@@ -1,9 +1,12 @@
 package server
 
 import (
+	"fmt"
 	"strings"
 	"strconv"
 	"errors"
+	"github.com/springstar/robot/core"
+	"github.com/springstar/robot/msg"
 )
 
 var (
@@ -27,6 +30,17 @@ func newAccountManager(start int, max int) *AccountManager {
 		idx : 0,
 		max : max,
 	}
+}
+
+func (mgr *AccountManager) init(r *Robot) {
+	r.dispatcher.Register(112, mgr)
+}
+
+func (mgr *AccountManager) HandleMessage(packet *core.Packet) {
+	fmt.Println("recv packet ", packet.Type)
+	msg := msg.ParseSCLoginResult(int32(packet.Type), packet.Data)
+	fmt.Println(msg.GetResultCode())
+	fmt.Println(msg.GetResultReason())
 }
 
 func (mgr *AccountManager) alloc() (error, *Account) {

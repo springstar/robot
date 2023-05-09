@@ -11,6 +11,7 @@ var (
 	serv *Server
 )
 
+
 type Server struct {
 	cfg ServerConfig
 	exit chan struct {}

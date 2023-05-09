@@ -18,7 +18,8 @@ type Robot struct {
 	fsm *RobotFsm
 	packetQ chan []*core.Packet
 	buffer *core.PacketBuffer
-	
+	dispatcher core.IDispatcher
+	moduleMgr *ModuleManager
 }
 
 func newRobot(account *Account, robotMgr *RobotManager, fsm *RobotFsm) *Robot {
@@ -28,6 +29,8 @@ func newRobot(account *Account, robotMgr *RobotManager, fsm *RobotFsm) *Robot {
 		fsm : fsm,
 		packetQ : make(chan []*core.Packet),
 		buffer : core.NewBuffer(),
+		dispatcher : core.NewMsgDispatcher(),
+		moduleMgr : newModuleManager(),
 	}
 
 	if (r.account != nil) {
@@ -64,7 +67,6 @@ func (r *Robot) connect() {
 	
 }
 
-
 func (r *Robot) on_connection_established() {
 	packet := msg.SerializeCSLogin(111, "robot", "123456", "", 1001, 1)
 	r.sendPacket(packet)
@@ -100,7 +102,7 @@ func (r *Robot) readLoop() {
 
 func (r *Robot) dispatch(packets []*core.Packet) {
 	for _, packet := range packets {
-		fmt.Println(packet.Type)
+		r.dispatcher.Dispatch(packet)
 	}
 
 }
