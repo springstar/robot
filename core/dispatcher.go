@@ -1,7 +1,7 @@
 package core
 
 import (
-	"fmt"
+	_ "fmt"
 )
 
 type IDispatcher interface {
@@ -33,8 +33,6 @@ func (d *MessageDispatcher) Register(msgid uint32, subscriber ISubscriber) {
 func (d *MessageDispatcher) Dispatch(packet *Packet) {
 	msgid := packet.Type
 	subs, ok := d.subscribers[msgid]
-	fmt.Println(msgid)
-	fmt.Println(subs)
 	if !ok {
 		return
 	}

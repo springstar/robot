@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"log"
 	"github.com/springstar/robot/core"
-	"github.com/springstar/robot/msg"
+	_ "github.com/springstar/robot/msg"
 	_ "github.com/gobwas/ws"
 )
 
@@ -48,6 +48,7 @@ func (r *Robot) loadModules() {
 
 func (r *Robot) startup() {
 	r.Register(112, r)
+	r.Register(1004, r)
 
 	r.fsm.trigger("entry", "connect", r)
 }
@@ -59,7 +60,9 @@ func (r *Robot) doAction(action string) {
 	case "on_connection_established":
 		r.on_connection_established()
 	case "login":
-		r.sendLoginRequest()	
+		r.sendLoginRequest()
+	case "querychars":
+		r.querychars()
 	default:
 		fmt.Println(action)	
 	}
@@ -75,12 +78,6 @@ func (r *Robot) connect() {
 
 	r.fsm.trigger("connecting", "cok", r)
 	
-}
-
-func (r *Robot) sendLoginRequest() {
-	fmt.Println("send login")
-	packet := msg.SerializeCSLogin(111, "robot", "123456", "", 1001, 1)
-	r.sendPacket(packet)
 }
 
 func (r *Robot) on_connection_established() {
@@ -134,15 +131,10 @@ func (r *Robot) HandleMessage(packet *core.Packet) {
 	switch packet.Type {
 	case 112:
 		r.handleLoginResult(packet)
+	case 1004:
+		r.handleQueryCharacters(packet)
 	}
 }
-
-func (r *Robot) handleLoginResult(packet *core.Packet) {
-	msg := msg.ParseSCLoginResult(int32(packet.Type), packet.Data)
-	fmt.Println(msg.GetResultCode())
-	fmt.Println(msg.GetResultReason())
-}
-
 
 func (r *Robot) sendPacket(packet []byte) {
 	r.conn.Write(packet)
