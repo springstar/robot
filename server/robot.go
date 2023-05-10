@@ -12,25 +12,27 @@ import (
 )
 
 type Robot struct {
+	core.IDispatcher
 	conn core.NetConnection
 	mgr *RobotManager
 	account *Account
 	fsm *RobotFsm
 	packetQ chan []*core.Packet
 	buffer *core.PacketBuffer
-	dispatcher core.IDispatcher
 	moduleMgr *ModuleManager
+
 }
 
 func newRobot(account *Account, robotMgr *RobotManager, fsm *RobotFsm) *Robot {
 	r := &Robot{
+		IDispatcher: core.NewMsgDispatcher(),
 		mgr : robotMgr,
 		account : account,
 		fsm : fsm,
 		packetQ : make(chan []*core.Packet),
 		buffer : core.NewBuffer(),
-		dispatcher : core.NewMsgDispatcher(),
 		moduleMgr : newModuleManager(),
+
 	}
 
 	if (r.account != nil) {
@@ -40,7 +42,13 @@ func newRobot(account *Account, robotMgr *RobotManager, fsm *RobotFsm) *Robot {
 	return r
 }
 
+func (r *Robot) loadModules() {
+
+}
+
 func (r *Robot) startup() {
+	r.Register(112, r)
+
 	r.fsm.trigger("entry", "connect", r)
 }
 
@@ -50,6 +58,8 @@ func (r *Robot) doAction(action string) {
 		r.connect()
 	case "on_connection_established":
 		r.on_connection_established()
+	case "login":
+		r.sendLoginRequest()	
 	default:
 		fmt.Println(action)	
 	}
@@ -67,15 +77,20 @@ func (r *Robot) connect() {
 	
 }
 
-func (r *Robot) on_connection_established() {
+func (r *Robot) sendLoginRequest() {
+	fmt.Println("send login")
 	packet := msg.SerializeCSLogin(111, "robot", "123456", "", 1001, 1)
 	r.sendPacket(packet)
-	go r.readLoop()
+}
+
+func (r *Robot) on_connection_established() {
+	go r.startWork()
 	r.mainLoop()
 }
 
+func (r *Robot) startWork() {
+	r.sendLoginRequest()
 
-func (r *Robot) readLoop() {
 	for {
 		bytes, err := r.conn.Read()
 		if (err != nil) {
@@ -102,23 +117,32 @@ func (r *Robot) readLoop() {
 
 func (r *Robot) dispatch(packets []*core.Packet) {
 	for _, packet := range packets {
-		r.dispatcher.Dispatch(packet)
+		r.Dispatch(packet)
 	}
-
 }
 
 func (r *Robot) mainLoop() {
 	for {
 		select {
 		case packets := <- r.packetQ:
-			r.dispatch(packets)
+			r.dispatch(packets)	
 		}
 	}
 }
 
-func (r *Robot) msgHandler() {
-
+func (r *Robot) HandleMessage(packet *core.Packet) {
+	switch packet.Type {
+	case 112:
+		r.handleLoginResult(packet)
+	}
 }
+
+func (r *Robot) handleLoginResult(packet *core.Packet) {
+	msg := msg.ParseSCLoginResult(int32(packet.Type), packet.Data)
+	fmt.Println(msg.GetResultCode())
+	fmt.Println(msg.GetResultReason())
+}
+
 
 func (r *Robot) sendPacket(packet []byte) {
 	r.conn.Write(packet)

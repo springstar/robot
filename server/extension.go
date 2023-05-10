@@ -10,7 +10,7 @@ type ModuleManager struct {
 
 type RobotModule interface {
 	core.IModule
-	core.IDispatcher
+	core.ISubscriber
 
 }
 
@@ -19,3 +19,4 @@ func newModuleManager() *ModuleManager {
 		modules: make(map[string]RobotModule),
 	}
 }
+

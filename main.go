@@ -16,9 +16,14 @@ func init() {
 
 }
 
+func initMsgDesciptors() {
+	g := newDescriptorGen()
+	g.parse("msg/protocol")
+}
+
 
 func startServer() {
-	fmt.Println("start server")
+	initMsgDesciptors()
 	serv := server.NewServer()
 	serv.Init()
 	serv.Run()

@@ -5,6 +5,7 @@ import (
 	"log"
 	"github.com/gin-gonic/gin"
 	"io/ioutil"
+	_ "github.com/springstar/robot/core"
 )
 
 var (
@@ -20,6 +21,7 @@ type Server struct {
 	accountMgr *AccountManager
 	robotMgr *RobotManager
 
+
 }
 
 
@@ -28,6 +30,7 @@ func NewServer() *Server {
 		engine : gin.Default(),
 		driver : NewDriver(),
 		exit : make(chan struct{}),
+
 	}
 
 	return serv

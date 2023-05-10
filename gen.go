@@ -2,16 +2,16 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"strings"
 	"log"
-	"os"
 	"io/ioutil"
 	"path/filepath"
 	"github.com/jhump/protoreflect/desc"
 	"github.com/jhump/protoreflect/desc/protoparse"
 	"github.com/golang/protobuf/proto"
 	"github.com/springstar/robot/pb"
-	"github.com/gobuffalo/plush"
+	"github.com/springstar/robot/msg"
 )
 
 var typeMap map[string]string = map[string]string{
@@ -28,27 +28,30 @@ type Field struct {
 	name string
 }
 
-type ProtoGen struct {
-	files []string
+type DescriptorGen struct {
 	mds map[int32]*desc.MessageDescriptor
-	fids map[string][]*desc.FieldDescriptor
 	id2names map[int32]string
 
 }
 
-func newProtoGen() *ProtoGen {
-	return &ProtoGen{
+func newDescriptorGen() *DescriptorGen {
+	return &DescriptorGen{
 		mds: make(map[int32]*desc.MessageDescriptor),
 		id2names: make(map[int32]string),
-		fids: make(map[string][]*desc.FieldDescriptor),
 	}
 }
 
-func(g *ProtoGen) parse(path string) {
+func(g *DescriptorGen) parse(path string) {
+	if _, err := os.Stat("msg/serializer.go"); err != nil {
+		log.Fatal(err)
+	}
+
 	files, err := ioutil.ReadDir(path)
 	if (err != nil) {
 		log.Fatal(err)
 	}
+
+	var pfiles []string
 
 	for _, f := range files {
 		if f.IsDir() {
@@ -61,12 +64,11 @@ func(g *ProtoGen) parse(path string) {
 		}
 
 		p := filepath.Join(path, f.Name())
-		
-		g.files = append(g.files, p)
+		pfiles = append(pfiles, p)
 	}
 
 	var parser protoparse.Parser
-	for _, f := range g.files {
+	for _, f := range pfiles {
 		fds, err := parser.ParseFiles(f)
 		if err != nil {
 			fmt.Println(err)
@@ -79,11 +81,8 @@ func(g *ProtoGen) parse(path string) {
 				options := md.GetOptions()
 				mid, _ := proto.GetExtension(options, pb.E_Msgid)
 				if (mid != nil) {
-					g.mds[ *mid.(*int32)] = md
+					msg.AddDescriptor(*mid.(*int32), md)
 					g.id2names[*mid.(*int32)] = md.GetName()
-					var fids []*desc.FieldDescriptor
-					fids = append(fids, md.GetFields()...)
-					g.fids[md.GetName()] = fids
 				}
 			}
 		}
@@ -91,130 +90,7 @@ func(g *ProtoGen) parse(path string) {
 
 }
 
-func (g *ProtoGen) generate() {
-	content, err := ioutil.ReadFile("template/funcdecl.tpl")
-	if (err != nil) {
-		log.Fatal(err)
-	}
 
-	template := string(content[:])
-
-	ctx := plush.NewContext()
-	var protos []string
-	for _, p := range g.id2names {
-		protos = append(protos, p)
-	}
-
-	ctx.Set("package", "package main")
-	ctx.Set("imports", func() []string {
-		return []string{
-			"github.com/springstar/protogen/pb",
-			"github.com/jhump/protoreflect/desc",
-			"github.com/jhump/protoreflect/dynamic",
-		}
-	})
-
-	ctx.Set("names", protos)
-	ctx.Set("decl", func(p string) string {
-		var sb strings.Builder
-		sb.WriteString("func parse")
-		sb.WriteString(p)
-		sb.WriteString("(id int32, bytes []byte)")
-		sb.WriteString(" *")
-		sb.WriteString(p)
-		return sb.String()
-		
-		
-	})
-
-	ctx.Set("lbrack", func() string {
-		return " {"
-	})
-
-	ctx.Set("rbrack", func() string {
-		return "}"
-	})
-
-	var tm map[string][]Field = make(map[string][]Field)
-	
-	for name, fields := range g.fids {
-		var fids []Field
-		for _, field := range fields {
-			t := typeMap[field.GetType().String()]
-			fld := Field{
-				typ: t,
-				name: field.GetName(),
-			}
-
-			fids = append(fids, fld)
-		}
-		
-		tm[name] = fids
-	}
-
-	ctx.Set("fields", func(name string) []string {
-		var fns []string
-		fields := g.fids[name]
-		for _, f := range fields {
-			fns = append(fns, f.GetName())
-		}
-		
-		return fns
-	})
-
-	ctx.Set("params", func(msg string) string {					
-		fields := tm[msg]
-		var sb strings.Builder
-		c := len(fields)
-		var i int = 0
-		for _, field := range fields {
-			k := field.typ
-			v := field.name
-			sb.WriteString(v)
-			sb.WriteString(" ")
-			if k == "msg" || k == "enum" {
-				var sbb strings.Builder
-				if k == "msg" {
-					sbb.WriteString("*pb.")
-				} else {
-					sbb.WriteString("pb.")
-				}
-				
-				cname := strings.Title(v)
-				sbb.WriteString(cname)
-				sb.WriteString(sbb.String())
-
-			} else {
-				sb.WriteString(k)
-			}
-
-			if i < c-1 {
-				sb.WriteString(", ")
-			}
-			i++
-		}
-
-		return sb.String()
-	})
-
-	s, err := plush.Render(template, ctx)
-	if (err != nil) {
-		log.Fatal(err)
-	}
-	
-	write(s)	
-
-}
-
-func write(s string) {
-    file, err := os.Create("serializer.go")
-    if err != nil {
-        return
-    }
-    defer file.Close()
-
-    file.WriteString(s)
-}
 
 
 
