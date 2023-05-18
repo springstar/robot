@@ -33,6 +33,8 @@ func (packet *Packet) Serialize() []byte {
 	return result
 }
 
+
+
 func uint32ToBytes(i uint32) []byte {
 	buffer := bytes.Buffer{}
 	_ = binary.Write(&buffer, binary.BigEndian, i)
@@ -46,3 +48,21 @@ func uint32FromBytes(b []byte) (uint32, error) {
 	return result, err
 }
 
+func Parse(msg []byte) *Packet {
+	len, err := uint32FromBytes(msg[0:4])
+	if (err != nil) {
+		return nil
+	}
+
+	msgid, err := uint32FromBytes(msg[4:8])
+	if (err != nil) {
+		return nil
+	}
+
+	return &Packet {
+		Length : len,
+		Type : msgid, 
+		Data : msg[8:],
+	}
+
+}
