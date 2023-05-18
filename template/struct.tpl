@@ -27,6 +27,15 @@ func Find<%=n%>(k interface{}) *<%=n%> {
     return nil
 }
 
+func GetAll<%=n%>() []*<%=n%> {
+    datas := make([]*<%=n%>, 0, len(<%=n%>Datas))
+    for _, d := range <%=n%>Datas {
+        datas = append(datas, d)
+    }
+
+    return datas
+}
+
 func load<%=n%>(m map[string]interface{}) error {
     obj := new<%=n%>()
     return obj.loadFromMap(m)
