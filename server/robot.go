@@ -63,6 +63,8 @@ func (r *Robot) doAction(action string) {
 		r.sendLoginRequest()
 	case "querychars":
 		r.querychars()
+	case "createchar":
+		r.createChar()
 	default:
 		fmt.Println(action)	
 	}
@@ -82,7 +84,7 @@ func (r *Robot) connect() {
 
 func (r *Robot) on_connection_established() {
 	go r.startWork()
-	r.mainLoop()
+	go r.mainLoop()
 }
 
 func (r *Robot) startWork() {
