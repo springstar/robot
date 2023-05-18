@@ -20,7 +20,7 @@ type Server struct {
 	driver *RobotDriver
 	accountMgr *AccountManager
 	robotMgr *RobotManager
-
+	confMgr *JsonConfigManager
 
 }
 
@@ -72,8 +72,9 @@ func (serv *Server) initManager() {
 	startAccountId := getStartAccountId(serv.cfg.ServerId)
 	serv.accountMgr = newAccountManager(startAccountId, serv.cfg.MaxNum)
 
-	serv.robotMgr = newRobotManager(serv.cfg.Url)
-
+	serv.robotMgr = newRobotManager(serv.cfg.Url)	
+	serv.confMgr  = newJsonConfigManager()
+	serv.confMgr.init("config")
 }
 
 func (serv *Server) Run() {
