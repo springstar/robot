@@ -49,6 +49,7 @@ func (r *Robot) loadModules() {
 func (r *Robot) startup() {
 	r.Register(112, r)
 	r.Register(1004, r)
+	r.Register(1006, r)
 
 	r.fsm.trigger("entry", "connect", r)
 }
@@ -135,6 +136,8 @@ func (r *Robot) HandleMessage(packet *core.Packet) {
 		r.handleLoginResult(packet)
 	case 1004:
 		r.handleQueryCharacters(packet)
+	case 1006:
+		r.handleCreateResult(packet)	
 	}
 }
 

@@ -35,6 +35,7 @@ func defaultTransitions() []fsm.Transition {
 		fsm.Transition{From: "connected", Event: "login", To: "trylogin", Action: "login"},
 		fsm.Transition{From: "trylogin", Event: "lok", To: "querychars", Action: "querychars"},
 		fsm.Transition{From: "trylogin", Event: "lfail", To: "disconnected", Action: "disconnected"},
+		fsm.Transition{From: "querychars", Event: "create", To: "createchar", Action: "createchar"},
 	}
 
 	return transitions

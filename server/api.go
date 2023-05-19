@@ -47,6 +47,9 @@ func testPost(c *gin.Context) {
 
 	  var cmd BenchCommand
 	  cmd.Batch = 1
+
+	  fmt.Println("post bench command")
+	
 	  if err := c.BindJSON(&cmd); err != nil {
 		fmt.Println(err)
 		return
