@@ -21,6 +21,7 @@ type Server struct {
 	accountMgr *AccountManager
 	robotMgr *RobotManager
 	confMgr *JsonConfigManager
+	nameMgr *NameManager
 
 }
 
@@ -75,6 +76,9 @@ func (serv *Server) initManager() {
 	serv.robotMgr = newRobotManager(serv.cfg.Url)	
 	serv.confMgr  = newJsonConfigManager()
 	serv.confMgr.init("config")
+
+	serv.nameMgr = newNameManager()
+	serv.nameMgr.loadNameFiles()
 }
 
 func (serv *Server) Run() {
@@ -85,4 +89,8 @@ func (serv *Server) Run() {
 
 func (serv *Server) PostCommand(cmd iCommand) {
 	serv.driver.PostCommand(cmd)
+}
+
+func (serv *Server) getNameManager() *NameManager {
+	return serv.nameMgr
 }

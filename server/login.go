@@ -64,8 +64,10 @@ func (r *Robot) createChar() {
 		fmt.Println(err)
 		return
 	}
+
+	name := serv.getNameManager().randomGenName(conf.RoleSex)
 	
-	msg := msg.SerializeCSCharacterCreate(1005, r.account.name, int32(soulInt), false, avatars, 1)
+	msg := msg.SerializeCSCharacterCreate(1005, name, int32(soulInt), false, avatars, 1)
 	r.sendPacket(msg)
 }
 
