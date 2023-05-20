@@ -3,8 +3,6 @@ package core
 import (
 	"fmt"
 	"reflect"
-	"strconv"
-	"strings"
 )
 
 func SetField(obj interface{}, name string, value interface{}) error {
@@ -69,41 +67,5 @@ func GetType(v interface{}) string {
     }
 }
 
-func Str2Int(s string) (int, error) {
-	n, err := strconv.ParseInt(s, 10, 32)
-	if err != nil {
-		return -1, err
-	}
 
-	return int(n), nil
-}
 
-func Str2IntSlice(s string) ([]int, error) {
-	strSlice := strings.Split(s, ",")
-	intSlice := make([]int, len(strSlice))
-	for _, v := range strSlice {
-		n, err := Str2Int(v)
-		if err != nil {
-			return nil, err
-		}
-
-		intSlice = append(intSlice, int(n))
-	}
-
-	return intSlice, nil
-}
-
-func Str2Int32Slice(s string) ([]int32, error) {
-	strSlice := strings.Split(s, ",")
-	intSlice := make([]int32, len(strSlice))
-	for _, v := range strSlice {
-		n, err := Str2Int(v)
-		if err != nil {
-			return nil, err
-		}
-
-		intSlice = append(intSlice, int32(n))
-	}
-
-	return intSlice, nil
-}
