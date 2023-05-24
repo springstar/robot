@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"log"
 	"github.com/springstar/robot/core"
-	_ "github.com/springstar/robot/msg"
+	"github.com/springstar/robot/msg"
 	_ "github.com/gobwas/ws"
 )
 
@@ -46,11 +46,16 @@ func (r *Robot) loadModules() {
 
 }
 
-func (r *Robot) startup() {
-	r.Register(112, r)
-	r.Register(1004, r)
-	r.Register(1006, r)
+func (r *Robot) registerMsgHandler() {
+	r.Register(msg.MSG_SCLoginResult, r)
+	r.Register(msg.MSG_SCQueryCharactersResult, r)
+	r.Register(msg.MSG_SCCharacterCreateResult, r)
+	r.Register(msg.MSG_SCCharacterLoginResult, r)
 
+}
+
+func (r *Robot) startup() {
+	r.registerMsgHandler()
 	r.fsm.trigger("entry", "connect", r)
 }
 
@@ -132,12 +137,14 @@ func (r *Robot) mainLoop() {
 
 func (r *Robot) HandleMessage(packet *core.Packet) {
 	switch packet.Type {
-	case 112:
+	case msg.MSG_SCLoginResult:
 		r.handleLoginResult(packet)
-	case 1004:
+	case msg.MSG_SCQueryCharactersResult:
 		r.handleQueryCharacters(packet)
-	case 1006:
-		r.handleCreateResult(packet)	
+	case msg.MSG_SCCharacterCreateResult:
+		r.handleCreateResult(packet)
+	case msg.MSG_SCCharacterLoginResult:
+		r.handleCharacterLogin(packet)		
 	}
 }
 

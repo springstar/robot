@@ -11,13 +11,13 @@ import (
 
 func (r *Robot) sendLoginRequest() {
 	fmt.Println("send login")
-	packet := msg.SerializeCSLogin(111, r.account.name, "123456", "", 1001, 1)
+	packet := msg.SerializeCSLogin(msg.MSG_CSLogin, r.account.name, "123456", "", 1001, 1)
 	r.sendPacket(packet)
 }
 
 func (r *Robot) querychars() {
 	fmt.Println("query chars")
-	packet := msg.SerializeCSQueryCharacters(1003, 1)
+	packet := msg.SerializeCSQueryCharacters(msg.MSG_CSQueryCharacters, 1)
 	r.sendPacket(packet)
 }
 
@@ -67,7 +67,7 @@ func (r *Robot) createChar() {
 
 	name := serv.getNameManager().randomGenName(conf.RoleSex)
 	
-	msg := msg.SerializeCSCharacterCreate(1005, name, int32(soulInt), false, avatars, 1)
+	msg := msg.SerializeCSCharacterCreate(msg.MSG_CSCharacterCreate, name, int32(soulInt), false, avatars, 1)
 	r.sendPacket(msg)
 }
 
@@ -88,4 +88,8 @@ func (r *Robot)handleCreateResult(packet *core.Packet) {
 	}
 
 	fmt.Println("create ok")
+}
+
+func (r *Robot)handleCharacterLogin(packet *core.Packet) {
+	
 }
