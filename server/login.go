@@ -39,8 +39,16 @@ func (r *Robot) handleQueryCharacters(packet *core.Packet) {
 	if len(characters) == 0 {
 		r.fsm.trigger(r.fsm.state, "create", r)
 	} else {
-
+		idx := core.GenRandomInt(len(characters))
+		char := characters[idx]
+		r.onLoad(char)
+		r.fsm.trigger(r.fsm.state, "clogin", r)	
 	}
+}
+
+func (r *Robot) sendCharacterLogin() {
+	packet := msg.SerializeCSCharacterLogin(msg.MSG_CSCharacterLogin, r.humanId)
+	r.sendPacket(packet)	
 }
 
 func (r *Robot) createChar() {
@@ -66,6 +74,7 @@ func (r *Robot) createChar() {
 	}
 
 	name := serv.getNameManager().randomGenName(conf.RoleSex)
+	r.setName(name)
 	
 	msg := msg.SerializeCSCharacterCreate(msg.MSG_CSCharacterCreate, name, int32(soulInt), false, avatars, 1)
 	r.sendPacket(msg)
@@ -87,9 +96,19 @@ func (r *Robot)handleCreateResult(packet *core.Packet) {
 		return
 	}
 
+	r.onCreate(msg.GetHumanId(), msg.GetFashionSn())
+	r.fsm.trigger(r.fsm.state, "creatok", r)
 	fmt.Println("create ok")
 }
 
 func (r *Robot)handleCharacterLogin(packet *core.Packet) {
-	
+	msg := msg.ParseSCCharacterLoginResult(int32(packet.Type), packet.Data)
+	if msg.GetResultCode() == 0 {
+		fmt.Println("character login ok")
+		r.fsm.trigger(r.fsm.state, "cloginok", r)
+	} else {
+		fmt.Println("character login failed")
+		r.fsm.trigger(r.fsm.state, "cloginfail", r)
+
+	}
 }

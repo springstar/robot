@@ -13,6 +13,7 @@ import (
 
 type Robot struct {
 	core.IDispatcher
+	*Character
 	conn core.NetConnection
 	mgr *RobotManager
 	account *Account
@@ -26,6 +27,7 @@ type Robot struct {
 func newRobot(account *Account, robotMgr *RobotManager, fsm *RobotFsm) *Robot {
 	r := &Robot{
 		IDispatcher: core.NewMsgDispatcher(),
+		Character: newCharacter(),
 		mgr : robotMgr,
 		account : account,
 		fsm : fsm,
