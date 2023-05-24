@@ -112,3 +112,9 @@ func (r *Robot)handleCharacterLogin(packet *core.Packet) {
 
 	}
 }
+
+func (r *Robot)waitInitData() {
+	
+}
+
+
