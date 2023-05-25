@@ -53,6 +53,7 @@ func (r *Robot) registerMsgHandler() {
 	r.Register(msg.MSG_SCQueryCharactersResult, r)
 	r.Register(msg.MSG_SCCharacterCreateResult, r)
 	r.Register(msg.MSG_SCCharacterLoginResult, r)
+	r.Register(msg.MSG_SCInitData, r)
 
 }
 
@@ -73,6 +74,10 @@ func (r *Robot) doAction(action string) {
 		r.querychars()
 	case "createchar":
 		r.createChar()
+	case "sendCharacterLogin":
+		r.sendCharacterLogin()
+	case "waitForInit":
+		r.waitForInit()		
 	default:
 		fmt.Println(action)	
 	}
@@ -146,7 +151,9 @@ func (r *Robot) HandleMessage(packet *core.Packet) {
 	case msg.MSG_SCCharacterCreateResult:
 		r.handleCreateResult(packet)
 	case msg.MSG_SCCharacterLoginResult:
-		r.handleCharacterLogin(packet)		
+		r.handleCharacterLogin(packet)
+	case msg.MSG_SCInitData:
+		r.handleInitData(packet)			
 	}
 }
 

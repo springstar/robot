@@ -1,7 +1,6 @@
 package core
 
 import (
-	"fmt"
 	"bytes"
 )
 
@@ -29,7 +28,6 @@ func (b *PacketBuffer) Read() []*Packet {
 
 	for {
 		data := b.buf.Bytes()
-		fmt.Println(data)
 		len, _ := uint32FromBytes(data[0:4])
 		if b.buf.Len() < int(len) || len == 0 {
 			break

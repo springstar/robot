@@ -98,23 +98,25 @@ func (r *Robot)handleCreateResult(packet *core.Packet) {
 
 	r.onCreate(msg.GetHumanId(), msg.GetFashionSn())
 	r.fsm.trigger(r.fsm.state, "creatok", r)
-	fmt.Println("create ok")
+
 }
 
 func (r *Robot)handleCharacterLogin(packet *core.Packet) {
 	msg := msg.ParseSCCharacterLoginResult(int32(packet.Type), packet.Data)
 	if msg.GetResultCode() == 0 {
-		fmt.Println("character login ok")
 		r.fsm.trigger(r.fsm.state, "cloginok", r)
 	} else {
 		fmt.Println("character login failed")
 		r.fsm.trigger(r.fsm.state, "cloginfail", r)
-
 	}
 }
 
-func (r *Robot)waitInitData() {
-	
+func (r *Robot)waitForInit() {
+	fmt.Println("waitForInit")
+}
+
+func (r *Robot)handleInitData(packet *core.Packet) {
+	fmt.Println("recv init data")
 }
 
 

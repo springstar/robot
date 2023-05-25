@@ -22,9 +22,9 @@ func newNameManager() *NameManager {
 }
 
 func (m *NameManager) loadNameFiles() {
-	m.firstNames = m.loadNames("../config/names/firstName.txt")
-	m.female = m.loadNames("../config/names/firstNameFemale.txt")
-	m.male = m.loadNames("../config/names/firstNameMale.txt")
+	m.firstNames = m.loadNames("config/names/firstName.txt")
+	m.female = m.loadNames("config/names/firstNameFemale.txt")
+	m.male = m.loadNames("config/names/firstNameMale.txt")
 }
 
 func (m *NameManager) loadRunes(f string) {
