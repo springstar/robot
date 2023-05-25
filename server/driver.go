@@ -40,18 +40,19 @@ func (driver *RobotDriver) PostCommand(cmd iCommand) {
 
 func (driver *RobotDriver) process() {
 	for {
-		driver.ticker.Reset(SERVER_PULSE)
 		select {
 		case cmd := <- driver.cq:
 			driver.exec(cmd)
-		case <- time.Tick(SERVER_PULSE):
+		case <- driver.ticker.C:
 			driver.pulse()
+			driver.ticker.Reset(SERVER_PULSE)
+
 		}	
 	}	
 }
 
 func (driver *RobotDriver) pulse() {
-	
+
 }
 
 func (driver *RobotDriver) exec(cmd iCommand) {

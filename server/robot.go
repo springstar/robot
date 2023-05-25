@@ -6,6 +6,7 @@ import (
 	_ "net"
 	"fmt"
 	"log"
+	"time"
 	"github.com/springstar/robot/core"
 	"github.com/springstar/robot/msg"
 	_ "github.com/gobwas/ws"
@@ -21,6 +22,7 @@ type Robot struct {
 	packetQ chan []*core.Packet
 	buffer *core.PacketBuffer
 	moduleMgr *ModuleManager
+	ticker *time.Ticker
 
 }
 
@@ -34,7 +36,6 @@ func newRobot(account *Account, robotMgr *RobotManager, fsm *RobotFsm) *Robot {
 		packetQ : make(chan []*core.Packet),
 		buffer : core.NewBuffer(),
 		moduleMgr : newModuleManager(),
-
 	}
 
 	if (r.account != nil) {
@@ -96,6 +97,7 @@ func (r *Robot) connect() {
 }
 
 func (r *Robot) on_connection_established() {
+	fmt.Println("connection established")
 	go r.startWork()
 	go r.mainLoop()
 }
@@ -133,11 +135,21 @@ func (r *Robot) dispatch(packets []*core.Packet) {
 	}
 }
 
+func (r *Robot) sendPulse() {
+	packet := msg.SerializeCSPing(msg.MSG_CSPing)
+	r.sendPacket(packet)
+}
+
 func (r *Robot) mainLoop() {
+	r.ticker = time.NewTicker(ROBOT_PULSE)
 	for {
 		select {
-		case packets := <- r.packetQ:
-			r.dispatch(packets)	
+			case packets := <- r.packetQ:
+				r.dispatch(packets)	
+			case <- r.ticker.C:	
+				r.sendPulse()
+				r.ticker.Reset(ROBOT_PULSE)
+			default:
 		}
 	}
 }
