@@ -56,6 +56,7 @@ func (r *Robot) registerMsgHandler() {
 	r.Register(msg.MSG_SCCharacterLoginResult, r)
 	r.Register(msg.MSG_SCInitData, r)
 	r.Register(msg.MSG_SCStageEnterResult, r)
+	r.Register(msg.MSG_SCStageSwitch, r)
 
 }
 
@@ -158,18 +159,26 @@ func (r *Robot) mainLoop() {
 
 func (r *Robot) HandleMessage(packet *core.Packet) {
 	switch packet.Type {
-	case msg.MSG_SCLoginResult:
-		r.handleLoginResult(packet)
-	case msg.MSG_SCQueryCharactersResult:
-		r.handleQueryCharacters(packet)
-	case msg.MSG_SCCharacterCreateResult:
-		r.handleCreateResult(packet)
-	case msg.MSG_SCCharacterLoginResult:
-		r.handleCharacterLogin(packet)
-	case msg.MSG_SCInitData:
-		r.handleInitData(packet)	
-	case msg.MSG_SCStageEnterResult:
-		r.handleEnterStage(packet)			
+		case msg.MSG_SCLoginResult:
+			r.handleLoginResult(packet)
+		case msg.MSG_SCQueryCharactersResult:
+			r.handleQueryCharacters(packet)
+		case msg.MSG_SCCharacterCreateResult:
+			r.handleCreateResult(packet)
+		case msg.MSG_SCCharacterLoginResult:
+			r.handleCharacterLogin(packet)
+		case msg.MSG_SCInitData:
+			r.handleInitData(packet)	
+		case msg.MSG_SCStageEnterResult:
+			r.handleEnterStage(packet)	
+		case msg.MSG_SCStageSwitch:
+			r.handleSwitchStage(packet)
+		case msg.MSG_SCStageObjectAppear:
+			r.handleObjAppear(packet)				
+		case msg.MSG_SCStageObjectDisappear:
+			r.handleObjDisappear(packet)	
+		default:
+			fmt.Println("recv packet type ", packet.Type)	
 	}
 }
 
