@@ -42,6 +42,7 @@ func defaultTransitions() []fsm.Transition {
 		fsm.Transition{From: "creatok", Event: "cloginfail", To: "disconnected", Action: "disconnected"},
 		fsm.Transition{From: "clogin", Event: "cloginok", To: "waitinit", Action: "waitForInit"},
 		fsm.Transition{From: "creatok", Event: "cloginok", To: "waitinit", Action: "waitForInit"},
+		fsm.Transition{From: "waitinit", Event: "initok", To: "enterstage", Action: "enterStage"},
 	}
 
 	return transitions

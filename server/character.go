@@ -15,6 +15,9 @@ type Character struct {
 	fashionSn int32
 	roleSn int32
 	soul int32
+	curHp int64
+	curMp int32
+	curExp int64
 }
 
 func newCharacter() *Character {
@@ -42,5 +45,11 @@ func (c *Character) onLoad(d *pb.DCharacter) {
 	c.roleSn = d.GetRoleSn()
 	c.soul = d.GetSoul()
 	c.sex = d.GetSex()
+}
 
+func (c *Character) onInit(d *pb.DHuman) {
+	c.curHp = d.HpCur
+	c.curMp = d.MpCur
+	c.curExp = d.ExpCur
+	c.combat = d.Combat
 }

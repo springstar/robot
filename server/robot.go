@@ -55,6 +55,7 @@ func (r *Robot) registerMsgHandler() {
 	r.Register(msg.MSG_SCCharacterCreateResult, r)
 	r.Register(msg.MSG_SCCharacterLoginResult, r)
 	r.Register(msg.MSG_SCInitData, r)
+	r.Register(msg.MSG_SCStageEnterResult, r)
 
 }
 
@@ -78,7 +79,9 @@ func (r *Robot) doAction(action string) {
 	case "sendCharacterLogin":
 		r.sendCharacterLogin()
 	case "waitForInit":
-		r.waitForInit()		
+		r.waitForInit()
+	case "enterStage":
+		r.enterStage()
 	default:
 		fmt.Println(action)	
 	}
@@ -149,7 +152,6 @@ func (r *Robot) mainLoop() {
 			case <- r.ticker.C:	
 				r.sendPulse()
 				r.ticker.Reset(ROBOT_PULSE)
-			default:
 		}
 	}
 }
@@ -165,7 +167,9 @@ func (r *Robot) HandleMessage(packet *core.Packet) {
 	case msg.MSG_SCCharacterLoginResult:
 		r.handleCharacterLogin(packet)
 	case msg.MSG_SCInitData:
-		r.handleInitData(packet)			
+		r.handleInitData(packet)	
+	case msg.MSG_SCStageEnterResult:
+		r.handleEnterStage(packet)			
 	}
 }
 
