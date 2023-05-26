@@ -1,0 +1,21 @@
+syntax = "proto3";
+package message;
+
+option go_package=".;pb";
+
+import "msg/protocol/options.proto";
+import "msg/protocol/common.proto";
+
+//客户端已准备好 进入地图
+message CSStageEnter {
+	option (msgid) = 1201;
+}
+
+//进入地图 返回结果
+message SCStageEnterResult {
+	option (msgid) = 1202;
+	repeated DStageObject obj = 1;
+	bool isShowBossNPC = 2;//是否显示世界boss的NPC
+	//repeated DStageArea areaobj = 3;//区域信息
+	bool isBridge = 3;//是否跨服，true跨服
+}

@@ -1,0 +1,67 @@
+syntax = "proto3";
+package message;
+
+option go_package=".;pb";
+
+import "msg/protocol/options.proto";
+import "msg/protocol/common.proto";
+
+message CSLogin {
+    option (msgid) = 111;
+    string account = 1;        //用户名
+    string password = 2;       //密码
+    string token = 3;          //token
+    int32 serverId = 4;        //服务器id
+    int32 version = 5;         //版本id
+}
+
+message SCLoginResult {
+	option (msgid) = 112;
+	int32 resultCode = 1;		//错误编号
+	string resultReason = 2;	//错误原因
+	bool keyActivate = 3;		//是否激活码
+	bool isServerFull = 4;		//是否是服务期人满了
+	int32 showGiftCode = 5;	//0不显示，1是显示 礼包码
+	int32 showService = 6;		//0不显示，1是显示 联系客服
+	int32 showGm = 7;			//0不显示，1是显示 Gm命令
+}
+
+message CSQueryCharacters {
+	option (msgid) = 1003;
+
+	int32 serverId = 1;    // 服务器id
+}
+
+message SCQueryCharactersResult {
+	option (msgid) = 1004;
+	repeated DCharacter characters = 1;		//角色列表集合 支持多角色
+}
+
+message CSCharacterCreate {
+	option (msgid) = 1005;
+	string name = 1;				//昵称
+	int32 roleSn = 2;				//形象sn
+	bool ptest = 5;                //压力测试账号(压力测试账号不进行初始副本)
+	repeated int32 fashionSn = 6;		//时装sn
+	int32 serverId = 7;       // 服务器id
+
+}
+
+message SCCharacterCreateResult {
+	option (msgid) = 1006;
+	int32 resultCode = 1;
+	int64 humanId = 2;
+	string resultReason = 3;
+	int32 fashionSn = 4;
+
+}
+
+message CSCharacterLogin {
+    option (msgid) = 1009;
+    int64 humanId = 1;
+}
+
+message SCCharacterLoginResult {
+    option (msgid) = 1010;
+    int32 resultCode = 1;
+}

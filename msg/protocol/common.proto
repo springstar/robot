@@ -3,6 +3,779 @@ package message;
 
 option go_package=".;pb";
 
-message Player {
-    string name =1;
+import "msg/protocol/options.proto";
+
+//2D坐标信息
+message DVector2 {
+	 float x = 1;				//横坐标
+	 float y = 2;				//纵坐标
+}
+//3D坐标信息
+message DVector3 {
+	 float x = 1;				//X坐标
+	 float y = 2;				//Y坐标
+	 float z = 3;				//Z坐标
+}
+
+message DCharacter {
+	int64 id = 1;				//角色ID
+	string sn = 2;
+	string name = 3;			//昵称
+	int32 profession = 4;		//职业
+	int32 level = 5;			//等级
+	int32 sex = 6;				//性别
+	int32 combat = 7;          //总战斗力
+	repeated int32 equip = 8;           //身上的装备
+	// bool dftSelected = 9;      //默认选择
+	int32 fashionSn = 10;           //身上的时装
+	int32 roleSn = 11;				//体型sn
+	int32 soul = 12;				//武魂
+	// string avaTar = 13;	//形象
+	int64 deleteTime = 14;//倒计时结束时间 0不删除 》0 删除倒计时
+	int32 soulBoneSultShow = 15;		//魂骨外显
+}
+
+//武魂类型
+enum ESoulType{
+    A = 0;//A武魂
+    B = 1;//B武魂
+}
+
+//属性信息
+message DProp {
+	 int32	phy=1	;//体质
+     int32	str=2	;//力量
+     int32	agi=3	;//敏捷
+     int32	wis=4	;//智力
+     int64	hpMax=5	;//生命值上限
+     int32	atkPhy=6	;//物理攻击
+     int32	atkMag=7	;//魔法攻击
+     int32	defPhy=8	;//物理防御
+     int32	defMag=9	;//魔法防御
+     int32	hit=10	;//命中
+     int32	dodge=11	;//闪避
+     int32	crit=12	;//暴击
+     int32	tough=13	;//坚韧
+     int32	crack=14	;//破击
+     int32	block=15	;//格挡
+     int32	speed=16	;//移动速度
+     int32	critAdd=17	;//暴击增伤
+     int32	critDec=18	;//暴击减伤
+     int32	blockAdd=19	;//格挡增伤
+     int32	blockDec=20	;//格挡减伤
+     int32	phyPct=21	;//体质百分比
+     int32	strPct=22	;//力量百分比
+     int32	agiPct=23	;//敏捷百分比
+     int32	wisPct=24	;//智力百分比
+     int32	hpMaxPct=25	;//生命值上限百分比
+     int32	atkPhyPct=26	;//物理攻击百分比
+     int32	atkMagPct=27	;//魔法攻击百分比
+     int32	defPhyPct=28	;//物理防御百分比
+     int32	defMagPct=29	;//魔法防御百分比
+     int32	hitPct=30	;//命中百分比
+     int32	dodgePct=31	;//闪避百分比
+     int32	critPct=32	;//暴击百分比
+     int32	toughPct=33	;//坚韧百分比
+     int32	crackPct=34	;//破击百分比
+     int32	blockPct=35	;//格挡百分比
+     int32	speedPct=36	;//移动速度百分比
+     int32	critAddPct=37	;//暴击增伤百分比
+     int32	critDecPct=38	;//暴击减伤百分比
+     int32	blockAddPct=39	;//格挡增伤百分比
+     int32	blockDecPct=40	;//格挡减伤百分比
+     int32	suck=41	;//吸血
+     int32	suckPct=42	;//吸血百分比
+     int32	suckRatio=43	;//吸血比率
+     int32	atkElm1=44	;//火攻
+     int32	defElm1=45	;//火抗性
+     int32	atkElm2=46	;//水攻
+     int32	defElm2=47	;//水抗性
+     int32	atkElm3=48	;//土攻
+     int32	defElm3=49	;//土抗性
+     int32	atkElm4=50	;//风攻
+     int32	defElm4=51	;//风抗性
+     int32	atkElm5=52	;//雷攻
+     int32	defElm5=53	;//雷抗性
+     int32	cure=54	;//治疗效果
+     int32	becure=55	;//被治疗效果
+//2020-5-7添加(策划:徐辉耀)
+	 int32	atkElm1Pct=56	;//火攻击百分比
+     int32	defElm1Pct=57	;//火抗性百分比
+     int32	atkElm2Pct=58	;//水攻击百分比
+     int32	defElm2Pct=59	;//水抗性百分比
+     int32	atkElm3Pct=60	;//土攻击百分比
+     int32	defElm3Pct=61	;//土抗性百分比
+     int32	atkElm4Pct=62	;//风攻击百分比
+     int32	defElm4Pct=63	;//风抗性百分比
+     int32	atkElm5Pct=64	;//雷攻击百分比
+     int32	defElm5Pct=65	;//雷抗性百分比
+     int32	dmgAdd=66;//伤害增加
+     int32	dmgDec=67;//伤害降低
+     int32	dmgAddPvP=68;//对玩家增伤
+     int32	dmgDecPvP=69;//受玩家减伤
+     int32	dmgAddPvE=70	;//对怪物增伤
+	 int32	dmgDecPvE=71	;//受怪物减伤
+//2021-1-23添加(策划:徐辉耀)
+	 int32 slowAdd=72 ;//减速强化
+	 int32 slowDec=73 ;//减速抗性
+	 int32 coilAdd=74 ;//定身强化
+	 int32 coilDec=75 ;//定身抗性
+	 int32 silenceAdd=76 ;//沉默强化
+	 int32 silenceDec=77 ;//沉默抗性
+	 int32 stunAdd=78 ;//眩晕强化
+	 int32 stunDec=79 ;//眩晕抗性
+	 int32 repelAdd=80 ;//击退强化
+	 int32 repelDec=81 ;//击退抗性
+	 int32 nocureAdd=82 ;//禁疗强化
+	 int32 nocureDec=83 ;//禁疗抗性
+	 int32 bloodAdd=84 ;//流血强化
+	 int32 bloodDec=85 ;//流血抗性
+	 int32 atkElm6=86;//金攻
+     int32 defElm6=87;//金抗性
+}
+
+//Buff状态的具体内容
+message DBuffProp {
+	string buffKey = 1;	//Buff的内容
+	double buffValue = 2;	//Buff的作用时间
+}
+
+//Buff基本信息
+message DBuff {
+	 int32 sn = 1;			//Buff sn
+	 int32 timeLeft = 2;		//剩余时间
+	repeated DBuffProp buffProp = 3;	//Buff的具体内容
+	 int32 plus = 4;		//buff层数
+     string firemsg = 5;      //释放者信息
+	 int32 buffExtTime  = 6;//持续时间
+}
+
+//装备位镶嵌宝石信息
+message DParts {
+	 int32 sn = 1; // 装备位编号
+	 int32 qhLv = 2; // 强化等级（精炼）
+	 int32 cxPhase = 3; // 铭刻阶段
+	 int32 cxLv = 4; //  铭刻等级
+	 int32 equipSn = 5; // 装备SN或0
+	repeated int32 gemSns = 6; // 三个宝石SN 未镶的补0
+	 int32 combat = 7; // 装备战斗力
+	 string extend = 8; // 装备扩展信息
+}
+
+// 激活的魂环信息
+message DActiveSoulRingDetail {
+	 int32 sn = 1;			// 魂环sn
+	 int32 years = 2;		// 年限
+	 int32 rarePrefix = 3;  // 稀有前缀
+	 int32 slot = 4;        // 所在装备位，-1则未装备
+	 int32 change = 5;      // 魂环变化标记，见ERingChange
+	 int32 ringGiftSn = 6;  //魂环对应的魂环礼包sn
+	 int32 soulRingGroupId = 7; //魂环对应组别
+	 bool isVariation = 8;//是否是变异武魂魂环
+	 int32 soulVariationSn = 9;//对应变异武魂节点Sn
+
+}
+
+enum EPkType {
+	PK_PEACE = 0; // 和平模式
+	PK_GUILD = 1; // 公会,帮派模式
+	PK_JUSTICE = 2; // 善恶pk,正义pk
+	PK_FREE = 3; // 自由Pk
+}
+
+message DSoulBoneGroup{
+	 int32 group = 1;
+	repeated int64 equipId = 2;
+	 string name = 3;
+}
+
+message DSoulBonePosLv{
+	 int32 pos = 1;
+	 int32 lv = 2;
+	 int32 count = 3;
+}
+
+message DSoulBone{
+	 int32 useGroup = 1;				//组0.1.2
+	repeated DSoulBoneGroup soulBoneGroup = 2; //魂骨
+	repeated DSoulBonePosLv posLv = 3;			//槽位与等级
+	 int32 autoDecomposeQty = 4;		//自动分解X以下的魂骨
+	 int32 showSuitSn = 5;				//外显的魂骨SN
+}
+
+//满足需求的累充金额和对应时间信息
+message DNeedPayInfo{
+	 int32 needPay = 1;// 需要累充的金额
+	 int64 time = 2;// 达到条件的时候时间
+}
+
+message DProduce {
+	 int32 sn = 1;			
+	 int32 num = 2;		//数量
+}
+
+// 货币类型对应值
+message DCurrency {
+	 int32 currencySn = 1;	//货币sn
+	 int64 value = 2;		//货币值
+}
+
+message DHuman {
+	 int64 id = 1;		//角色ID
+	 DProp prop = 2;		//属性
+	 string name = 3;		//昵称
+	 int32 profession = 4;		//职业
+	 int32 level = 5;		//等级
+	 int32 sex = 6;		//性别
+	 int64 hpCur = 7;		//当前生命
+	 int32 mpCur		= 8;		//当前法力
+	 int64 hpMax		= 9;		//当前最大生命
+	 int32 mpMax		= 10;		//当前法力
+	 int64 actValue		= 11;		//当前活力
+	 int64 actValueMax	= 12;	//总活力
+	 int32 combat		= 15;		//总战斗力
+	 int64 expCur		= 16;		//当前经验
+	 string modelSn = 17;			//模型Sn
+	 string sn = 18;				//配置SN
+	 string propJson		= 19;		//属性map 的json
+	 bool canMove		= 20;		//是否可以移动
+	 bool canCastSkill      = 21;	//是否可以施法
+	 bool canAttack		= 22;		//是否可以有各种动作
+	 int64 teamBundleID		= 23;	//老大和小弟一起群体标号
+	repeated int64 generalList = 24; 		//小弟的集合
+     int32 vipLevel = 25;		        //VIP等级
+	repeated int32 titleSn		= 27;			//称号
+	repeated DBuff buffs = 28;
+	 string sign = 29;		//个性签名
+
+	
+
+	// old
+	repeated int64 virtualGoods		= 30;	//虚拟品
+	 int32 fightPower	= 33;	//战斗力
+	 int32 rebirthGold	= 34;	//元宝复活所需元宝数量
+	repeated DParts parts		= 35;	//装备位
+    repeated int32 propShopLimitCounts = 36;//道具商店剩余限制次数
+    repeated int32 otherLimitCounts	= 37;	//其它功能剩余限制次数
+     int64 nextRefreshShopTime = 38;  //下次刷新黑市时间
+	// end
+	
+	
+	 int64 factionId		= 39;			//帮派ID
+	 string factionName		= 40;			//帮派名称
+	 int32 lockContribution = 41;			//帮派锁定的贡献值
+	 int64 lockContributionTime = 42;		//帮派锁定的贡献值倒计时开始时间
+     int64 dailyLiveness = 43;              //活跃度
+	 string guestJson	= 44;				//新手引导JSON
+	 int32 practiceValue = 45;				//技能修炼值
+	 int32 campPosition = 46;				//阵营职位
+	 int64 factionShowId =47;				//帮派显示ID
+	 int32 contribution = 48;				//帮派贡献
+     int32 actBuyCount = 49;				//体力购买次数
+	 int32 campPrestige = 50;				//阵营声望
+	 int32 treasureValue = 51;				//宝藏醉酒值
+	 int64 showId = 52;						//玩家的显示id
+	 int32 factionPosition = 53;			//帮派职务
+	 int32 fashionExp = 54;                   //时装总魅力
+	repeated int32 fashionSn = 55;					//时装
+	 int64 chargeGold = 56;					//累计充值
+     int32 questCampRefreshCount = 57;		//阵营任务刷新次数
+     int32 questCampGroupCount = 58;		//阵营任务组次数
+     int32 questCampCount = 59;				//阵营任务次数
+    
+
+	 int32 soul = 60;				//武魂
+	repeated DActiveSoulRingDetail rings = 61;    // 魂环图鉴
+	// string avaTar = 62;				//形象
+	 int32 masterSn = 63;           // 魂师头衔
+	 int32 soulLvSn = 64;           // 武魂等阶
+	 int32 soulPtSn = 65;           // 武魂点数
+
+	 EPkType pkmode = 66;	//pk模式
+	 int32 evilpoint = 67;			//恶人值
+	 int32 autoDecomposeQty = 68;  //自动分解装备品质值
+ 
+	 int32 assistGroup = 70; // 当前助战伙伴组
+	 int32 plotInstancePass = 71;//剧情副本通关次数
+ 
+	 int64 createTime = 73;	// 创建时间
+	 DSoulBone soulBone = 74;//魂骨
+ 
+	 int64 leaveFactionTime = 76;   //主动退出帮派的时间
+	 string greetings = 77;   // 帮派迎新设置欢迎语
+	 bool isGreetRandom = 78; // 迎新给钱是否随机
+	 int32 greetMaxNum = 79;  // 迎新设置最大值
+	 int32 greetNum = 80;    // 迎新设置给予金钱
+	 int32 restDonateNum = 90; // 帮派剩余捐献次数
+	 int32 shelfNum = 91;//寄售数量
+	 int32 autoDecomposeSoulBoneQty = 92;//自动分解魂骨品质
+	repeated int32 finishQuest = 93;//已完成的任务
+	 int32 automaticSoulRin = 94;//是否自动吸收魂环礼包 默认0不使用，1使用
+	 int32 medalCoin = 97; //勋章币 MEDALCOIN 
+	 int32 uniqueSkillExp = 99;//绝学经验
+	 int64 firstPayTime = 100;//首充时间
+	repeated DNeedPayInfo dNeedPayInfo = 101; // 满足需求的累充金额和对应时间信息
+	 int32 headFrame = 102;//头像框 
+	 int64 lastWorshipTime = 104; //上一次膜拜时间，默认为0
+
+	repeated int32 rewardModSn = 105;//功能预告领取的奖励
+	 int32 soulGroupId = 106;//魂环组别
+ 
+	 int64 chargeGoldSpecial = 108;					//累计充值（特殊）
+	repeated int32 fightReward = 110;//变强奖励 
+	repeated DProduce floorProduce = 117;// 所有保底掉落的次数,用DProduce是不想加新协议
+
+	repeated DCurrency dCurrency = 119;
+}
+
+//地图信息
+message DInitDataStage {
+	 int64 id = 1;				//地图真实ID
+	 int32 sn = 2;				//地图配置SN
+	 int32 instanceSn = 3;		//副本Sn（如果是副本，会有此属性）
+	 int32 lineNum = 4;			//分线号 默认为1
+	 DVector2 posNow = 5;		//初始坐标
+	 DVector2 dirNow = 6;       //初始朝向
+	
+}
+
+//技能信息
+message DSkill {
+	 int32 skillSn = 1;			//技能sn
+	 int32 skillLevel = 2;		//技能等级
+	 int32 position = 3;		//技能位置
+	 int64 nextRealse = 4;		//下次可以释放的时间
+	
+}
+
+//物品
+message DItem {
+	 int32 code = 1; //物品code
+	 int32 num = 2;  //数量
+	 int32 bind = 3; //绑定状态：0非绑定，1绑定
+	 int64 etime = 4; //有效截止时间
+	 int32 pos = 5; // 当关心其位置时（背包、装备位），这个赋值其位置
+	 bool isNew = 6; //是否是新
+	 int32 combat = 7; // 装备战斗力
+	 int64 recovCd = 8;    //物品恢复cd
+	 string extend = 9; //  扩展信息
+	 int32 ascend = 10;//阶级
+	 int64 id =11;
+	 int32 ringGiftSn = 12;//武魂来源
+	 bool frozen = 13; //是否冻结，处于冻结状态则禁止交易
+	 int64 recycleTime = 14; //道具回收时间
+	 int32 soulRealQuality = 15;//魂珠品质
+	 int32 soulRealPower = 16;//魂珠耐久度
+}
+
+
+//背包数据
+message DBag {
+	 int32 capacity = 1;  //背包容量
+	repeated DItem items = 2; //物品信息
+	 int32 pType = 3; // 所在背包 
+	 int32 buyBagNum = 4; // 解锁格子数 
+}
+
+message DTask {
+	 int32 code = 1;        //数据id  
+	 int32 state = 2;       //当前状态
+	 int32 value = 3;       //完成进度
+}
+
+//单个虚拟品
+message DVirtual {
+	 int32 type = 1; //类型
+	 int64 num = 2;  //数量
+}
+
+//邮件数据
+message DMail {
+	 int64 sender = 1;       //发送者
+	 string title = 2;        //标题
+	 string content = 3;      //内容
+	 int64  sendTime = 4;     //发送时间
+	 int64  spanTime = 5;     //距离有效截止时间的时间间隔
+	 int32  read = 6;         //是否已读（0：未读，1：已读）
+	repeated DVirtual virtuals = 7;   //虚拟品奖励
+	repeated DItem items = 8;	  //物品奖励
+	 int64 id = 9;            //邮件id
+	 int64 mailSn = 10;   //邮件sn
+}
+
+//宝藏
+message DTreasure {
+	 int32 type = 1; //1初级2中级3高级
+	 int32 dailyFree = 2; //今日免费抽了几次
+	 int32 bonusProc = 3; //买n赠1买到几了
+	 int32 toHiden = 4; //还有几次必出牛逼物品
+	 int64 cd = 5; //时间
+	repeated int32 hotItems = 6; //热点物品ID
+	 int32 batchCost = 7; //抽10次的消耗
+	 float batchSale = 8; //折扣
+}
+
+//黑市商品
+message DBlackGoods {
+	 int32 code = 1; //商品ID
+ bool canBuy = 2; //是否可购买
+}
+
+//月签到
+message DSignIn {
+	 int32 month = 1; //月份
+ int32 days = 2; //累计天数
+ int32 state = 3; //今天领取状态0-未领取,1-领取基础,2-领取了vip
+}
+
+//个人设定
+message DSetting{
+	 int32 hpPercent = 1;
+	 int32 mpPercent = 2;
+	 int32 fightRange = 3;
+	 bool autoFire = 4; //自动反击
+	 bool autoRevive = 5; //自动复活
+	 int64 remainTime = 6; //剩余时间 秒
+	 bool autoTeamTurn = 7; 	//组队自动翻
+	 bool autoTeamRevive = 8; //组队自动复活
+	 bool drugOrder = 9; //使用药的顺序（true为高到低，false低到高）
+ }
+
+ //阵营信息
+message DCampInfo{
+	 int64 humanId = 1;
+	 string humanName = 2;
+	 int32 humanLevel = 3;
+	 int32 campType = 4;//阵营类型
+	 int32 totalPrestige = 5;//所有等级累计的经验和
+	 int32 currPrestige = 6;//当前等级累计的声望
+	 int32 nextPrestige = 7;//升级需要的声望
+	 int32 rank = 8;//排名
+	 int32 positionSn = 9;//官职sn
+	 bool isLeader = 10;//是否是领袖
+	
+}
+
+//任务数据
+message DQuest{
+	 int32 sn = 1;        //任务id 
+	 int32 targetProgress = 2;    //目标进度
+	 int32 nowProgress = 3;       //当前进度
+	 int32 status = 4;            //状态
+    repeated int32 awards = 5;            //奖励
+     int64 updateTime = 6;        //更新时间
+     int32 star = 7;              //星级
+	 int32 group = 8;        	//任务组
+	 int32 type = 9;			//任务类型
+	 string param = 10;         //扩展字段
+	 bool cycleQuest = 11;		//是否跑环任务
+}
+
+//快捷栏药水数据
+message ShortcutPotion {
+	 int32 pid = 1;   //槽位id
+	 int32 sn = 2;    //药品sn
+}
+
+// 问卷类型
+enum ECollegeQuestionType {
+	QUESTION_TYPE_NONE = 0;			// 无问卷
+	QUESTION_TYPE_APPRENTICE = 1;	// 学徒问卷
+	QUESTION_TYPE_MASTER = 2;	// 师父问卷
+}
+
+// 学院调查问题
+message DCollegeQuestion {
+	 int32 questionSn = 1;		// 问题
+	 int32 answer = 2;			// 回答
+}
+
+message SCInitData {
+	option (msgid) = 1101;
+	DHuman human = 1;				//玩家基本信息
+	DInitDataStage stage = 2;		//地图信息
+	DSkill skill = 3;				//技能面板信息
+	DSkill skillB = 15;				//技能面板信息
+	ESoulType sourType = 16;			//武魂类型
+	// old
+	DBag dBag = 4;					//1道具包、2碎片包
+	DBag altar = 5;				//灵魂祭坛装备
+	DTask tasks = 6;				//所有已接和可接任务
+	int32 excuteTaskCode = 7;		//上次客户端正在执行的任务code
+	DMail mails = 8;				//邮件
+	repeated DTreasure treasures = 9;		//宝藏信息
+    repeated DBlackGoods blackGoods = 10;	//黑市商品
+	DSignIn signIn = 11;			//月签到
+	DSetting setting = 12;         //战斗设定
+	// end
+	
+	DCampInfo campInfo = 13;	    //阵营信息
+    repeated DQuest questInfo = 14;	        //任务信息
+    int64 shortcuts  = 17;         //技能快捷栏信息，按位存储栏位开启/关闭状态，0为关闭，1为开启
+	repeated ShortcutPotion scpotion = 18;  //快捷栏药水信息
+	repeated int32 skillSlot = 19;	        //已经解锁的技能槽位
+
+	ECollegeQuestionType eCollegeQuestionType = 20;// 师徒问卷类型
+	repeated DCollegeQuestion collegeQuestion = 21;			// 师徒问卷功能问题
+	int64 startServerTime  = 22;	//服务器开服时间
+}
+
+//地图单位类型
+enum EWorldObjectType {
+	HUMAN = 0;		//玩家
+	MONSTER = 1;	//怪物 
+	DROP = 2;		//掉落物 
+	DOT = 3;		//持续伤害 
+	BULLET = 4;		//持续伤害 d
+	NPC = 5;		//游戏角色
+	PICK = 6;		//可采集物
+	TRIGGER = 7;	//机关
+	COMMON = 8;		//除上面外的其他地图单元
+	PARTNER = 9; 	//伙伴信息
+	COMPETE = 10; 	//竞技场信息
+	SROLE = 11; 	//创选角色对象
+	HERO = 12;		//玩家自己
+	ZOMBIE = 13;	//僵尸
+	CAMPLEADER = 14;	//阵营领袖
+	AREA = 15;//区域
+}
+
+enum ESideLine{
+	UnSet = 0;
+	FisherMan = 1;//渔夫
+	Farmer = 2;//农夫
+	Carpentry = 3;//木工
+	Blacksmith = 4;//铁匠
+}
+
+//地图单位信息（被其他玩家看到） 玩家
+message DStageHuman {
+	 int32 level		= 1;	//等级
+	 int64 hpCur		= 2;	//血量
+	 int64 hpMax		= 3;	//最大血量
+	 int32 speed		= 4;	//速度
+	 bool inFighting	= 5;			//是否在战斗状态
+	repeated int32 titleSn		= 6;			//称号
+	 int32 rage		= 7;				//怒气
+	repeated DBuff buffs = 8;					//玩家身上当前所有的buff
+	repeated int32  fashionSn = 9;		//时装
+	 ESoulType soulType = 10;	//武魂类型
+	 int32 soul = 11;	//武魂
+	// string avaTar = 12;		//形象Avata
+	 int32 soulBoneSuitShow = 12;	//魂骨外显SN 如果没有显示0
+	 int32 masterSn = 13;       //魂师头衔
+	 EPkType pkmode = 14;			//pk状态
+	 int32 evilpoint = 15;			//恶人值
+	 ESideLine sideline = 16;		//副职业
+	 int32 sidelineLv = 17;			//副职业等级
+	 bool mountsStatus = 18;	//坐骑状态 坐骑上或下
+	 string factionName = 19;   // 宗门名称
+	 string factionPosition = 20; // 宗门职位
+	 int32 factionTag = 21;//宗门类型
+	 int32 headFrame = 22;//头像框
+	 int64 factionId = 23;//宗门id
+	 int32 rageMax = 24;// 怒气最大值
+	 string soulTitle = 25;//自定义头衔
+	 string cpName = 26;// cp结婚名字
+}
+
+//地图单位信息（被玩家看到） 怪物
+message DStageMonster {
+	 int64 hpCur = 1;			//当前血量
+	 int64 hpMax = 2;			//最大血量
+	 int32 speed = 3;			//速度
+	 string sn = 4;			//配置SN
+	 int32 stageObjectSn = 5;	//场景配置SN
+	 int32 rage = 6;			//怒气	
+	repeated DBuff buffs = 7;					//当前所有的buff
+	 int64 attachId = 8;		//附着在谁身上
+
+}
+
+//地图单位信息（被玩家看到） 掉落物
+message DStageDrop {
+	 string type = 1;			//掉落物 item物品 coin金币
+	 int32 itemSn = 2;			//物品SN
+	 int32 num = 3;				//数量
+	 int64 humanId = 4;			//该物品的归属者
+	 int32 protectTime = 5;			//保护时间（秒） 在这期间只有本人才能拾取
+	 int32 bind = 6;			//是否绑定
+	 int64 monsterId = 7;			//哪个怪物掉的
+}
+
+//地图单位信息（被玩家看到） 采集物
+message DStagePick {
+	 string sn = 1;             //sn
+	 int32 stageObjectSn = 2;	//场景配置SN
+	 bool canGather = 3;            //是否可以采集
+	 int32 gatherCount = 4;           //已经采集的次数
+}
+
+// NPC类型
+enum ENpcType
+{
+	Npc_Normal = 0;
+	Npc_Area = 1;
+	Npc_Lens = 2;
+	Npc_Statue = 3;  //雕像
+	Npc_tomb = 4;   //墓碑
+}
+
+//区域类型
+enum EAreaType {
+	UNDEFINED = 0;		//未定义
+	NORMAL = 1;			//普通区域
+	TRANSPORT = 2;		//传送区域
+	SAFETY = 3;			//安全区域
+}
+
+// NPC状态
+enum ECharacterStatus
+{
+	NoneType = 0;				//无
+	Blocked = 1;			//阻挡
+	Unblocked = 2;			//允许通过
+}
+
+//地图单位信息（被玩家看到） NPC
+message DStageNPC {
+	 int32 npcSn = 1;   				//sn
+	 DVector2 position = 2;   			//位置
+	 DVector2 rotation = 3;   			//旋转
+	 string characterModelSn = 4;		//怪物模型的Sn
+	 ENpcType type = 5;					//NPC类型
+	 EAreaType areaType = 6;			//区域类型
+	 ECharacterStatus status = 7;		//NPC状态
+	 int32 stageObjectSn = 8;			//ScenCharacter.sn
+	 int32 fallenSoulStatus = 9;		//堕落邪魂npc状态//0无人挑战，1被挑战， 3挑战结束
+	// string avata = 10;                 //雕像所代表玩家的avata
+	repeated int32 fashions = 11;             //雕像所代表玩家的时装
+
+}
+
+//地图单位信息（被玩家看到） 持续技能
+message DStageDot {
+	 int32 dotSn = 1;				//sn
+	 DVector2 pos = 2;				//坐标
+	 int32 scopeType = 3;				//范围类型（1，圆形）
+	 int32 scopeParam1 = 4;			//范围参数1
+	 int32 scopeParam2 = 5;			//范围参数2
+	 int64 createId = 6;				//创建ID 可能是 武将 bullet dot 
+	 int64 targetId = 7;			//跟随谁移动
+}
+
+message DStageBullet {
+	 int32 bulletSn = 1;				//sn
+	 DVector2 pos = 2;				//坐标
+	 DVector2 posTar = 3;				//坐标
+	 int64 unitTarID = 4;				//目标单位的ID
+	 int32 skillSn = 5;				//bullet 所属技能的SN
+	 int64 createId = 6;				//创建ID 可能是 武将 bullet dot 
+	 int64 fireId = 7;				//技能释放者ID 只能是武将 怪物 
+}
+
+//地图区域信息
+message DStageArea {
+	 DVector2 pos = 1;			//坐标
+	 int32 shapeType = 2;		//1-矩形,2-圆形）
+	 float width = 3;	//矩形在x轴上的长度
+	 float height = 4;	//矩形在z轴上的长度
+	 float radius = 5;//圆形区域半径
+	 EAreaType areaType = 6;// 区域类型（1-普通区域,2-传送区域,3-安全区域）
+	 int32 toMapSn = 7;//要传送到哪里
+	 int32 sn = 8;//模型SceneCharactor表sn
+	 int64  id = 9;	//区域id
+}
+
+//地图单位信息（被玩家看到） 触发区
+message DStageTrigger {
+	 int32 type = 1;   // 场景区域类型（1：立方体；2：圆柱体）
+	 DVector3 position = 2;   // 位置
+	 DVector3 rotation = 3;   // 旋转
+	 DVector3 scale = 4;   // 缩放
+	 DVector3 cubeAreaColliderSize = 5;   // 立方体碰撞区的尺寸
+	 float cylinderAreaColliderRadius = 6;   // 圆柱体碰撞区的半径
+	 float cylinderAreaColliderHeight = 7;   // 圆柱体碰撞区的高度
+	 string effectPrefab = 8;   // 特效的prefab。
+	 DVector3 effectPosition = 9;   // 特效的位置。
+	 DVector3 effectRotation = 10;   // 特效的旋转。
+	 DVector3 effectScale = 11;   // 特效的缩放。
+	 int32 eventCode = 12;   // 事件id
+	 int32 eventType = 13;   // 事件类型（1：普通事件；2：传送事件）
+	 DVector3 transportExitPoint = 14;   // 传送事件的传出点
+}
+
+message DUnit {
+	 int64 id		= 1;		//角色ID
+	 DProp prop		= 2;		//属性
+	 string name		= 3;	//昵称
+	 int32 profession	= 4;	//职业
+	 int32 level		= 5;	//等级
+	 int32 sex		= 6;		//性别
+	 int64 hpCur		= 7;	//当前生命
+	 int32 mpCur		= 8;	//当前法力
+	 int64 hpMax		= 9;	//当前最大生命
+	 int32 mpMax		= 10;	//当前法力
+	 string modelSn = 11;		//模型Sn
+	 string sn = 13;			//配置Sn
+	 int64 expCur		= 14;		//当前经验
+	 int64 expUpgrade		= 15;		//升级经验
+	 int64 teamBundleID	= 52;	//老大和小弟一起群体标号
+}
+
+//新伙伴信息
+message DPartner {
+	 int64 id = 1;								//伙伴ID
+	 DUnit unit = 2;							//属性
+	 int32 level= 3;							//等级
+	 int32 exp = 4;								//经验
+	 int32 partnerSn = 5;						//伙伴表sn
+	 int32 usePos = 6;							//伙伴出战位置    0：未出战
+	 bool lock = 7;								//是否锁定 默认false
+}
+
+//地图单位信息（被玩家看到）新伙伴
+message DStagePartner {
+	repeated DVector3 posEnd	= 1;			//目标路径坐标
+	 DPartner dPartner	= 2;			//伙伴数据
+	 string pvpMode		= 3;			//pvp模式
+	 bool inFighting	= 4;			//是否在战斗状态
+	 int32 rage			= 5;			//怒气
+	 int64 teamBundleID	= 6;			//老大和小弟一起群体标号
+	 bool canMove		= 7;			//是否可以移动
+	 bool canCastSkill  = 8;			//是否可以施法
+	repeated int32 buffs		= 9;			//当前所有的buff
+	 int32 campType		= 10;			//阵营类型
+	 bool attackable	= 11;			//是否可以被攻击(针对character有效)
+	// string skillGroupSn= 12;			//技能组
+	//repeated DSkill skill		= 13;			//技能
+	 int32 partnerSn = 14;				//伙伴表sn
+	 int64 parentId = 15;				//玩家id
+}
+
+//地图单位信息
+message DStageObject {
+	 DVector2 pos = 1;			//坐标
+	 DVector2 dir = 2;			//方向
+	 int64 objId = 3;			//WordldObjectId
+	 string modelSn = 4;			//模型Sn
+	 string name = 5;			//昵称
+	 EWorldObjectType type = 6;		//对象类识别码 HUMAN玩家 MONSTER怪物 DROP掉落物 DOT持续伤害 NPC游戏角色 BULLET子弹
+	 DStageHuman human = 7;			//玩家对象
+	 DStageMonster monster = 8;		//怪物对象
+	 DStageDrop drop = 9;			//掉落物
+	 DStagePick pick = 10;			//采集物
+	 DStageNPC npc = 11;			//npc
+	 DStageDot dot = 12;			//持续技能
+	 DStageBullet bullet = 13;		//子弹
+	 DStageArea area = 14;			//区域
+	// old
+	 DStageTrigger trigger = 15;//触发器
+	//阵营
+	 int32 camp = 16;		//阵营红-1，蓝1
+	 DStagePartner partner = 17;	//伙伴
+}
+
+message CSPing {
+	option(msgid) = 1122;
 }
