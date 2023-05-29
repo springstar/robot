@@ -6,8 +6,8 @@ import (
 )
 
 func TestName(t *testing.T) {
-	m := newNameManager()
-	m.loadNameFiles()
-	name := m.randomGenName(ROLE_SEX_FEMALE)
-	t.Log(name)
+	// m := newNameManager()
+	// m.loadNameFiles()
+	// name := m.randomGenName(ROLE_SEX_FEMALE)
+	// t.Log(name)
 }

@@ -48,3 +48,7 @@ func (wsc *WebSockConn) Read() ([]byte, error) {
 
 	return bytes, nil
 }
+
+func (wsc *WebSockConn) Close() {
+	wsc.c.Close(websocket.StatusNormalClosure, "connction closed")
+}

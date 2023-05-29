@@ -17,4 +17,11 @@ func TestAlloc(t *testing.T) {
 	assert.Equal(t, 1002, account3.id)
 	assert.Equal(t, "robot1002", account3.name)
 
+	acc := accountMgr.findAccountByName("robot1001")
+	assert.Equal(t, acc.id, account2.id)
+
+	err, acc1 := accountMgr.findAccount(1001)
+	assert.Equal(t, err, nil)
+	assert.Equal(t, acc, acc1)
+
 }

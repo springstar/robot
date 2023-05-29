@@ -23,6 +23,12 @@ var apis[] api = []api {
 		method: "POST",
 		handler: testPost,
 	},
+	api {
+		url: "debug",
+		method: "POST",
+		handler: debug,
+
+	},
 }
 
 func test(c *gin.Context) {
@@ -45,16 +51,35 @@ func testPost(c *gin.Context) {
 		"message": "test post",
 	  })
 
-	  var cmd BenchCommand
-	  cmd.Batch = 1
+	var cmd BenchCommand
+	cmd.Batch = 1
 
-	  fmt.Println("post bench command")
+	fmt.Println("post bench command")
 	
-	  if err := c.BindJSON(&cmd); err != nil {
+	if err := c.BindJSON(&cmd); err != nil {
 		fmt.Println(err)
 		return
-	  }
+	}
 
 	serv.PostCommand(cmd)	  
 
+}
+
+func debug(c *gin.Context) {
+	var cmd DebugCommand
+	postCommand(c, &cmd)
+
+}
+
+func postCommand(c *gin.Context, cmd iCommand) {
+	c.JSON(http.StatusOK, gin.H{
+		"message": "debug",
+	})
+
+	if err := c.BindJSON(cmd); err != nil {
+		fmt.Println(err)
+		return
+	}
+	
+	serv.PostCommand(cmd)
 }

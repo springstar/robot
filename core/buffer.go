@@ -1,7 +1,9 @@
 package core
 
 import (
+	_ "fmt"
 	"bytes"
+	_ "errors"
 )
 
 type PacketBuffer struct {
@@ -20,7 +22,7 @@ func (b *PacketBuffer) Write(bytes []byte) error {
 }
 
 func (b *PacketBuffer) Read() []*Packet {
-	if b.buf.Len() < 8 {
+	if b.buf.Len() < 4 {
 		return nil
 	}
 
@@ -28,9 +30,9 @@ func (b *PacketBuffer) Read() []*Packet {
 
 	for {
 		data := b.buf.Bytes()
-		len, _ := uint32FromBytes(data[0:4])
+		len, err := uint32FromBytes(data[0:4])
 		if b.buf.Len() < int(len) || len == 0 {
-			break
+			return packets
 		}
 
 		slice := make([]byte, len)
@@ -38,7 +40,7 @@ func (b *PacketBuffer) Read() []*Packet {
 
 		msgid, err := uint32FromBytes(slice[4:8])
 		if (err != nil) {
-			return nil
+			return packets
 		}
 	
 		packet := NewPacket(msgid, slice[8:])

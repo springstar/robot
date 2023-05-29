@@ -122,4 +122,7 @@ func (r *Robot)handleInitData(packet *core.Packet) {
 	r.fsm.trigger(r.fsm.state, "initok", r)
 }
 
-
+func (r *Robot)handleKick(packet *core.Packet) {
+	msg := msg.ParseSCHumanKick(int32(packet.Type), packet.Data)
+	fmt.Println(msg.GetReason())
+}

@@ -74,6 +74,24 @@ func (cmd BenchCommand) runRobots() {
 	}
 }
 
+type DebugCommand struct {
+	Command
+	Account string `account:"account name"`
+}
+
+func (cmd DebugCommand) exec() {
+	name := cmd.Account
+	account := serv.accountMgr.findAccountByName(name)
+	if account == nil {
+		_, account = serv.accountMgr.allocName(name)
+
+	}
+
+	robot := newRobot(account, serv.robotMgr, newFsm())
+	robot.startup()
+}
+
+
 type ExitCommand struct {
 
 }

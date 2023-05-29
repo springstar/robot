@@ -7,6 +7,9 @@ import (
 	"fmt"
 	"log"
 	"time"
+	"sync"
+	_ "context"
+
 	"github.com/springstar/robot/core"
 	"github.com/springstar/robot/msg"
 	_ "github.com/gobwas/ws"
@@ -23,8 +26,12 @@ type Robot struct {
 	buffer *core.PacketBuffer
 	moduleMgr *ModuleManager
 	ticker *time.Ticker
+	wg sync.WaitGroup
+	quit chan struct{}
 
 }
+
+
 
 func newRobot(account *Account, robotMgr *RobotManager, fsm *RobotFsm) *Robot {
 	r := &Robot{
@@ -36,6 +43,7 @@ func newRobot(account *Account, robotMgr *RobotManager, fsm *RobotFsm) *Robot {
 		packetQ : make(chan []*core.Packet),
 		buffer : core.NewBuffer(),
 		moduleMgr : newModuleManager(),
+		quit: make(chan struct{}),
 	}
 
 	if (r.account != nil) {
@@ -57,6 +65,7 @@ func (r *Robot) registerMsgHandler() {
 	r.Register(msg.MSG_SCInitData, r)
 	r.Register(msg.MSG_SCStageEnterResult, r)
 	r.Register(msg.MSG_SCStageSwitch, r)
+	r.Register(msg.MSG_SCHumanKick, r)
 
 }
 
@@ -101,18 +110,41 @@ func (r *Robot) connect() {
 }
 
 func (r *Robot) on_connection_established() {
-	fmt.Println("connection established")
-	go r.startWork()
+	log.Printf("connection established")
+	r.sendLoginRequest()
+
+	go r.readPackets()
 	go r.mainLoop()
 }
 
-func (r *Robot) startWork() {
-	r.sendLoginRequest()
+// func (r *Robot) doWork() {
+// 	var wg sync.WaitGroup
+//     ctx, cancel := context.WithCancel(context.Background())
+//     defer cancel()
+// 	for i := 0; i < len(workers); i++ {
+// 		wg.Add(1)
+// 		go func() {
+// 			for {
+// 				select {
+// 				case <- ctx.Done():
+// 					return
+// 				default:	
+// 				}
+
+// 				workers[i](r)
+// 			}
+// 		}()
+// 	}
+
+// }
+
+func (r *Robot)readPackets() {
 
 	for {
 		bytes, err := r.conn.Read()
 		if (err != nil) {
-			log.Fatal(err)
+			r.quit<- struct{}{}
+			break
 		}
 
 		if len(bytes) <= 0 {
@@ -133,6 +165,7 @@ func (r *Robot) startWork() {
 	}
 }
 
+
 func (r *Robot) dispatch(packets []*core.Packet) {
 	for _, packet := range packets {
 		r.Dispatch(packet)
@@ -144,7 +177,7 @@ func (r *Robot) sendPulse() {
 	r.sendPacket(packet)
 }
 
-func (r *Robot) mainLoop() {
+func (r *Robot)mainLoop() {
 	r.ticker = time.NewTicker(ROBOT_PULSE)
 	for {
 		select {
@@ -153,6 +186,9 @@ func (r *Robot) mainLoop() {
 			case <- r.ticker.C:	
 				r.sendPulse()
 				r.ticker.Reset(ROBOT_PULSE)
+			case <- r.quit:
+				return	
+
 		}
 	}
 }
@@ -176,7 +212,9 @@ func (r *Robot) HandleMessage(packet *core.Packet) {
 		case msg.MSG_SCStageObjectAppear:
 			r.handleObjAppear(packet)				
 		case msg.MSG_SCStageObjectDisappear:
-			r.handleObjDisappear(packet)	
+			r.handleObjDisappear(packet)
+		case msg.MSG_SCHumanKick:
+			r.handleKick(packet)		
 		default:
 			fmt.Println("recv packet type ", packet.Type)	
 	}

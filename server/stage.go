@@ -13,7 +13,6 @@ func (r *Robot) enterStage() {
 }
 
 func (r *Robot) handleEnterStage(packet *core.Packet) {
-	fmt.Println("recv ")
 	msg := msg.ParseSCStageEnterResult(int32(packet.Type), packet.Data)
 	stageObjs := msg.GetObj()
 	for _, obj := range stageObjs {
@@ -41,5 +40,6 @@ func (r *Robot) handleObjAppear(packet *core.Packet) {
 }
 
 func (r *Robot) handleObjDisappear(packet *core.Packet) {
-	
+
 }
+
