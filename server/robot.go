@@ -139,11 +139,10 @@ func (r *Robot) on_connection_established() {
 // }
 
 func (r *Robot)readPackets() {
-
 	for {
 		bytes, err := r.conn.Read()
 		if (err != nil) {
-			r.quit<- struct{}{}
+			r.done()
 			break
 		}
 
@@ -165,6 +164,9 @@ func (r *Robot)readPackets() {
 	}
 }
 
+func (r *Robot) done() {
+	r.quit <- struct{}{}
+}
 
 func (r *Robot) dispatch(packets []*core.Packet) {
 	for _, packet := range packets {
