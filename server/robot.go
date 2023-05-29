@@ -117,26 +117,6 @@ func (r *Robot) on_connection_established() {
 	go r.mainLoop()
 }
 
-// func (r *Robot) doWork() {
-// 	var wg sync.WaitGroup
-//     ctx, cancel := context.WithCancel(context.Background())
-//     defer cancel()
-// 	for i := 0; i < len(workers); i++ {
-// 		wg.Add(1)
-// 		go func() {
-// 			for {
-// 				select {
-// 				case <- ctx.Done():
-// 					return
-// 				default:	
-// 				}
-
-// 				workers[i](r)
-// 			}
-// 		}()
-// 	}
-
-// }
 
 func (r *Robot)readPackets() {
 	for {
