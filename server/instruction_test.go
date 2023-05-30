@@ -5,5 +5,6 @@ import (
 )
 
 func TestLoadInstruction(t *testing.T) {
-	loadInstructions()
+	instructions := loadInstructions()
+	t.Log(instructions)
 }

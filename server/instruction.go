@@ -3,7 +3,7 @@ package server
 import (
 	"github.com/springstar/robot/core"
 	"strings"
-	"fmt"
+	
 )
 
 type Instruction struct {
@@ -17,7 +17,7 @@ func newInstruction() *Instruction {
 	}
 }
 
-func loadInstructions() {
+func loadInstructions() (instructions []*Instruction){
 	lines := core.ReadLines("../server/orders.txt")
 	for _, line := range lines {
 		command := strings.Split(line, " ")
@@ -27,7 +27,8 @@ func loadInstructions() {
 			instruction.params = append(instruction.params, command[i])
 		}
 
-		fmt.Println(instruction)
-
+		instructions = append(instructions, instruction)
 	}	
+
+	return
 }
