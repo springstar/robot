@@ -17,9 +17,10 @@ func newInstruction() *Instruction {
 	}
 }
 
-func loadInstructions() []string {
-	lines := core.ReadLines("../server/orders.txt")
-	return lines
+func loadInstructions(f string) (instructions []*Instruction) {
+	lines := core.ReadLines(f)
+	instructions = parseInstructions(lines)
+	return
 }
 
 func parseInstructions(lines []string) (instructions []*Instruction) {
