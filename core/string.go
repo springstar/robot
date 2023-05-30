@@ -2,6 +2,7 @@ package core
 
 import (
 	"fmt"
+	"os"
 	"strconv"
 	"strings"
 	"bufio"
@@ -83,4 +84,20 @@ func ScanRunes(text string) {
             fmt.Printf("%q [%d]\n", string(c), sz)
         }
     }
+}
+
+func ReadLines(f string) []string{
+	file, err := os.Open(f)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var lines []string
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := scanner.Text()
+		lines = append(lines, line)
+	}
+
+	return lines
 }

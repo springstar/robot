@@ -175,6 +175,10 @@ func (r *Robot)mainLoop() {
 	}
 }
 
+func (r *Robot)update() {
+	
+}
+
 func (r *Robot) HandleMessage(packet *core.Packet) {
 	switch packet.Type {
 		case msg.MSG_SCLoginResult:
