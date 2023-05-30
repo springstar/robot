@@ -17,8 +17,12 @@ func newInstruction() *Instruction {
 	}
 }
 
-func loadInstructions() (instructions []*Instruction){
+func loadInstructions() []string {
 	lines := core.ReadLines("../server/orders.txt")
+	return lines
+}
+
+func parseInstructions(lines []string) (instructions []*Instruction) {
 	for _, line := range lines {
 		command := strings.Split(line, " ")
 		instruction := newInstruction()
@@ -31,4 +35,5 @@ func loadInstructions() (instructions []*Instruction){
 	}	
 
 	return
+
 }
