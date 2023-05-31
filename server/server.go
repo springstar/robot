@@ -14,6 +14,7 @@ var (
 
 
 type Server struct {
+	*InstructionList
 	cfg ServerConfig
 	exit chan struct {}
 	engine *gin.Engine
@@ -22,7 +23,6 @@ type Server struct {
 	robotMgr *RobotManager
 	confMgr *JsonConfigManager
 	nameMgr *NameManager
-
 }
 
 
@@ -49,6 +49,8 @@ func (serv *Server) Init() {
 		log.Fatal(err)
 		return
 	}
+
+	serv.InstructionList = loadInstructions("server/orders.txt")
 
 	serv.initManager()
 

@@ -7,13 +7,17 @@ import (
 	"fmt"
 	"log"
 	"time"
-	"sync"
+	_ "sync"
 	_ "context"
 
 	"github.com/springstar/robot/core"
 	"github.com/springstar/robot/msg"
 	_ "github.com/gobwas/ws"
 )
+
+type iExecutor interface {
+	exec() ExecState
+}
 
 type Robot struct {
 	core.IDispatcher
@@ -26,9 +30,9 @@ type Robot struct {
 	buffer *core.PacketBuffer
 	moduleMgr *ModuleManager
 	ticker *time.Ticker
-	wg sync.WaitGroup
 	quit chan struct{}
-
+	executors map[string]iExecutor
+	pc int
 }
 
 
@@ -44,6 +48,8 @@ func newRobot(account *Account, robotMgr *RobotManager, fsm *RobotFsm) *Robot {
 		buffer : core.NewBuffer(),
 		moduleMgr : newModuleManager(),
 		quit: make(chan struct{}),
+		pc: -1,
+		executors: make(map[string]iExecutor),
 	}
 
 	if (r.account != nil) {
@@ -92,6 +98,8 @@ func (r *Robot) doAction(action string) {
 		r.waitForInit()
 	case "enterStage":
 		r.enterStage()
+	case "ready":
+		r.ready()
 	default:
 		fmt.Println(action)	
 	}
@@ -166,8 +174,7 @@ func (r *Robot)mainLoop() {
 			case packets := <- r.packetQ:
 				r.dispatch(packets)	
 			case <- r.ticker.C:	
-				r.sendPulse()
-				r.ticker.Reset(ROBOT_PULSE)
+				r.update()
 			case <- r.quit:
 				return	
 
@@ -175,7 +182,51 @@ func (r *Robot)mainLoop() {
 	}
 }
 
+func (r *Robot) ready() {
+	fmt.Println("ready")
+	r.pc = core.GenRandomInt(serv.icount())
+}
+
+
 func (r *Robot)update() {
+	r.sendPulse()
+	r.vm()
+
+	r.ticker.Reset(ROBOT_PULSE)
+
+}
+
+
+func (r *Robot) move(para []interface{}) {
+	fmt.Println(para)
+}
+
+func (r *Robot) quest(para []interface{}) {
+	fmt.Println(para)
+
+}
+
+func (r *Robot) findExecutor(cmd string) iExecutor {
+	if executor, ok := r.executors[cmd]; !ok {
+		return nil
+	} else {
+		return executor
+	}
+}
+
+func (r *Robot) vm() {
+	if r.pc != -1 {
+		instruction := serv.fetch(r.pc)
+		executor := r.findExecutor(instruction.cmd)
+		if executor == nil {
+			log.Fatal("no executor ", instruction.cmd)
+		} else {
+			state := executor.exec()
+			if state == EXEC_COMPLETED {
+				r.pc, instruction = serv.next(r.pc)
+			}
+		}
+	}
 	
 }
 

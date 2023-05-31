@@ -13,9 +13,10 @@ func TestLoadInstruction(t *testing.T) {
 	}
 
 	instructions := parseInstructions(lines)
-	assert.Equal(t, 2, len(instructions))
-	assert.Equal(t, "move", instructions[0].cmd)
-	assert.Equal(t, 4, len(instructions[0].params))
-	assert.Equal(t, "quest", instructions[1].cmd)
-	assert.Equal(t, 0, len(instructions[1].params))
+	assert.Equal(t, 2, instructions.icount())
+	assert.Equal(t, "move", instructions.fetch(0).cmd)
+	assert.Equal(t, "quest", instructions.fetch(1).cmd)
+	assert.Equal(t, (*Instruction)(nil), instructions.fetch(2))
+
+	
 }

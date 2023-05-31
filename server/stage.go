@@ -32,6 +32,7 @@ func (r *Robot) handleSwitchStage(packet *core.Packet) {
 	dir := msg.GetDir()
 	lineNum := msg.GetLineNum()
 	fmt.Println(stageId, mapSn, repSn, pos, dir, lineNum)
+	r.fsm.trigger(r.fsm.state, "enterok", r)
 
 }
 
@@ -42,4 +43,5 @@ func (r *Robot) handleObjAppear(packet *core.Packet) {
 func (r *Robot) handleObjDisappear(packet *core.Packet) {
 
 }
+
 

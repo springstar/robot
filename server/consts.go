@@ -12,3 +12,11 @@ const (
 	ROLE_SEX_MALE = 0
 	ROLE_SEX_FEMALE = 1
 )
+
+type ExecState int32
+
+const (
+	EXEC_NO_START ExecState = iota
+	EXEC_ONGOING
+	EXEC_COMPLETED
+)
