@@ -1,25 +1,48 @@
 package server
 
 import (
-	"math"
+	"fmt"
+	_ "math"
+	"github.com/springstar/robot/core"
 )
 
-type Obj struct {
-	x float64
-	y float64
+type RobotMovement struct {
+	*core.Vec2
 }
 
-func newObj() *Obj {
-	return &Obj{}
+func newMovement() *RobotMovement {
+	return &RobotMovement{
+		core.NewVec2(0, 0),
+	}
 }
 
-func moveto(a *Obj, b *Obj) {
-	dir := rotation(a.x, a.y, b.x, b.y)
-	a.x += math.Cos(dir)*0.5
-	a.y += math.Sin(dir)*0.5
+func (m *RobotMovement) exec(params []string, delta int) ExecState {
+	var target []float64
+	for _, para := range params {
+		v := core.Str2Float64(para)
+		target = append(target, v)
+	}
+
+	d := core.NewVec2(float32(target[0]), float32(target[1]))
 	
+	r := m.moveto(d)
+
+	if r == -1 {
+		return EXEC_ONGOING
+	}
+
+	return EXEC_COMPLETED
 }
 
-func rotation(srcX, srcY float64, dstX, dstY float64) float64 {
-	return math.Atan2(dstY - srcY, dstX - srcX)
+func (m *RobotMovement)moveto(d *core.Vec2) int {
+	v := core.MoveTowards(m.Vec2, d, 15)
+	if v.Equals(d) {
+		return 0
+	} else {
+		fmt.Println(v)
+	}
+
+	return -1
 }
+
+

@@ -49,6 +49,16 @@ func Str2Int32Slice(s string) ([]int32, error) {
 	return intSlice, nil
 }
 
+func Str2Float64(s string) float64 {
+	f, _ := strconv.ParseFloat(strings.TrimSpace(s), 64)
+	return f
+}
+
+func Str2Float32(s string) float32 {
+	f, _ := strconv.ParseFloat(strings.TrimSpace(s), 32)
+	return float32(f)
+}
+
 func ConcatStrings(ss []string, sep string) string {
 	var b strings.Builder
 	for _, s := range ss {

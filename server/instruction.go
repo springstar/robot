@@ -9,7 +9,7 @@ import (
 
 type Instruction struct {
 	cmd string
-	params []interface{}
+	params []string
 }
 
 type InstructionList []*Instruction

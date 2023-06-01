@@ -1,17 +1,11 @@
 package server
 
 import (
-	"github.com/springstar/robot/core"
+
 	"github.com/springstar/robot/pb"
+	
 )
 
-type Position2D struct {
-	core.Vector2	
-}
-
-type Position3D struct {
-	core.Vector3
-}
 
 type Character struct {
 	humanId int64

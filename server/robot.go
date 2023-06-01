@@ -16,7 +16,7 @@ import (
 )
 
 type iExecutor interface {
-	exec() ExecState
+	exec(params []string, delta int) ExecState
 }
 
 type Robot struct {
@@ -60,7 +60,7 @@ func newRobot(account *Account, robotMgr *RobotManager, fsm *RobotFsm) *Robot {
 }
 
 func (r *Robot) loadModules() {
-
+	r.executors["move"] = newMovement()
 }
 
 func (r *Robot) registerMsgHandler() {
@@ -76,6 +76,7 @@ func (r *Robot) registerMsgHandler() {
 }
 
 func (r *Robot) startup() {
+	r.loadModules()
 	r.registerMsgHandler()
 	r.fsm.trigger("entry", "connect", r)
 }
@@ -219,11 +220,13 @@ func (r *Robot) vm() {
 		instruction := serv.fetch(r.pc)
 		executor := r.findExecutor(instruction.cmd)
 		if executor == nil {
-			log.Fatal("no executor ", instruction.cmd)
+			fmt.Println("no executor ", instruction.cmd)
+			// log.Fatal("no executor ", instruction.cmd)
 		} else {
-			state := executor.exec()
+			state := executor.exec(instruction.params, 30)
 			if state == EXEC_COMPLETED {
 				r.pc, instruction = serv.next(r.pc)
+				fmt.Println("exec completed")
 			}
 		}
 	}
