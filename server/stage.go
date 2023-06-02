@@ -44,4 +44,6 @@ func (r *Robot) handleObjDisappear(packet *core.Packet) {
 
 }
 
-
+func (r *Robot) handleStageMove(packet *core.Packet) {
+	fmt.Println("sc stage move")
+}

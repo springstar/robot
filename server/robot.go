@@ -72,6 +72,7 @@ func (r *Robot) registerMsgHandler() {
 	r.Register(msg.MSG_SCStageEnterResult, r)
 	r.Register(msg.MSG_SCStageSwitch, r)
 	r.Register(msg.MSG_SCHumanKick, r)
+	r.Register(msg.MSG_SCStageMove, r)
 
 }
 
@@ -226,7 +227,6 @@ func (r *Robot) vm() {
 			state := executor.exec(instruction.params, 30)
 			if state == EXEC_COMPLETED {
 				r.pc, instruction = serv.next(r.pc)
-				fmt.Println("exec completed")
 			}
 		}
 	}
@@ -254,7 +254,9 @@ func (r *Robot) HandleMessage(packet *core.Packet) {
 		case msg.MSG_SCStageObjectDisappear:
 			r.handleObjDisappear(packet)
 		case msg.MSG_SCHumanKick:
-			r.handleKick(packet)		
+			r.handleKick(packet)
+		case msg.MSG_SCStageMove:
+			r.handleStageMove(packet)			
 		default:
 			fmt.Println("recv packet type ", packet.Type)	
 	}
