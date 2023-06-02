@@ -1,24 +1,21 @@
 package server
 
 import (
-	"fmt"
+	"github.com/springstar/robot/core"
+	_ "fmt"
 	"testing"
 )
 
 func TestMoveTo(t *testing.T) {
-	a := newObj()
-	
-	a.x = 12.56
-	a.y = 7.3
+	a := core.NewVec2(212.56, 75.3)
+	b := core.NewVec2(100.25, 200.30)
 
-	b := newObj()
-	b.x = 100.25
-	b.y = 200.30
 
 	for i := 0; i < 10000000; i++ {
-		moveto(a, b)
+		v := core.MoveTowards(a, b, 15)
+		if v.Equals(b) {
+			t.Log("reach destination")
+		}
 	}
 
-	fmt.Println(a.x - b.x)
-	fmt.Println(a.y - b.y)
 }

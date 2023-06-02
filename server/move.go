@@ -42,6 +42,8 @@ func (m *RobotMovement)moveto(d *core.Vec2) int {
 		fmt.Println(v)
 	}
 
+	m.Vec2 = v
+
 	return -1
 }
 
