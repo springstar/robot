@@ -61,6 +61,7 @@ func newRobot(account *Account, robotMgr *RobotManager, fsm *RobotFsm) *Robot {
 
 func (r *Robot) loadModules() {
 	r.executors["move"] = newMovement()
+	r.executors["quest"] = newQuestHandler()
 }
 
 func (r *Robot) registerMsgHandler() {
