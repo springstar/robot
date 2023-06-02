@@ -8,11 +8,13 @@ import (
 
 type RobotMovement struct {
 	*core.Vec2
+	r *Robot
 }
 
-func newMovement() *RobotMovement {
+func newMovement(r *Robot) *RobotMovement {
 	return &RobotMovement{
-		core.NewVec2(0, 0),
+		Vec2: core.NewVec2(0, 0),
+		r: r,
 	}
 }
 
