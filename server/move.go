@@ -9,14 +9,12 @@ import (
 )
 
 type RobotMovement struct {
-	*core.Vec2
 	r *Robot
 	lastSyncTime int64
 }
 
 func newMovement(r *Robot) *RobotMovement {
 	return &RobotMovement{
-		Vec2: core.NewVec2(0, 0),
 		r: r,
 	}
 }
