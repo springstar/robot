@@ -29,7 +29,12 @@ func (b *PacketBuffer) Read() []*Packet {
 	var packets []*Packet
 
 	for {
+		if b.buf.Len() == 0 {
+			return packets
+		}
+
 		data := b.buf.Bytes()
+		
 		len, err := uint32FromBytes(data[0:4])
 		if b.buf.Len() < int(len) || len == 0 {
 			return packets

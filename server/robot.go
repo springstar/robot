@@ -22,7 +22,7 @@ type iExecutor interface {
 type Robot struct {
 	core.IDispatcher
 	*Character
-	
+
 	conn core.NetConnection
 	mgr *RobotManager
 	account *Account
@@ -136,6 +136,7 @@ func (r *Robot)readPackets() {
 		bytes, err := r.conn.Read()
 		if (err != nil) {
 			r.done()
+			log.Fatal(err)
 			break
 		}
 
