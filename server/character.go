@@ -26,12 +26,13 @@ type Character struct {
 	mapSn int32
 	pos *core.Vec2
 	dir *core.Vec2
+	qset *RobotQuestSet
 
 }
 
 func newCharacter() *Character {
 	return &Character{
-
+		qset: newQuestSet(),
 	}
 }
 
@@ -65,4 +66,14 @@ func (c *Character) onInit(human *pb.DHuman, stage *pb.DInitDataStage, quests []
 	c.mapSn = stage.GetSn()
 	c.pos = core.NewVec2(stage.PosNow.GetX(), stage.PosNow.GetY())
 	c.dir = core.NewVec2(stage.DirNow.GetX(), stage.DirNow.GetY())
+
+	for _, quest := range quests {
+		q := newQuest()		
+		q.sn = quest.Sn
+		q.typ = quest.Type
+		q.status = quest.Status
+		q.total = quest.TargetProgress
+		q.step = quest.NowProgress
+		c.qset.addQuest(q)
+	}
 }
