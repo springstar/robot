@@ -1,6 +1,8 @@
 package server
 
 import (
+	"github.com/springstar/robot/pb"
+	"github.com/springstar/robot/msg"
 	"fmt"
 	_ "math"
 	"github.com/springstar/robot/core"
@@ -16,6 +18,40 @@ func newMovement(r *Robot) *RobotMovement {
 		Vec2: core.NewVec2(0, 0),
 		r: r,
 	}
+}
+
+func (m *RobotMovement) sendMoveRequest(path []*core.Vec2) {
+	if len(path) == 0 {
+		return
+	}
+
+	start := &pb.DVector3{
+		X: m.r.pos.X,
+		Y: m.r.pos.Y,
+		Z: 0,
+	}
+
+	var end []*pb.DVector3
+	for _, p := range path {
+		pos := &pb.DVector3{
+			X: p.X,
+			Y: p.Y,
+			Z: 0,
+		}
+
+		end = append(end, pos)
+	}
+
+	dir := &pb.DVector3{
+		X: m.r.dir.X,
+		Y: m.r.dir.Y,
+		Z: 0,
+	}
+
+	now := core.GetCurrentTime()
+
+	msg := msg.SerializeCSStageMove(msg.MSG_CSStageMove, m.r.humanId, start, end, dir, now)
+	m.r.sendPacket(msg)
 }
 
 func (m *RobotMovement) exec(params []string, delta int) ExecState {
