@@ -11,6 +11,7 @@ import (
 type RobotMovement struct {
 	*core.Vec2
 	r *Robot
+	lastSyncTime int64
 }
 
 func newMovement(r *Robot) *RobotMovement {
@@ -22,6 +23,11 @@ func newMovement(r *Robot) *RobotMovement {
 
 func (m *RobotMovement) sendMoveRequest(path []*core.Vec2) {
 	if len(path) == 0 {
+		return
+	}
+
+	now := core.GetCurrentTime()
+	if !m.isTimeToSync(now) {
 		return
 	}
 
@@ -48,10 +54,23 @@ func (m *RobotMovement) sendMoveRequest(path []*core.Vec2) {
 		Z: 0,
 	}
 
-	now := core.GetCurrentTime()
-
 	msg := msg.SerializeCSStageMove(msg.MSG_CSStageMove, m.r.humanId, start, end, dir, now)
 	m.r.sendPacket(msg)
+
+	m.updateSyncTime(now)
+
+}
+
+func (m *RobotMovement) updateSyncTime(now int64) {
+	m.lastSyncTime = now
+}
+
+func (m *RobotMovement) isTimeToSync(now int64) bool {
+	if m.lastSyncTime == 0 || m.lastSyncTime + 100 > now {
+		return true
+	}
+
+	return false
 }
 
 func (m *RobotMovement) exec(params []string, delta int) ExecState {
@@ -74,14 +93,14 @@ func (m *RobotMovement) exec(params []string, delta int) ExecState {
 }
 
 func (m *RobotMovement)moveto(d *core.Vec2, delta float32) int {
-	v := core.MoveTowards(m.Vec2, d, delta)
+	v := core.MoveTowards(m.r.pos, d, delta)
 	if v.Equals(d) {
 		return 0
 	} else {
 		fmt.Println(v)
 	}
 
-	m.Vec2 = v
+	m.r.pos = v
 
 	return -1
 }
