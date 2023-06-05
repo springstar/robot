@@ -27,7 +27,8 @@ func (m *RobotMovement) exec(params []string, delta int) ExecState {
 
 	d := core.NewVec2(float32(target[0]), float32(target[1]))
 	
-	r := m.moveto(d)
+	delta = delta * int(m.r.speed)
+	r := m.moveto(d, float32(delta))
 
 	if r == -1 {
 		return EXEC_ONGOING
@@ -36,8 +37,8 @@ func (m *RobotMovement) exec(params []string, delta int) ExecState {
 	return EXEC_COMPLETED
 }
 
-func (m *RobotMovement)moveto(d *core.Vec2) int {
-	v := core.MoveTowards(m.Vec2, d, 15)
+func (m *RobotMovement)moveto(d *core.Vec2, delta float32) int {
+	v := core.MoveTowards(m.Vec2, d, delta)
 	if v.Equals(d) {
 		return 0
 	} else {

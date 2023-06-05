@@ -22,9 +22,11 @@ type Character struct {
 	curHp int64
 	curMp int32
 	curExp int64
+	speed int32
 	mapSn int32
 	pos *core.Vec2
 	dir *core.Vec2
+
 }
 
 func newCharacter() *Character {
@@ -54,11 +56,12 @@ func (c *Character) onLoad(d *pb.DCharacter) {
 	c.sex = d.GetSex()
 }
 
-func (c *Character) onInit(human *pb.DHuman, stage *pb.DInitDataStage) {
+func (c *Character) onInit(human *pb.DHuman, stage *pb.DInitDataStage, quests []*pb.DQuest) {
 	c.curHp = human.HpCur
 	c.curMp = human.MpCur
 	c.curExp = human.ExpCur
 	c.combat = human.Combat
+	c.speed = human.Prop.Speed
 	c.mapSn = stage.GetSn()
 	c.pos = core.NewVec2(stage.PosNow.GetX(), stage.PosNow.GetY())
 	c.dir = core.NewVec2(stage.DirNow.GetX(), stage.DirNow.GetY())
