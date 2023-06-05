@@ -77,3 +77,4 @@ func (c *Character) onInit(human *pb.DHuman, stage *pb.DInitDataStage, quests []
 		c.qset.addQuest(q)
 	}
 }
+

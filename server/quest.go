@@ -30,17 +30,17 @@ func (qs *RobotQuestSet) addQuest(q *Quest) {
 	}
 }
 
-type RobotQuestHandler struct {
+type RobotQuestExecutor struct {
 	r *Robot
 }
 
-func newQuestHandler(r *Robot) *RobotQuestHandler {
-	return &RobotQuestHandler{
+func newQuestExecutor(r *Robot) *RobotQuestExecutor {
+	return &RobotQuestExecutor{
 		r: r,
 	}
 }
 
-func (q *RobotQuestHandler) exec(params []string, delta int) ExecState {
+func (q *RobotQuestExecutor) exec(params []string, delta int) ExecState {
 
 	return EXEC_COMPLETED
 }
