@@ -22,6 +22,7 @@ type iExecutor interface {
 type Robot struct {
 	core.IDispatcher
 	*Character
+	
 	conn core.NetConnection
 	mgr *RobotManager
 	account *Account
@@ -33,6 +34,7 @@ type Robot struct {
 	quit chan struct{}
 	executors map[string]iExecutor
 	pc int
+
 }
 
 

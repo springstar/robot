@@ -1,6 +1,7 @@
 package server
 
 import (
+	"github.com/springstar/robot/core"
 
 	"github.com/springstar/robot/pb"
 	
@@ -21,6 +22,9 @@ type Character struct {
 	curHp int64
 	curMp int32
 	curExp int64
+	mapSn int32
+	pos *core.Vec2
+	dir *core.Vec2
 }
 
 func newCharacter() *Character {
@@ -50,9 +54,12 @@ func (c *Character) onLoad(d *pb.DCharacter) {
 	c.sex = d.GetSex()
 }
 
-func (c *Character) onInit(d *pb.DHuman) {
-	c.curHp = d.HpCur
-	c.curMp = d.MpCur
-	c.curExp = d.ExpCur
-	c.combat = d.Combat
+func (c *Character) onInit(human *pb.DHuman, stage *pb.DInitDataStage) {
+	c.curHp = human.HpCur
+	c.curMp = human.MpCur
+	c.curExp = human.ExpCur
+	c.combat = human.Combat
+	c.mapSn = stage.GetSn()
+	c.pos = core.NewVec2(stage.PosNow.GetX(), stage.PosNow.GetY())
+	c.dir = core.NewVec2(stage.DirNow.GetX(), stage.DirNow.GetY())
 }
