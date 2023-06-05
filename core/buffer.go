@@ -29,7 +29,7 @@ func (b *PacketBuffer) Read() []*Packet {
 	var packets []*Packet
 
 	for {
-		if b.buf.Len() == 0 {
+		if b.buf.Len()  < 4 {
 			return packets
 		}
 
