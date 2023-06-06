@@ -37,8 +37,6 @@ type Robot struct {
 
 }
 
-
-
 func newRobot(account *Account, robotMgr *RobotManager, fsm *RobotFsm) *Robot {
 	r := &Robot{
 		IDispatcher: core.NewMsgDispatcher(),
@@ -130,7 +128,6 @@ func (r *Robot) on_connection_established() {
 	go r.mainLoop()
 }
 
-
 func (r *Robot)readPackets() {
 	for {
 		bytes, err := r.conn.Read()
@@ -193,7 +190,6 @@ func (r *Robot) ready() {
 	r.pc = core.GenRandomInt(serv.icount())
 }
 
-
 func (r *Robot)update() {
 	r.sendPulse()
 	r.vm()
@@ -201,7 +197,6 @@ func (r *Robot)update() {
 	r.ticker.Reset(ROBOT_PULSE)
 
 }
-
 
 func (r *Robot) move(para []interface{}) {
 	fmt.Println(para)
@@ -233,8 +228,7 @@ func (r *Robot) vm() {
 				r.pc, instruction = serv.next(r.pc)
 			}
 		}
-	}
-	
+	}	
 }
 
 func (r *Robot) HandleMessage(packet *core.Packet) {

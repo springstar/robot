@@ -45,8 +45,6 @@ func (driver *RobotDriver) process() {
 		select {
 		case cmd := <- driver.cq:
 			driver.exec(cmd)
-		case stat := <- driver.ch:
-			driver.statistic(stat)	
 		case <- driver.ticker.C:
 			driver.pulse()
 			driver.ticker.Reset(SERVER_PULSE)	
@@ -56,7 +54,9 @@ func (driver *RobotDriver) process() {
 }
 
 func (driver *RobotDriver) pulse() {
-
+	for stat := range driver.ch {
+		driver.statistic(stat)
+	}
 }
 
 func (driver *RobotDriver) exec(cmd iCommand) {
