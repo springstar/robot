@@ -99,3 +99,12 @@ type ExitCommand struct {
 func (cmd ExitCommand) exec() {
 
 }
+
+type ReportCommand struct {
+	Command
+	param string `param: "param"`
+}
+
+func (cmd ReportCommand) exec() {
+	
+}

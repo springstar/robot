@@ -29,6 +29,11 @@ var apis[] api = []api {
 		handler: debug,
 
 	},
+	api {
+		url: "report",
+		method: "POST",
+		handler: report,
+	},
 }
 
 func test(c *gin.Context) {
@@ -68,6 +73,10 @@ func testPost(c *gin.Context) {
 func debug(c *gin.Context) {
 	var cmd DebugCommand
 	postCommand(c, &cmd)
+
+}
+
+func report(c *gin.Context) {
 
 }
 
