@@ -9,6 +9,7 @@ import (
 )
 
 type RobotDriver struct {
+	*RunStat
 	cq chan iCommand
 	pool *tunny.Pool
 	ticker *time.Ticker
@@ -16,6 +17,7 @@ type RobotDriver struct {
 
 func NewDriver() *RobotDriver {
 	return &RobotDriver{
+		RunStat: newRunStat(),
 		cq : make(chan iCommand),
 		ticker : time.NewTicker(SERVER_PULSE),
 	}
@@ -43,9 +45,11 @@ func (driver *RobotDriver) process() {
 		select {
 		case cmd := <- driver.cq:
 			driver.exec(cmd)
+		case stat := <- driver.ch:
+			driver.statistic(stat)	
 		case <- driver.ticker.C:
 			driver.pulse()
-			driver.ticker.Reset(SERVER_PULSE)
+			driver.ticker.Reset(SERVER_PULSE)	
 
 		}	
 	}	

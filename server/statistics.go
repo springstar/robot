@@ -1,6 +1,17 @@
 package server
 
-type ServerStat struct {
+type StatType int32
+
+const (
+
+)
+
+type Stat struct {
+	typ StatType
+	v interface{}
+}
+
+type RunStat struct {
 	sends  		int32 `json:"sends"`
 	roles  		int32 `json:"creates"`
 	logins 		int32 `json:"logins"`
@@ -10,12 +21,23 @@ type ServerStat struct {
 	rbytes		int32 `json:"recvbytes"`
 	msgsends   map[int32]int32	`json:"msgsends"`
 	msgrecvs   map[int32]int32	`json:"msgrecvs"`
+
+	ch chan Stat
+
 }
 
-func newServerStat() *ServerStat {
-	return &ServerStat{
+func newRunStat() *RunStat {
+	return &RunStat{
 		msgsends: make(map[int32]int32),
 		msgrecvs: make(map[int32]int32),
+		ch: make(chan Stat),
 	}
 }
+
+func (rs *RunStat) statistic(s Stat) {
+	
+}
+
+
+
 
