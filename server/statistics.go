@@ -42,7 +42,7 @@ func newRunStat() *RunStat {
 	return &RunStat{
 		msgsends: make(map[int32]int32),
 		msgrecvs: make(map[int32]int32),
-		ch: make(chan Stat),
+		ch: make(chan Stat, 8192),
 	}
 }
 
@@ -68,10 +68,17 @@ func (rs *RunStat) statistic(s Stat) {
 }
 
 func (rs *RunStat) statSendPackets(s Stat) {
-
+	rs.spackets += 1
+	ms := s.v.(MsgStat)
+	rs.sbytes += ms.bytes
+	rs.msgsends[ms.msgTyp] = rs.spackets
 }
 
 func (rs *RunStat) statRecvPackets(s Stat) {
+	rs.rpackets += 1
+	ms := s.v.(MsgStat)
+	rs.rbytes += ms.bytes
+	rs.msgrecvs[ms.msgTyp] = rs.rpackets
 
 }
 

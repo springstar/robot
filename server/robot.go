@@ -232,6 +232,7 @@ func (r *Robot) vm() {
 }
 
 func (r *Robot) HandleMessage(packet *core.Packet) {
+	serv.driver.queueMsgStat(STAT_RECV_PACKETS, int32(packet.Type), int32(packet.Length))
 	switch packet.Type {
 		case msg.MSG_SCLoginResult:
 			r.handleLoginResult(packet)

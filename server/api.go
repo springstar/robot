@@ -31,7 +31,7 @@ var apis[] api = []api {
 	},
 	api {
 		url: "report",
-		method: "POST",
+		method: "GET",
 		handler: report,
 	},
 }
@@ -40,15 +40,6 @@ func test(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message": "pong",
 	  })
-  
-	  cmd := TestCommand {
-		Command: Command {
-			typ : COMMAND_TEST,
-		},
-		desc : "test",
-	  }
-
-	  serv.PostCommand(cmd)
 }
 
 func testPost(c *gin.Context) {
@@ -77,6 +68,18 @@ func debug(c *gin.Context) {
 }
 
 func report(c *gin.Context) {
+	cmd := ReportCommand {
+
+	}
+	
+	serv.PostCommand(cmd)
+
+	res := <- serv.driver.rq
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": res,
+	  })
+
 
 }
 

@@ -9,6 +9,7 @@ type CommandType int32
 const (
 	COMMAND_TEST  CommandType = 1
 	COMMAND_BENCH CommandType = 2
+	COMMAND_REPORT CommandType = 3
 )
 
 type iCommand interface {
@@ -102,9 +103,8 @@ func (cmd ExitCommand) exec() {
 
 type ReportCommand struct {
 	Command
-	param string `param: "param"`
 }
 
 func (cmd ReportCommand) exec() {
-	
+	serv.driver.rq <- "test"
 }
