@@ -1,5 +1,10 @@
 package server
 
+import (
+	_ "fmt"
+	"time"
+)
+
 type StatType int32
 
 const (
@@ -24,37 +29,58 @@ type Stat struct {
 }
 
 type RunStat struct {
-	sends  		int32 `json:"sends"`
-	roles  		int32 `json:"creates"`
-	logins 		int32 `json:"logins"`
-	spackets 	int32 `json:"sendpackets"`
-	rpackets	int32 `json:"recvpackets"`
-	sbytes		int32 `json:"sendbytes"`
-	rbytes		int32 `json:"recvbytes"`
-	msgsends   map[int32]int32	`json:"msgsends"`
-	msgrecvs   map[int32]int32	`json:"msgrecvs"`
+	Sends  		int32 `json:"sends"`
+	Roles  		int32 `json:"creates"`
+	Logins 		int32 `json:"logins"`
+	Spackets 	int32 `json:"sendpackets"`
+	Rpackets	int32 `json:"recvpackets"`
+	Sbytes		int32 `json:"sendbytes"`
+	Rbytes		int32 `json:"recvbytes"`
+	Msgsends   map[int32]int32	`json:"msgsends"`
+	Msgrecvs   map[int32]int32	`json:"msgrecvs"`
 
 	ch chan Stat
+	ticker *time.Ticker
+
 
 }
 
 func newRunStat() *RunStat {
 	return &RunStat{
-		msgsends: make(map[int32]int32),
-		msgrecvs: make(map[int32]int32),
+		Msgsends: make(map[int32]int32),
+		Msgrecvs: make(map[int32]int32),
 		ch: make(chan Stat, 8192),
+		ticker : time.NewTicker(SERVER_PULSE),
+
 	}
 }
 
-func (rs *RunStat) queueMsgStat(stype StatType, mtype int32, size int32) {
+func queueMsgStat(stype StatType, mtype int32, size int32) {
 	var s Stat
 	s.typ = stype
 	var ms MsgStat
 	ms.msgTyp = mtype
 	ms.bytes = size
 	s.v = ms
-	rs.ch <- s
+	serv.ch <- s
 }
+
+func (rs *RunStat) Start() {
+	for {
+		select {
+		case <- rs.ticker.C:
+			rs.pulse()
+			rs.ticker.Reset(SERVER_PULSE)	
+		}	
+	}
+}
+
+func (rs *RunStat) pulse() {
+	for stat := range rs.ch {
+		rs.statistic(stat)
+	}
+}
+
 
 func (rs *RunStat) statistic(s Stat) {
 	switch s.typ {
@@ -63,23 +89,22 @@ func (rs *RunStat) statistic(s Stat) {
 	case STAT_RECV_PACKETS:	
 		rs.statRecvPackets(s)
 	default:
-
+		break
 	}
 }
 
 func (rs *RunStat) statSendPackets(s Stat) {
-	rs.spackets += 1
+	rs.Spackets += 1
 	ms := s.v.(MsgStat)
-	rs.sbytes += ms.bytes
-	rs.msgsends[ms.msgTyp] = rs.spackets
+	rs.Sbytes += ms.bytes
+	rs.Msgsends[ms.msgTyp] = rs.Spackets
 }
 
 func (rs *RunStat) statRecvPackets(s Stat) {
-	rs.rpackets += 1
+	rs.Rpackets += 1
 	ms := s.v.(MsgStat)
-	rs.rbytes += ms.bytes
-	rs.msgrecvs[ms.msgTyp] = rs.rpackets
-
+	rs.Rbytes += ms.bytes
+	rs.Msgrecvs[ms.msgTyp] = rs.Rpackets
 }
 
 

@@ -3,26 +3,22 @@ package server
 import (
 	_ "fmt"
 	"runtime"
-	"time"
+	
 
 	"github.com/Jeffail/tunny"
 	
 )
 
 type RobotDriver struct {
-	*RunStat
 	cq chan iCommand
 	rq chan string
 	pool *tunny.Pool
-	ticker *time.Ticker
 }
 
 func NewDriver() *RobotDriver {
 	return &RobotDriver{
-		RunStat: newRunStat(),
 		cq : make(chan iCommand),
 		rq : make(chan string),
-		ticker : time.NewTicker(SERVER_PULSE),
 	}
 }
 
@@ -48,22 +44,8 @@ func (driver *RobotDriver) process() {
 		select {
 		case cmd := <- driver.cq:
 			driver.exec(cmd)
-		case <- driver.ticker.C:
-			driver.pulse()
-			driver.ticker.Reset(SERVER_PULSE)	
-
 		}	
 	}	
-}
-
-func (driver *RobotDriver) pulse() {
-	if len(driver.ch) == 0 {
-		return
-	}
-
-	for stat := range driver.ch {
-		driver.statistic(stat)
-	}
 }
 
 func (driver *RobotDriver) exec(cmd iCommand) {

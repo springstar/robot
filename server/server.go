@@ -14,6 +14,7 @@ var (
 
 
 type Server struct {
+	*RunStat
 	*InstructionList
 	cfg ServerConfig
 	exit chan struct {}
@@ -30,6 +31,7 @@ func NewServer() *Server {
 	serv = &Server{
 		engine : gin.Default(),
 		driver : NewDriver(),
+		RunStat: newRunStat(),
 		exit : make(chan struct{}),
 
 	}
@@ -85,6 +87,7 @@ func (serv *Server) initManager() {
 
 func (serv *Server) Run() {
 	go serv.driver.Start()
+	go serv.RunStat.Start()
 	serv.engine.Run()
 	
 }

@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"encoding/json"
 )
 
 type CommandType int32
@@ -106,5 +107,14 @@ type ReportCommand struct {
 }
 
 func (cmd ReportCommand) exec() {
-	serv.driver.rq <- "test"
+	fmt.Println("report")
+	b, err := json.Marshal(serv.RunStat)
+	if err != nil {
+		fmt.Println(err)
+		serv.driver.rq <- "error"
+		return
+	}
+
+
+	serv.driver.rq <- string(b)
 }
