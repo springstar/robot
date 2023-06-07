@@ -111,7 +111,7 @@ func (rs *RunStat) statSendPackets(s Stat) {
 	rs.Spackets += 1
 	ms := s.v.(MsgStat)
 	rs.Sbytes += ms.bytes
-	rs.Msgsends[ms.msgTyp] = rs.Spackets
+	rs.Msgsends[ms.msgTyp] = rs.Msgsends[ms.msgTyp] + 1
 }
 
 func (rs *RunStat) statRecvPackets(s Stat) {

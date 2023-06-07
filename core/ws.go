@@ -26,6 +26,8 @@ func (wsc *WebSockConn) Connect(addr string) error {
 		fmt.Print("connect err ", err)
 	}
 
+	wsc.c.SetReadLimit(32768 * 2)
+
 	return nil
 }
 
