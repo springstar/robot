@@ -104,7 +104,8 @@ func (rs *RunStat) statRecvPackets(s Stat) {
 	rs.Rpackets += 1
 	ms := s.v.(MsgStat)
 	rs.Rbytes += ms.bytes
-	rs.Msgrecvs[ms.msgTyp] = rs.Rpackets
+
+	rs.Msgrecvs[ms.msgTyp] = rs.Msgrecvs[ms.msgTyp] + 1
 }
 
 
