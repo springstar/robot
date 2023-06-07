@@ -33,6 +33,7 @@ func (r *Robot) handleSwitchStage(packet *core.Packet) {
 	lineNum := msg.GetLineNum()
 	fmt.Println(stageId, mapSn, repSn, pos, dir, lineNum)
 	r.fsm.trigger(r.fsm.state, "enterok", r)
+	queueStat(STAT_ENTER_STAGE, 1)
 
 }
 

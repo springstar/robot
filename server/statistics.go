@@ -55,6 +55,14 @@ func newRunStat() *RunStat {
 	}
 }
 
+func queueStat(stype StatType, count int32) {
+	var s Stat
+	s.typ = stype
+	s.v = count
+	serv.ch <- s
+
+}
+
 func queueMsgStat(stype StatType, mtype int32, size int32) {
 	var s Stat
 	s.typ = stype
@@ -88,6 +96,12 @@ func (rs *RunStat) statistic(s Stat) {
 		rs.statSendPackets(s)
 	case STAT_RECV_PACKETS:	
 		rs.statRecvPackets(s)
+	case STAT_SEND_ROBOTS:
+		rs.Sends += s.v.(int32)
+	case STAT_CREATE_ROLES:
+		rs.Roles += s.v.(int32)	
+	case STAT_ENTER_STAGE:	
+		rs.Logins += s.v.(int32)
 	default:
 		break
 	}

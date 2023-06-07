@@ -1,6 +1,7 @@
 package server
 
 import (
+	"log"
 	"fmt"
 	"encoding/json"
 )
@@ -65,15 +66,20 @@ func (cmd BenchCommand) runRobots() {
 	accountMgr := serv.accountMgr
 	robotMgr := serv.robotMgr
 
+	count := 0
 	for i := 0; i < cmd.Count; i++ {
 		err, account := accountMgr.alloc()
 		if (err != nil) {
+			log.Fatal(err)
 			break
 		}
 
 		robot := newRobot(account, robotMgr, newFsm())
 		robot.startup()
+		count += 1
 	}
+
+	queueStat(STAT_SEND_ROBOTS, int32(count))
 }
 
 type DebugCommand struct {

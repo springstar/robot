@@ -98,6 +98,7 @@ func (r *Robot)handleCreateResult(packet *core.Packet) {
 
 	r.onCreate(msg.GetHumanId(), msg.GetFashionSn())
 	r.fsm.trigger(r.fsm.state, "creatok", r)
+	queueStat(STAT_CREATE_ROLES, 1)
 
 }
 
