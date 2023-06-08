@@ -19,9 +19,14 @@ var apis[] api = []api {
 		handler: test,
 	},
 	api {
-		url: "start",
+		url: "bench",
 		method: "POST",
-		handler: testPost,
+		handler: bench,
+	},
+	api {
+		url: "stop",
+		method: "GET",
+		handler: stop,
 	},
 	api {
 		url: "debug",
@@ -34,6 +39,11 @@ var apis[] api = []api {
 		method: "GET",
 		handler: report,
 	},
+	api {
+		url: "quit",
+		method: "GET",
+		handler: quit,
+	},
 }
 
 func test(c *gin.Context) {
@@ -42,9 +52,9 @@ func test(c *gin.Context) {
 	  })
 }
 
-func testPost(c *gin.Context) {
+func bench(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
-		"message": "test post",
+		"message": "bench",
 	  })
 
 	var cmd BenchCommand
@@ -61,10 +71,22 @@ func testPost(c *gin.Context) {
 
 }
 
+func stop(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"message": "stop",
+	})
+
+	
+}
+
 func debug(c *gin.Context) {
 	var cmd DebugCommand
 	postCommand(c, &cmd)
 
+}
+
+func quit(c *gin.Context) {
+	
 }
 
 func report(c *gin.Context) {

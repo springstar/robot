@@ -108,6 +108,23 @@ func (cmd ExitCommand) exec() {
 
 }
 
+type StopCommand struct {
+	Command
+}
+
+func (cmd StopCommand) exec() {
+	
+}
+
+type QuitCommand struct {
+	Command
+}
+
+func (cmd QuitCommand) exec() {
+	fmt.Println("quit")
+
+}
+
 type ReportCommand struct {
 	Command
 }
@@ -124,3 +141,4 @@ func (cmd ReportCommand) exec() {
 
 	serv.driver.rq <- string(b)
 }
+
