@@ -286,6 +286,18 @@ func (mgr *RobotManager)add(account int, robot *Robot) {
 	mgr.robots[account] = robot
 }
 
+func (mgr *RobotManager) stopRobots() {
+	for _, r := range mgr.robots {
+		r.conn.Close()
+	}
+
+	for k := range mgr.robots {
+		delete(mgr.robots, k)
+	}
+
+
+}
+
 
 
 

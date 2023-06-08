@@ -113,7 +113,7 @@ type StopCommand struct {
 }
 
 func (cmd StopCommand) exec() {
-	
+	serv.robotMgr.stopRobots()
 }
 
 type QuitCommand struct {
@@ -121,7 +121,6 @@ type QuitCommand struct {
 }
 
 func (cmd QuitCommand) exec() {
-	fmt.Println("quit")
 
 }
 
@@ -130,11 +129,9 @@ type ReportCommand struct {
 }
 
 func (cmd ReportCommand) exec() {
-	fmt.Println("report")
 	b, err := json.Marshal(serv.RunStat)
 	if err != nil {
-		fmt.Println(err)
-		serv.driver.rq <- "error"
+		serv.driver.rq <- err.Error()
 		return
 	}
 

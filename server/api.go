@@ -76,7 +76,12 @@ func stop(c *gin.Context) {
 		"message": "stop",
 	})
 
-	
+	cmd := StopCommand{
+
+	}
+
+	serv.PostCommand(cmd)
+
 }
 
 func debug(c *gin.Context) {
@@ -86,7 +91,11 @@ func debug(c *gin.Context) {
 }
 
 func quit(c *gin.Context) {
-	
+	cmd := QuitCommand {
+
+	}
+
+	serv.PostCommand(cmd)
 }
 
 func report(c *gin.Context) {

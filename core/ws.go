@@ -52,5 +52,8 @@ func (wsc *WebSockConn) Read() ([]byte, error) {
 }
 
 func (wsc *WebSockConn) Close() {
-	wsc.c.Close(websocket.StatusNormalClosure, "connction closed")
+	err := wsc.c.Close(websocket.StatusNormalClosure, "connction closed")
+	if err != nil {
+		fmt.Println(err)
+	}
 }
