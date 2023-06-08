@@ -74,6 +74,7 @@ func (r *Robot) registerMsgHandler() {
 	r.Register(msg.MSG_SCStageSwitch, r)
 	r.Register(msg.MSG_SCHumanKick, r)
 	r.Register(msg.MSG_SCStageMove, r)
+	r.Register(msg.MSG_SCAccountLoginQueue, r)
 
 }
 
@@ -121,7 +122,7 @@ func (r *Robot) connect() {
 }
 
 func (r *Robot) on_connection_established() {
-	log.Printf("connection established")
+	// log.Printf("connection established")
 	r.sendLoginRequest()
 
 	go r.readPackets()
@@ -186,7 +187,7 @@ func (r *Robot)mainLoop() {
 }
 
 func (r *Robot) ready() {
-	fmt.Println("ready")
+	// fmt.Println("ready")
 	r.pc = core.GenRandomInt(serv.icount())
 }
 
@@ -235,6 +236,8 @@ func (r *Robot) HandleMessage(packet *core.Packet) {
 	switch packet.Type {
 		case msg.MSG_SCLoginResult:
 			r.handleLoginResult(packet)
+		case msg.MSG_SCAccountLoginQueue:
+			r.handleLoginQueue(packet)	
 		case msg.MSG_SCQueryCharactersResult:
 			r.handleQueryCharacters(packet)
 		case msg.MSG_SCCharacterCreateResult:

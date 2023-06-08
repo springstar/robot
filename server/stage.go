@@ -7,7 +7,6 @@ import (
 )
 
 func (r *Robot) enterStage() {
-	fmt.Println("enterStage")
 	packet := msg.SerializeCSStageEnter(msg.MSG_CSStageEnter)	
 	r.sendPacket(packet)
 	queueMsgStat(STAT_SEND_PACKETS, int32(msg.MSG_CSStageEnter), int32(len(packet)))
@@ -24,7 +23,6 @@ func (r *Robot) handleEnterStage(packet *core.Packet) {
 }
 
 func (r *Robot) handleSwitchStage(packet *core.Packet) {
-	fmt.Printf("%s switch stage\n", r.name)
 	msg := msg.ParseSCStageSwitch(int32(packet.Type), packet.Data)
 	stageId := msg.GetStageId()
 	mapSn := msg.GetStageSn()

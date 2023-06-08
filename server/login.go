@@ -10,13 +10,13 @@ import (
 )
 
 func (r *Robot) sendLoginRequest() {
-	fmt.Println("send login")
+	// fmt.Println("send login")
 	packet := msg.SerializeCSLogin(msg.MSG_CSLogin, r.account.name, "123456", "", 1001, 1)
 	r.sendPacket(packet)
 }
 
 func (r *Robot) querychars() {
-	fmt.Println("query chars")
+	// fmt.Println("query chars")
 	packet := msg.SerializeCSQueryCharacters(msg.MSG_CSQueryCharacters, 1)
 	r.sendPacket(packet)
 }
@@ -31,6 +31,10 @@ func (r *Robot) handleLoginResult(packet *core.Packet) {
 
 	r.fsm.trigger("trylogin", "lok", r)
 
+}
+
+func (r *Robot) handleLoginQueue(packet *core.Packet) {
+	fmt.Println("login queue")
 }
 
 func (r *Robot) handleQueryCharacters(packet *core.Packet) {
@@ -109,11 +113,12 @@ func (r *Robot)handleCharacterLogin(packet *core.Packet) {
 	} else {
 		fmt.Println("character login failed")
 		r.fsm.trigger(r.fsm.state, "cloginfail", r)
+		queueStat(STAT_LOGIN_FAILS, int32(1))
 	}
 }
 
 func (r *Robot)waitForInit() {
-	fmt.Println("waitForInit")
+	// fmt.Println("waitForInit")
 }
 
 func (r *Robot)handleInitData(packet *core.Packet) {

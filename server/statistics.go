@@ -11,6 +11,7 @@ const (
 	STAT_SEND_ROBOTS = iota
 	STAT_CREATE_ROLES
 	STAT_ENTER_STAGE
+	STAT_LOGIN_FAILS
 	STAT_SEND_PACKETS
 	STAT_RECV_PACKETS
 	STAT_SEND_BYTES
@@ -32,6 +33,7 @@ type RunStat struct {
 	Sends  		int32 `json:"sends"`
 	Roles  		int32 `json:"creates"`
 	Logins 		int32 `json:"logins"`
+	LoginFails  int32 `json:"loginfails"`
 	Spackets 	int32 `json:"sendpackets"`
 	Rpackets	int32 `json:"recvpackets"`
 	Sbytes		int32 `json:"sendbytes"`
@@ -102,6 +104,8 @@ func (rs *RunStat) statistic(s Stat) {
 		rs.Roles += s.v.(int32)	
 	case STAT_ENTER_STAGE:	
 		rs.Logins += s.v.(int32)
+	case STAT_LOGIN_FAILS:
+		rs.LoginFails += s.v.(int32)	
 	default:
 		break
 	}
