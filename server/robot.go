@@ -34,6 +34,7 @@ type Robot struct {
 	quit chan struct{}
 	executors map[string]iExecutor
 	pc int
+	isQuit bool
 
 }
 
@@ -50,6 +51,7 @@ func newRobot(account *Account, robotMgr *RobotManager, fsm *RobotFsm) *Robot {
 		quit: make(chan struct{}),
 		pc: -1,
 		executors: make(map[string]iExecutor),
+		isQuit: false,
 	}
 
 	if (r.account != nil) {
@@ -130,29 +132,39 @@ func (r *Robot) on_connection_established() {
 }
 
 func (r *Robot)readPackets() {
+	Loop:
 	for {
-		bytes, err := r.conn.Read()
-		if (err != nil) {
-			r.done()
-			log.Fatal(err)
-			break
+		select {
+		case <- r.quit:
+			r.isQuit = true
+			break Loop
+		default:
+			bytes, err := r.conn.Read()
+			if (err != nil) {
+				log.Fatal(err)
+				break Loop
+			}
+	
+			if len(bytes) <= 0 {
+				continue
+			}
+	
+			// add to msg buffer
+			r.buffer.Write(bytes)
+	
+			// split packet from msg buffer and send to packetQ channel
+			packets := r.buffer.Read()
+			if (packets == nil) {
+				continue
+			}
+			
+			r.packetQ <- packets	
+
 		}
+	}
 
-		if len(bytes) <= 0 {
-			continue
-		}
-
-		// add to msg buffer
-		r.buffer.Write(bytes)
-
-		// split packet from msg buffer and send to packetQ channel
-		packets := r.buffer.Read()
-		if (packets == nil) {
-			continue
-		}
-
-		r.packetQ <- packets
-		
+	if r.isQuit {
+		close(r.packetQ)
 	}
 }
 
@@ -178,10 +190,12 @@ func (r *Robot)mainLoop() {
 			case packets := <- r.packetQ:
 				r.dispatch(packets)	
 			case <- r.ticker.C:	
+			if r.isQuit {
+				r.conn.Close()
+				r.ticker.Stop()			
+			} else {
 				r.update()
-			case <- r.quit:
-				return	
-
+			}
 		}
 	}
 }
@@ -288,7 +302,7 @@ func (mgr *RobotManager)add(account int, robot *Robot) {
 
 func (mgr *RobotManager) stopRobots() {
 	for _, r := range mgr.robots {
-		r.conn.Close()
+		r.done()
 	}
 
 	for k := range mgr.robots {
