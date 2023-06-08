@@ -162,10 +162,6 @@ func (r *Robot)readPackets() {
 
 		}
 	}
-
-	if r.isQuit {
-		close(r.packetQ)
-	}
 }
 
 func (r *Robot) done() {
@@ -191,6 +187,7 @@ func (r *Robot)mainLoop() {
 				r.dispatch(packets)	
 			case <- r.ticker.C:	
 			if r.isQuit {
+				close(r.packetQ)
 				r.conn.Close()
 				r.ticker.Stop()			
 			} else {
