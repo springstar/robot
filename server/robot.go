@@ -186,15 +186,22 @@ func (r *Robot)mainLoop() {
 			case packets := <- r.packetQ:
 				r.dispatch(packets)	
 			case <- r.ticker.C:	
-			if r.isQuit {
-				close(r.packetQ)
-				r.conn.Close()
-				r.ticker.Stop()			
-			} else {
-				r.update()
-			}
+				if !r.checkQuit() {
+					r.update()
+				}	
 		}
 	}
+}
+
+func (r *Robot) checkQuit() bool {
+	if r.isQuit {
+		close(r.packetQ)
+		r.conn.Close()
+		r.ticker.Stop()		
+		return true
+	}
+
+	return false
 }
 
 func (r *Robot) ready() {
