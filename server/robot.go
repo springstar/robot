@@ -22,13 +22,13 @@ type iExecutor interface {
 type Robot struct {
 	core.IDispatcher
 	*Character
-
 	conn core.NetConnection
+	packetQ chan []*core.Packet
+	buffer *core.PacketBuffer
 	mgr *RobotManager
 	account *Account
 	fsm *RobotFsm
-	packetQ chan []*core.Packet
-	buffer *core.PacketBuffer
+
 	moduleMgr *ModuleManager
 	ticker *time.Ticker
 	quit chan struct{}
