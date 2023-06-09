@@ -32,3 +32,12 @@ func (sm *SceneManager) init() {
 		sm.pathpoints[int32(conf.Sn)] = points
 	}
 }
+
+func (sm *SceneManager) getPath(sn int32) []*core.Vec2 {
+	if path, ok := sm.pathpoints[sn]; ok {
+		return path
+	}
+
+	return []*core.Vec2{}
+
+}
