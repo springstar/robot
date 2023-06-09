@@ -1,6 +1,7 @@
 package server
 
 import (
+	_ "fmt"
 	"github.com/springstar/robot/core"
 	"github.com/springstar/robot/config"
 )
@@ -21,7 +22,7 @@ func (sm *SceneManager) init() {
 	for _, conf := range confPathPoints {
 		var points []*core.Vec2
 		strPoints := []string{conf.Position1, conf.Position2, conf.Position3, conf.Position4, conf.Position5, conf.Position6, conf.Position7,
-			conf.Position8, conf.Position9, conf.Position10 }
+			conf.Position8, conf.Position9, conf.Position10 }	
 	
 		for _, s := range strPoints {
 			pts := core.Str2Float32Slice(s)
@@ -31,6 +32,20 @@ func (sm *SceneManager) init() {
 
 		sm.pathpoints[int32(conf.Sn)] = points
 	}
+}
+
+func (sm *SceneManager) getPoint(sn int32, num int) *core.Vec2 {
+	if num < 1 || num > 10 {
+		return nil
+	}
+
+	path := sm.getPath(sn)
+	if len(path) < 10 {
+		return nil
+	}
+
+	p := path[num - 1]
+	return p
 }
 
 func (sm *SceneManager) getPath(sn int32) []*core.Vec2 {

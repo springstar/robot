@@ -87,6 +87,8 @@ func (serv *Server) initManager() {
 	serv.nameMgr = newNameManager()
 	serv.nameMgr.loadNameFiles()
 
+	serv.sceneMgr = newSceneManager()
+	serv.sceneMgr.init()
 
 }
 

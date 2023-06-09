@@ -72,16 +72,18 @@ func (m *RobotMovement) isTimeToSync(now int64) bool {
 }
 
 func (m *RobotMovement) exec(params []string, delta int) ExecState {
-	var target []float64
-	for _, para := range params {
-		v := core.Str2Float64(para)
-		target = append(target, v)
+	v, err := core.Str2Int(params[0])
+	if err != nil {
+		fmt.Printf("path point error %s", params)
+		return EXEC_COMPLETED
 	}
 
-	d := core.NewVec2(float32(target[0]), float32(target[1]))
+	target := serv.sceneMgr.getPoint(m.r.mapSn, v)
+
+	fmt.Printf("map %d num %d target %v\n", m.r.mapSn, v, target)
 	
 	delta = delta * int(m.r.speed)
-	r := m.moveto(d, float32(delta))
+	r := m.moveto(target, float32(delta))
 
 	if r == -1 {
 		return EXEC_ONGOING
@@ -93,6 +95,7 @@ func (m *RobotMovement) exec(params []string, delta int) ExecState {
 func (m *RobotMovement)moveto(d *core.Vec2, delta float32) int {
 	v := core.MoveTowards(m.r.pos, d, delta)
 	if v.Equals(d) {
+		fmt.Println("move completed ", d)
 		return 0
 	} else {
 		fmt.Println(v)

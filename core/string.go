@@ -21,7 +21,7 @@ func Str2Int(s string) (int, error) {
 
 func Str2IntSlice(s string) ([]int, error) {
 	strSlice := strings.Split(s, ",")
-	intSlice := make([]int, len(strSlice))
+	var intSlice []int
 	for _, v := range strSlice {
 		n, err := Str2Int(v)
 		if err != nil {
@@ -36,7 +36,7 @@ func Str2IntSlice(s string) ([]int, error) {
 
 func Str2Int32Slice(s string) ([]int32, error) {
 	strSlice := strings.Split(s, ",")
-	intSlice := make([]int32, len(strSlice))
+	var intSlice []int32
 	for _, v := range strSlice {
 		n, err := Str2Int(v)
 		if err != nil {
@@ -61,7 +61,7 @@ func Str2Float32(s string) float32 {
 
 func Str2Float32Slice(s string) []float32 {
 	strSlice := strings.Split(s, ",")
-	floatSlice := make([]float32, len(strSlice))
+	var floatSlice []float32
 	for _, v := range strSlice {
 		f := Str2Float32(v)
 		floatSlice = append(floatSlice, f)
