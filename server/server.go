@@ -24,6 +24,8 @@ type Server struct {
 	robotMgr *RobotManager
 	confMgr *JsonConfigManager
 	nameMgr *NameManager
+	sceneMgr *SceneManager
+
 }
 
 
@@ -74,15 +76,18 @@ func (serv *Server) parseConfig(content []byte) error {
 }
 
 func (serv *Server) initManager() {
+	serv.confMgr  = newJsonConfigManager()
+	serv.confMgr.init("config")
+
 	startAccountId := getStartAccountId(serv.cfg.ServerId)
 	serv.accountMgr = newAccountManager(startAccountId, serv.cfg.MaxNum)
 
 	serv.robotMgr = newRobotManager(serv.cfg.Url)	
-	serv.confMgr  = newJsonConfigManager()
-	serv.confMgr.init("config")
 
 	serv.nameMgr = newNameManager()
 	serv.nameMgr.loadNameFiles()
+
+
 }
 
 func (serv *Server) Run() {

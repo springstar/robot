@@ -59,6 +59,17 @@ func Str2Float32(s string) float32 {
 	return float32(f)
 }
 
+func Str2Float32Slice(s string) []float32 {
+	strSlice := strings.Split(s, ",")
+	floatSlice := make([]float32, len(strSlice))
+	for _, v := range strSlice {
+		f := Str2Float32(v)
+		floatSlice = append(floatSlice, f)
+	}
+
+	return floatSlice
+}
+
 func ConcatStrings(ss []string, sep string) string {
 	var b strings.Builder
 	for _, s := range ss {
