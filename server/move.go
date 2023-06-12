@@ -10,6 +10,7 @@ import (
 
 type RobotMovement struct {
 	r *Robot
+	path []*core.Vec2
 	lastSyncTime int64
 }
 
@@ -19,15 +20,12 @@ func newMovement(r *Robot) *RobotMovement {
 	}
 }
 
-func (m *RobotMovement) sendMoveRequest(path []*core.Vec2) {
-	if len(path) == 0 {
+func (m *RobotMovement) sendMoveRequest() {
+	if len(m.path) == 0 {
 		return
 	}
 
 	now := core.GetCurrentTime()
-	if !m.isTimeToSync(now) {
-		return
-	}
 
 	start := &pb.DVector3{
 		X: m.r.pos.X,
@@ -36,7 +34,7 @@ func (m *RobotMovement) sendMoveRequest(path []*core.Vec2) {
 	}
 
 	var end []*pb.DVector3
-	for _, p := range path {
+	for _, p := range m.path {
 		pos := &pb.DVector3{
 			X: p.X,
 			Y: p.Y,
@@ -56,7 +54,12 @@ func (m *RobotMovement) sendMoveRequest(path []*core.Vec2) {
 	m.r.sendPacket(msg)
 
 	m.updateSyncTime(now)
-
+	
+	for _, pos := range m.path {
+		fmt.Println(pos)
+	}
+	// clear path
+	m.path = m.path[:0]
 }
 
 func (m *RobotMovement) updateSyncTime(now int64) {
@@ -64,7 +67,7 @@ func (m *RobotMovement) updateSyncTime(now int64) {
 }
 
 func (m *RobotMovement) isTimeToSync(now int64) bool {
-	if m.lastSyncTime == 0 || m.lastSyncTime + 100 > now {
+	if m.lastSyncTime == 0 || m.lastSyncTime + 100 < now {
 		return true
 	}
 
@@ -80,10 +83,16 @@ func (m *RobotMovement) exec(params []string, delta int) ExecState {
 
 	target := serv.sceneMgr.getPoint(m.r.mapSn, v)
 
-	fmt.Printf("map %d num %d target %v\n", m.r.mapSn, v, target)
-	
-	delta = delta * int(m.r.speed)
+	// fmt.Printf("map %d num %d target %v\n", m.r.mapSn, v, target)
+	delta = 5
+	// delta = delta * int(m.r.speed)
+	now := core.GetCurrentTime()
+
 	r := m.moveto(target, float32(delta))
+
+	if m.isTimeToSync(now) {
+		m.sendMoveRequest()
+	}
 
 	if r == -1 {
 		return EXEC_ONGOING
@@ -93,15 +102,17 @@ func (m *RobotMovement) exec(params []string, delta int) ExecState {
 }
 
 func (m *RobotMovement)moveto(d *core.Vec2, delta float32) int {
+	// fmt.Println(m.r.pos, *d, delta)
 	v := core.MoveTowards(m.r.pos, d, delta)
 	if v.Equals(d) {
 		fmt.Println("move completed ", d)
 		return 0
 	} else {
-		fmt.Println(v)
+		// fmt.Println(v)
 	}
 
 	m.r.pos = v
+	m.path = append(m.path, v)
 
 	return -1
 }
