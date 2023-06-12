@@ -77,6 +77,7 @@ func (r *Robot) registerMsgHandler() {
 	r.Register(msg.MSG_SCHumanKick, r)
 	r.Register(msg.MSG_SCStageMove, r)
 	r.Register(msg.MSG_SCAccountLoginQueue, r)
+	r.Register(msg.MSG_SCSoulAwaken, r)
 
 }
 
@@ -205,7 +206,11 @@ func (r *Robot) checkQuit() bool {
 }
 
 func (r *Robot) ready() {
-	// fmt.Println("ready")
+	if r.profession == 0 {
+		r.awakeSoul()
+		return
+	}	
+
 	r.pc = core.GenRandomInt(serv.icount())
 }
 
@@ -275,7 +280,9 @@ func (r *Robot) HandleMessage(packet *core.Packet) {
 		case msg.MSG_SCHumanKick:
 			r.handleKick(packet)
 		case msg.MSG_SCStageMove:
-			r.handleStageMove(packet)			
+			r.handleStageMove(packet)
+		case msg.MSG_SCSoulAwaken:
+			r.handleSoulAwaken(packet)				
 		default:
 			fmt.Println("recv packet type ", packet.Type)	
 	}

@@ -1,6 +1,8 @@
 package server
 
 import (
+	"strconv"
+	"github.com/springstar/robot/msg"
 	"github.com/springstar/robot/core"
 
 	"github.com/springstar/robot/pb"
@@ -78,3 +80,19 @@ func (c *Character) onInit(human *pb.DHuman, stage *pb.DInitDataStage, quests []
 	}
 }
 
+func (r *Robot) awakeSoul() {
+	souls := []int{11, 12, 13}
+	idx := core.GenRandomInt(len(souls))
+	msg := msg.SerializeCSSoulAwaken(msg.MSG_CSSoulAwaken, strconv.Itoa(souls[idx]))
+	r.sendPacket(msg)
+}
+
+func (r *Robot) handleSoulAwaken(packet *core.Packet) {
+	awakeMsg := msg.ParseSCSoulAwaken(int32(msg.MSG_SCSoulAwaken), packet.Data)
+	r.profession = awakeMsg.GetProfession()
+	r.roleSn = awakeMsg.GetRoleSn()
+	r.soul = awakeMsg.GetSoul()
+	
+	request := msg.SerializeCSInstanceLeave(msg.MSG_CSInstanceLeave)
+	r.sendPacket(request)
+}
