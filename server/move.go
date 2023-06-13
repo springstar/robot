@@ -83,7 +83,7 @@ func (m *RobotMovement) exec(params []string, delta int) ExecState {
 
 	target := serv.sceneMgr.getPoint(m.r.mapSn, v)
 
-	// fmt.Printf("map %d num %d target %v\n", m.r.mapSn, v, target)
+	fmt.Printf("map %d num %d target %v\n", m.r.mapSn, v, target)
 	delta = 5
 	// delta = delta * int(m.r.speed)
 	now := core.GetCurrentTime()

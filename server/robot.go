@@ -107,6 +107,8 @@ func (r *Robot) doAction(action string) {
 		r.enterStage()
 	case "ready":
 		r.ready()
+	case "onswitch":
+		r.onSwitchStage()		
 	default:
 		fmt.Println(action)	
 	}
@@ -207,13 +209,13 @@ func (r *Robot) checkQuit() bool {
 
 func (r *Robot) ready() {
 	if r.profession == 0 {
-		r.awakeSoul()
 		return
 	}	
-
+	
 	r.pc = core.GenRandomInt(serv.icount())
+	fmt.Println("r.pc =", r.pc)
 }
-
+ 
 func (r *Robot)update() {
 	r.sendPulse()
 	r.vm()
