@@ -7,14 +7,14 @@ import (
 type MatchType int
 
 const (
-	MATCH_TYPE_NONE MatchType = iota
-	MATCH_TYPE_3V3 
-	MATCH_TYPE_5V5
+	MT_NONE MatchType = iota
+	MT_3V3 
+	MT_5V5
 
-	MATCH_TYPE_10v10_OCCUPY = 4
-	MATCH_TYPE_10v10_RESOURCES = 5
-	MATCH_TYPE_10V10_CAPTURE = 6
-	MATCH_TYPE_REP = 7
+	MT_OCCUPY = 4
+	MT_RESOURCES = 5
+	MT_CAPTURE = 6
+	MT_REP = 7
 
 )
 
@@ -39,19 +39,39 @@ func (m *MatchExecutor) exec(params []string, delta int) ExecState {
 		return EXEC_COMPLETED
 	}
 
-	if m.isPVPMatch(MatchType(t)) {
-
+	if m.isPVEMatch(MatchType(t)) {
+		m.startPVEMatch()
+	} else if m.isPVPMatch(MatchType(t)) {
+		m.startPVPMatch()
+	} else {
+		core.Error("error match type ", t)
 	}
 
 	return EXEC_COMPLETED
 }
 
-func (m *MatchExecutor) isPVPMatch(t MatchType) bool {
-	if t == MATCH_TYPE_3V3 || t == MATCH_TYPE_5V5 {
+func (m *MatchExecutor) isPVEMatch(t MatchType) bool {
+	if t == MT_REP {
 		return true
 	}
 
 	return false
+}
+
+func (m *MatchExecutor) isPVPMatch(t MatchType) bool {
+	if t == MT_3V3 || t == MT_5V5 || t == MT_OCCUPY || t == MT_RESOURCES || t == MT_CAPTURE {
+		return true
+	} else {
+		return false
+	}
+}
+
+func (m *MatchExecutor) startPVPMatch() {
+
+}
+
+func (m *MatchExecutor) startPVEMatch() {
+
 }
 
 func (m *MatchExecutor) checkIfExec() bool {
