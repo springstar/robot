@@ -21,8 +21,8 @@ func (r *Robot) handleEnterStage(packet *core.Packet) {
 		fmt.Println(obj.GetName())
 	}
 
-	fmt.Println("enter stage, profession: ", r.profession)
-	fmt.Println("map ", r.mapSn)
+	core.Info("enter stage, profession: ", r.profession)
+	core.Info("map ", r.mapSn)
 	r.fsm.trigger(r.fsm.state, "enterok", r)
 }
 
@@ -49,7 +49,7 @@ func (r *Robot) onSwitchStage() {
 	}
 
 	r.pc = core.GenRandomInt(serv.icount())
-	fmt.Println("after switch r.pc =", r.pc)
+	core.Info("after switch r.pc =", r.pc)
 }
 
 func (r *Robot) handleObjAppear(packet *core.Packet) {
@@ -61,5 +61,5 @@ func (r *Robot) handleObjDisappear(packet *core.Packet) {
 }
 
 func (r *Robot) handleStageMove(packet *core.Packet) {
-	fmt.Println("sc stage move")
+	// fmt.Println("sc stage move")
 }

@@ -1,6 +1,7 @@
 package server
 
 import (
+	 _ "log"
 	"github.com/springstar/robot/pb"
 	"github.com/springstar/robot/msg"
 	"fmt"
@@ -52,9 +53,8 @@ func (m *RobotMovement) sendMoveRequest() {
 	}
 
 	msg := msg.SerializeCSStageMove(msg.MSG_CSStageMove, m.r.humanId, start, end, dir, now)
-	fmt.Println("start", start)
-	fmt.Println("end", end)
 	m.r.sendPacket(msg)
+	
 
 	m.updateSyncTime(now)
 	
