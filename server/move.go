@@ -108,7 +108,6 @@ func (m *RobotMovement)moveto(d *core.Vec2, delta float32) int {
 	// fmt.Println(m.r.pos, *d, delta)
 	v := core.MoveTowards(m.r.pos, d, delta)
 	if v.Equals(d) {
-		core.Info("move completed ", d)
 		return 0
 	} else {
 		// fmt.Println(v)
