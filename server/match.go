@@ -70,6 +70,7 @@ func (m *MatchExecutor) isPVPMatch(t MatchType) bool {
 }
 
 func (m *MatchExecutor) startPVPMatch(mt MatchType) {
+	core.Info("start pvp match")
 	request := msg.SerializeCSMatchEnrollRequest(msg.MSG_CSMatchEnrollRequest, int32(mt))
 	m.sendPacket(request)
 	m.markMatching(mt)
@@ -117,6 +118,24 @@ func (r *Robot) handleArenaEnroll(packet *core.Packet) {
 		executor := r.findExecutor("match").(*MatchExecutor)
 		executor.markNone()
 	}
+
+	core.Info("arena enroll code ", code)
 }
 
+func (r *Robot) handleArenaMatchResult(packet *core.Packet) {
+	dumpMatchResult(packet)
+}
 
+func dumpMatchResult(packet *core.Packet) {
+	msg := msg.ParseSCMatchResult(int32(msg.MSG_SCMatchResult), packet.Data)
+	sideA := msg.GetSideA()
+	sideB := msg.GetSideB()
+
+	for _, member := range sideA.GetMembers() {
+		core.Info(member.GetName())
+	}
+
+	for _, member := range sideB.GetMembers() {
+		core.Info(member.GetName())
+	}
+}
