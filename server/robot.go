@@ -16,6 +16,7 @@ import (
 
 type iExecutor interface {
 	exec(params []string, delta int) ExecState
+	checkIfExec() bool
 }
 
 type Robot struct {
@@ -63,6 +64,7 @@ func newRobot(account *Account, robotMgr *RobotManager, fsm *RobotFsm) *Robot {
 func (r *Robot) loadModules() {
 	r.executors["move"] = newMovement(r)
 	r.executors["quest"] = newQuestExecutor(r)
+	r.executors["match"] = newMatchExecutor(r)
 }
 
 func (r *Robot) registerMsgHandler() {
@@ -240,6 +242,10 @@ func (r *Robot) vm() {
 			core.Error("no executor ", instruction.cmd)
 			// log.Fatal("no executor ", instruction.cmd)
 		} else {
+			if !executor.checkIfExec() {
+				return
+			}
+			
 			state := executor.exec(instruction.params, 30)
 			if state == EXEC_COMPLETED {
 				r.pc, instruction = serv.next(r.pc)

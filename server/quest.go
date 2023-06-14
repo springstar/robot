@@ -44,4 +44,8 @@ func (q *RobotQuestExecutor) exec(params []string, delta int) ExecState {
 
 	return EXEC_COMPLETED
 }
+
+func (q *RobotQuestExecutor) checkIfExec() bool {
+	return true
+}
 	 
