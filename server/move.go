@@ -10,6 +10,7 @@ import (
 
 type RobotMovement struct {
 	r *Robot
+	lastPos *core.Vec2
 	path []*core.Vec2
 	lastSyncTime int64
 }
@@ -28,8 +29,8 @@ func (m *RobotMovement) sendMoveRequest() {
 	now := core.GetCurrentTime()
 
 	start := &pb.DVector3{
-		X: m.r.pos.X,
-		Y: m.r.pos.Y,
+		X: m.lastPos.X,
+		Y: m.lastPos.Y,
 		Z: 0,
 	}
 
@@ -51,15 +52,15 @@ func (m *RobotMovement) sendMoveRequest() {
 	}
 
 	msg := msg.SerializeCSStageMove(msg.MSG_CSStageMove, m.r.humanId, start, end, dir, now)
+	fmt.Println("start", start)
+	fmt.Println("end", end)
 	m.r.sendPacket(msg)
 
 	m.updateSyncTime(now)
 	
-	for _, pos := range m.path {
-		fmt.Println(pos)
-	}
 	// clear path
 	m.path = m.path[:0]
+	m.lastPos = m.r.pos
 }
 
 func (m *RobotMovement) updateSyncTime(now int64) {
@@ -67,7 +68,7 @@ func (m *RobotMovement) updateSyncTime(now int64) {
 }
 
 func (m *RobotMovement) isTimeToSync(now int64) bool {
-	if m.lastSyncTime == 0 || m.lastSyncTime + 100 < now {
+	if m.lastSyncTime == 0 || m.lastSyncTime + 150 < now {
 		return true
 	}
 
@@ -81,9 +82,12 @@ func (m *RobotMovement) exec(params []string, delta int) ExecState {
 		return EXEC_COMPLETED
 	}
 
+	if m.lastPos == nil {
+		m.lastPos = m.r.pos
+	}
+
 	target := serv.sceneMgr.getPoint(m.r.mapSn, v)
 
-	fmt.Printf("map %d num %d target %v\n", m.r.mapSn, v, target)
 	delta = 5
 	// delta = delta * int(m.r.speed)
 	now := core.GetCurrentTime()
