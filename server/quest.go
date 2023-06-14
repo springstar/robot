@@ -48,4 +48,8 @@ func (q *RobotQuestExecutor) exec(params []string, delta int) ExecState {
 func (q *RobotQuestExecutor) checkIfExec() bool {
 	return true
 }
+
+func (q *RobotQuestExecutor) handleBreak() {
+	
+}
 	 

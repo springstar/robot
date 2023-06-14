@@ -17,6 +17,7 @@ import (
 type iExecutor interface {
 	exec(params []string, delta int) ExecState
 	checkIfExec() bool
+	handleBreak()
 }
 
 type Robot struct {
@@ -243,6 +244,7 @@ func (r *Robot) vm() {
 			// log.Fatal("no executor ", instruction.cmd)
 		} else {
 			if !executor.checkIfExec() {
+				executor.handleBreak()
 				return
 			}
 			

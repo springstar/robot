@@ -78,6 +78,10 @@ func (m *RobotMovement) checkIfExec() bool {
 	return true
 }
 
+func (m *RobotMovement) handleBreak() {
+	
+}
+
 func (m *RobotMovement) exec(params []string, delta int) ExecState {
 	v, err := core.Str2Int(params[0])
 	if err != nil {
