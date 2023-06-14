@@ -4,7 +4,6 @@ import (
 	_ "bytes"
 	
 	_ "net"
-	"fmt"
 	"log"
 	"time"
 	_ "sync"
@@ -110,7 +109,7 @@ func (r *Robot) doAction(action string) {
 	case "onswitch":
 		r.onSwitchStage()		
 	default:
-		fmt.Println(action)	
+		core.Warn(action)	
 	}
 }
 
@@ -118,7 +117,7 @@ func (r *Robot) connect() {
 	r.conn = core.NewWsConnection()
 	err := r.conn.Connect(r.mgr.url)
 	if err != nil {
-		fmt.Print(err)
+		core.Error(err)
 		r.fsm.trigger("connecting", "cfail", r)
 	}
 
@@ -213,7 +212,6 @@ func (r *Robot) ready() {
 	}	
 	
 	r.pc = core.GenRandomInt(serv.icount())
-	fmt.Println("r.pc =", r.pc)
 }
  
 func (r *Robot)update() {
@@ -221,15 +219,6 @@ func (r *Robot)update() {
 	r.vm()
 
 	r.ticker.Reset(ROBOT_PULSE)
-
-}
-
-func (r *Robot) move(para []interface{}) {
-	fmt.Println(para)
-}
-
-func (r *Robot) quest(para []interface{}) {
-	fmt.Println(para)
 
 }
 
@@ -246,7 +235,7 @@ func (r *Robot) vm() {
 		instruction := serv.fetch(r.pc)
 		executor := r.findExecutor(instruction.cmd)
 		if executor == nil {
-			fmt.Println("no executor ", instruction.cmd)
+			core.Error("no executor ", instruction.cmd)
 			// log.Fatal("no executor ", instruction.cmd)
 		} else {
 			state := executor.exec(instruction.params, 30)
@@ -286,7 +275,7 @@ func (r *Robot) HandleMessage(packet *core.Packet) {
 		case msg.MSG_SCSoulAwaken:
 			r.handleSoulAwaken(packet)				
 		default:
-			fmt.Println("recv packet type ", packet.Type)	
+			core.Warn("recv packet type ", packet.Type)	
 	}
 
 	queueMsgStat(STAT_RECV_PACKETS, int32(packet.Type), int32(packet.Length))

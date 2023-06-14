@@ -4,7 +4,6 @@ import (
 	 _ "log"
 	"github.com/springstar/robot/pb"
 	"github.com/springstar/robot/msg"
-	"fmt"
 	_ "math"
 	"github.com/springstar/robot/core"
 )
@@ -78,7 +77,7 @@ func (m *RobotMovement) isTimeToSync(now int64) bool {
 func (m *RobotMovement) exec(params []string, delta int) ExecState {
 	v, err := core.Str2Int(params[0])
 	if err != nil {
-		fmt.Printf("path point error %s", params)
+		core.Error("path point error %s", params)
 		return EXEC_COMPLETED
 	}
 
@@ -109,7 +108,7 @@ func (m *RobotMovement)moveto(d *core.Vec2, delta float32) int {
 	// fmt.Println(m.r.pos, *d, delta)
 	v := core.MoveTowards(m.r.pos, d, delta)
 	if v.Equals(d) {
-		fmt.Println("move completed ", d)
+		core.Info("move completed ", d)
 		return 0
 	} else {
 		// fmt.Println(v)

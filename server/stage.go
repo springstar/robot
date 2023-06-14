@@ -3,7 +3,6 @@ package server
 import (
 	"github.com/springstar/robot/core"
 	"github.com/springstar/robot/msg"
-	"fmt"
 )
 
 func (r *Robot) enterStage() {
@@ -16,9 +15,9 @@ func (r *Robot) handleEnterStage(packet *core.Packet) {
 	msg := msg.ParseSCStageEnterResult(int32(packet.Type), packet.Data)
 	stageObjs := msg.GetObj()
 	for _, obj := range stageObjs {
-		fmt.Println(obj.GetType())
-		fmt.Println(obj.GetPos())
-		fmt.Println(obj.GetName())
+		core.Info(obj.GetType())
+		core.Info(obj.GetPos())
+		core.Info(obj.GetName())
 	}
 
 	core.Info("enter stage, profession: ", r.profession)
@@ -34,8 +33,8 @@ func (r *Robot) handleSwitchStage(packet *core.Packet) {
 	pos := msg.GetPos()
 	dir := msg.GetDir()
 	lineNum := msg.GetLineNum()
-	fmt.Println(stageId, mapSn, repSn, pos, dir, lineNum)
-	fmt.Println("switch stage curr state ", r.fsm.state)
+	core.Info(stageId, mapSn, repSn, pos, dir, lineNum)
+	core.Info("switch stage curr state ", r.fsm.state)
 	r.fsm.trigger(r.fsm.state, "switch", r)
 	queueStat(STAT_ENTER_STAGE, 1)
 
@@ -43,7 +42,7 @@ func (r *Robot) handleSwitchStage(packet *core.Packet) {
 
 func (r *Robot) onSwitchStage() {
 	if r.profession == 0 {
-		fmt.Println("awake soul after switch stage")
+		core.Info("awake soul after switch stage")
 		r.awakeSoul()
 		return
 	}

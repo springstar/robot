@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"github.com/gin-gonic/gin"
 	"fmt"
+	"github.com/springstar/robot/core"
 )
 
 type api struct {
@@ -60,7 +61,7 @@ func bench(c *gin.Context) {
 	var cmd BenchCommand
 	cmd.Batch = 1
 
-	fmt.Println("post bench command")
+	core.Info("post bench command")
 	
 	if err := c.BindJSON(&cmd); err != nil {
 		fmt.Println(err)
