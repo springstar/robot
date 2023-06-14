@@ -82,6 +82,7 @@ func (r *Robot) registerMsgHandler() {
 	r.Register(msg.MSG_SCSoulAwaken, r)
 	r.Register(msg.MSG_SCStageObjectAppear, r)
 	r.Register(msg.MSG_SCStageObjectDisappear, r)
+	r.Register(msg.MSG_SCMatchEnrollResponse, r)
 
 }
 
@@ -283,7 +284,9 @@ func (r *Robot) HandleMessage(packet *core.Packet) {
 		case msg.MSG_SCStageMove:
 			r.handleStageMove(packet)
 		case msg.MSG_SCSoulAwaken:
-			r.handleSoulAwaken(packet)				
+			r.handleSoulAwaken(packet)
+		case msg.MSG_SCMatchEnrollResponse:
+			r.handleArenaEnroll(packet)					
 		default:
 			core.Warn("recv packet type ", packet.Type)	
 	}
@@ -320,8 +323,6 @@ func (mgr *RobotManager) stopRobots() {
 	for k := range mgr.robots {
 		delete(mgr.robots, k)
 	}
-
-
 }
 
 

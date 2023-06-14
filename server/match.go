@@ -1,6 +1,7 @@
 package server
 
 import (
+	"github.com/springstar/robot/msg"
 	"github.com/springstar/robot/core"
 )
 
@@ -21,6 +22,7 @@ const (
 type MatchExecutor struct {
 	*Robot
 	isMatching bool
+	mt MatchType
 	startTime int64
 }
 
@@ -29,6 +31,7 @@ func newMatchExecutor(r *Robot) *MatchExecutor {
 		Robot: r,
 		isMatching: false,
 		startTime: 0,
+		mt: MT_NONE,
 	}
 }
 
@@ -42,7 +45,7 @@ func (m *MatchExecutor) exec(params []string, delta int) ExecState {
 	if m.isPVEMatch(MatchType(t)) {
 		m.startPVEMatch()
 	} else if m.isPVPMatch(MatchType(t)) {
-		m.startPVPMatch()
+		m.startPVPMatch(MatchType(t))
 	} else {
 		core.Error("error match type ", t)
 	}
@@ -66,12 +69,31 @@ func (m *MatchExecutor) isPVPMatch(t MatchType) bool {
 	}
 }
 
-func (m *MatchExecutor) startPVPMatch() {
-
+func (m *MatchExecutor) startPVPMatch(mt MatchType) {
+	request := msg.SerializeCSMatchEnrollRequest(msg.MSG_CSMatchEnrollRequest, int32(mt))
+	m.sendPacket(request)
+	m.markMatching(mt)
 }
 
 func (m *MatchExecutor) startPVEMatch() {
 
+}
+
+func (m *MatchExecutor) markMatching(t MatchType) {
+	m.mt = t
+	m.isMatching = true
+	m.startTime = core.GetCurrentTime()
+}
+
+func (m *MatchExecutor) markNone() {
+	m.mt = MT_NONE
+	m.isMatching = false
+	m.startTime = 0
+}
+
+func (m *MatchExecutor) cancelArenaMatch() {
+	request := msg.SerializeCSMatchCancelRequest(msg.MSG_CSMatchCancelRequest, int32(m.mt))
+	m.sendPacket(request)
 }
 
 func (m *MatchExecutor) checkIfExec() bool {
@@ -80,13 +102,21 @@ func (m *MatchExecutor) checkIfExec() bool {
 		return false
 	}
 
-
 	return true
 }
 
 func (m *MatchExecutor) handleBreak() {
 	// now := core.GetCurrentTime()
 
+}
+
+func (r *Robot) handleArenaEnroll(packet *core.Packet) {
+	msg := msg.ParseSCMatchEnrollResponse(int32(msg.MSG_SCMatchEnrollResponse), packet.Data)
+	code := msg.GetCode()
+	if code == 1 {
+		executor := r.findExecutor("match").(*MatchExecutor)
+		executor.markNone()
+	}
 }
 
 
