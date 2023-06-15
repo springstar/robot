@@ -60,7 +60,8 @@ func (r *Robot) HandleMessage(packet *core.Packet) {
 			r.handleArenaMatchResult(packet)	
 		case msg.MSG_SCInformMsg:
 			r.handleInform(packet)
-				
+		case msg.MSG_SCTeamMine:
+			r.handleTeamDetail(packet)				
 		default:
 			core.Warn("recv packet type ", packet.Type)	
 	}

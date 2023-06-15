@@ -88,9 +88,7 @@ func (r *Robot) doAction(action string) {
 	case "enterStage":
 		r.enterStage()
 	case "ready":
-		r.ready()
-	case "onswitch":
-		r.onSwitchStage()		
+		r.ready()	
 	default:
 		core.Warn(action)	
 	}
@@ -190,7 +188,9 @@ func (r *Robot) checkQuit() bool {
 }
 
 func (r *Robot) ready() {
-	if r.profession == 0 {
+	if r.profession == 0 && isRep(int(r.mapSn)) {
+		core.Info("awake soul when ready")
+		r.awakeSoul()
 		return
 	}	
 	

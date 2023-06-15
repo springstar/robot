@@ -23,6 +23,7 @@ func (r *Robot) handleEnterStage(packet *core.Packet) {
 	core.Info("enter stage, profession: ", r.profession)
 	core.Info("map ", r.mapSn)
 	r.fsm.trigger(r.fsm.state, "enterok", r)
+	queueStat(STAT_ENTER_STAGE, 1)
 }
 
 func (r *Robot) handleSwitchStage(packet *core.Packet) {
@@ -33,26 +34,20 @@ func (r *Robot) handleSwitchStage(packet *core.Packet) {
 	pos := msg.GetPos()
 	dir := msg.GetDir()
 	lineNum := msg.GetLineNum()
+
+	r.mapSn = mapSn
 	core.Info(stageId, mapSn, repSn, pos, dir, lineNum)
 	core.Info("switch stage curr state ", r.fsm.state)
 	r.fsm.trigger(r.fsm.state, "switch", r)
-	queueStat(STAT_ENTER_STAGE, 1)
+	queueStat(STAT_SWITCH_STAGE, 1)
 
-}
-
-func (r *Robot) onSwitchStage() {
-	if r.profession == 0 {
-		core.Info("awake soul after switch stage")
-		r.awakeSoul()
-		return
-	}
-
-	r.pc = core.GenRandomInt(serv.icount())
-	core.Info("after switch r.pc =", r.pc)
 }
 
 func (r *Robot) handleObjAppear(packet *core.Packet) {
-
+	msg := msg.ParseSCStageObjectAppear(int32(msg.MSG_SCStageObjectAppear), packet.Data)
+	if r.humanId == msg.GetObjAppear().GetObjId() {
+		core.Info("appear ", r.name)
+	}
 }
 
 func (r *Robot) handleObjDisappear(packet *core.Packet) {

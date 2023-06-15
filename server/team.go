@@ -23,9 +23,12 @@ type TeamMember struct {
 	isLeader bool
 }
 
-func newTeamMember(tid int64) *TeamMember {
+
+
+func newTeamMember(tid int64, isLeader bool) *TeamMember {
 	return &TeamMember{
 		teamId: tid,
+		isLeader: isLeader,
 	}
 }
 
@@ -33,6 +36,7 @@ func newTeamExecutor(r *Robot) *TeamExecutor {
 	return &TeamExecutor{
 		Robot: r,
 		ae: newAsyncExecutor(),
+		TeamMember: newTeamMember(0, false),
 	}
 }
 
@@ -46,11 +50,13 @@ func (t *TeamExecutor) exec(params []string, delta int) ExecState {
 }
 
 func (t *TeamExecutor) create(params []string) ExecState {
+	core.Info("send create team request")
+
 	targetSn, _ := core.Str2Int(params[1])
 	teamType, _ := core.Str2Int(params[2])
 	request := msg.SerializeCSPlatCreateTeam(msg.MSG_CSPlatCreateTeam, int32(targetSn), int32(teamType))
 	t.sendPacket(request)
-	t.ae.setOngoing()
+	// t.ae.setOngoing()
 	return t.ae.getState()
 }
 
@@ -68,6 +74,10 @@ func (t *TeamExecutor) checkIfExec(params []string) bool {
 		return false
 	}
 
+	if t.profession == 0 {
+		return false
+	}
+
 	op, err := parseOperation(params)
 	if err != nil {
 		return false
@@ -75,7 +85,7 @@ func (t *TeamExecutor) checkIfExec(params []string) bool {
 
 	switch op {
 	case TO_CREATE:
-		return t.teamId == 0
+		return t.teamId <= 0
 	default:
 		return false	
 	}
@@ -85,4 +95,23 @@ func (t *TeamExecutor) checkIfExec(params []string) bool {
 func (t *TeamExecutor) handleBreak() {
 	// now := core.GetCurrentTime()
 
+}
+
+func (r *Robot) handleTeamDetail(packet *core.Packet) {
+	detail := msg.ParseSCTeamMine(int32(msg.MSG_SCTeamMine), packet.Data)
+	e := r.findExecutor("team").(*TeamExecutor)
+	teamId := detail.GetTeamId() 
+	if teamId <= 0 {
+		return
+	}
+
+	isLeader := r.isLeader(detail.GetLeaderId())
+	e.TeamMember.teamId = detail.GetTeamId()
+	e.TeamMember.isLeader = isLeader
+	e.ae.setCompleted()
+	core.Info("team detail ", detail)
+}
+
+func (r *Robot) isLeader(leaderId int64) bool {
+	return r.humanId == leaderId
 }

@@ -15,7 +15,9 @@ type Executor struct {
 }
 
 func newExecutor() *Executor {
-	return &Executor{}
+	return &Executor{
+		ExecState: EXEC_NO_START,
+	}
 }
 
 func (e *Executor) exec(params []string, delta int) ExecState {
@@ -47,7 +49,9 @@ type AsyncExecutor struct {
 }
 
 func newAsyncExecutor() *AsyncExecutor {
-	return &AsyncExecutor{}
+	return &AsyncExecutor{
+		Executor: newExecutor(),
+	}
 }
 
 func (ae *AsyncExecutor) checkIfExec(params []string) bool {
