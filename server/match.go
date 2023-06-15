@@ -97,7 +97,7 @@ func (m *MatchExecutor) cancelArenaMatch() {
 	m.sendPacket(request)
 }
 
-func (m *MatchExecutor) checkIfExec() bool {
+func (m *MatchExecutor) checkIfExec(params []string) bool {
 	// now := core.GetCurrentTime()
 	if m.isMatching {
 		return false

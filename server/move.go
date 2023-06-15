@@ -74,12 +74,12 @@ func (m *RobotMovement) isTimeToSync(now int64) bool {
 	return false
 }
 
-func (m *RobotMovement) checkIfExec() bool {
+func (m *RobotMovement) checkIfExec(params []string) bool {
 	return true
 }
 
 func (m *RobotMovement) handleBreak() {
-	
+
 }
 
 func (m *RobotMovement) exec(params []string, delta int) ExecState {

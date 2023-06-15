@@ -16,7 +16,7 @@ import (
 
 type iExecutor interface {
 	exec(params []string, delta int) ExecState
-	checkIfExec() bool
+	checkIfExec(params []string) bool
 	handleBreak()
 }
 
@@ -247,7 +247,7 @@ func (r *Robot) vm() {
 			core.Error("no executor ", instruction.cmd)
 			// log.Fatal("no executor ", instruction.cmd)
 		} else {
-			if !executor.checkIfExec() {
+			if !executor.checkIfExec(instruction.params) {
 				executor.handleBreak()
 				return
 			}
