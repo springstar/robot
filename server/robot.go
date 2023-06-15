@@ -14,12 +14,6 @@ import (
 	_ "github.com/gobwas/ws"
 )
 
-type iExecutor interface {
-	exec(params []string, delta int) ExecState
-	checkIfExec(params []string) bool
-	handleBreak()
-}
-
 type Robot struct {
 	core.IDispatcher
 	*Character
@@ -237,27 +231,6 @@ func (r *Robot) findExecutor(cmd string) iExecutor {
 	} else {
 		return executor
 	}
-}
-
-func (r *Robot) vm() {
-	if r.pc != -1 {
-		instruction := serv.fetch(r.pc)
-		executor := r.findExecutor(instruction.cmd)
-		if executor == nil {
-			core.Error("no executor ", instruction.cmd)
-			// log.Fatal("no executor ", instruction.cmd)
-		} else {
-			if !executor.checkIfExec(instruction.params) {
-				executor.handleBreak()
-				return
-			}
-			
-			state := executor.exec(instruction.params, 30)
-			if state == EXEC_COMPLETED {
-				r.pc, instruction = serv.next(r.pc)
-			}
-		}
-	}	
 }
 
 func (r *Robot) HandleMessage(packet *core.Packet) {
