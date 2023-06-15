@@ -17,7 +17,6 @@ type RobotMovement struct {
 
 func newMovement(r *Robot) *RobotMovement {
 	return &RobotMovement{
-		Executor: nil,
 		r: r,
 	}
 }
