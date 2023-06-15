@@ -132,10 +132,10 @@ func dumpMatchResult(packet *core.Packet) {
 	sideB := msg.GetSideB()
 
 	for _, member := range sideA.GetMembers() {
-		core.Info(member.GetName())
+		core.Info("sideA member name ", member.GetName())
 	}
 
 	for _, member := range sideB.GetMembers() {
-		core.Info(member.GetName())
+		core.Info("sideB member name ", member.GetName())
 	}
 }

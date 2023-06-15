@@ -84,6 +84,7 @@ func (r *Robot) registerMsgHandler() {
 	r.Register(msg.MSG_SCStageObjectDisappear, r)
 	r.Register(msg.MSG_SCMatchEnrollResponse, r)
 	r.Register(msg.MSG_SCMatchResult, r)
+	r.Register(msg.MSG_SCInformMsg, r)
 
 }
 
@@ -290,6 +291,8 @@ func (r *Robot) HandleMessage(packet *core.Packet) {
 			r.handleArenaEnroll(packet)					
 		case msg.MSG_SCMatchResult:
 			r.handleArenaMatchResult(packet)	
+		case msg.MSG_SCInformMsg:
+			r.handleInform(packet)	
 		default:
 			core.Warn("recv packet type ", packet.Type)	
 	}
