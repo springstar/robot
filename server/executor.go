@@ -14,6 +14,10 @@ type Executor struct {
 	ExecState
 }
 
+func newExecutor() *Executor {
+	return &Executor{}
+}
+
 func (e *Executor) exec(params []string, delta int) ExecState {
 	return EXEC_COMPLETED
 }
@@ -26,12 +30,32 @@ func (e *Executor) checkIfExec() bool {
 	return false
 }
 
-type RepeatedExecutor struct {
-	*Executor
+func (e *Executor) setOngoing() {
+	e.ExecState = EXEC_ONGOING
+}
+
+func (e *Executor) setCompleted() {
+	e.ExecState = EXEC_COMPLETED
+}
+
+func (e *Executor) getState() ExecState {
+	return e.ExecState
 }
 
 type AsyncExecutor struct {
 	*Executor
+}
+
+func newAsyncExecutor() *AsyncExecutor {
+	return &AsyncExecutor{}
+}
+
+func (ae *AsyncExecutor) checkIfExec(params []string) bool {
+	if ae.ExecState == EXEC_ONGOING {
+		return false
+	}
+
+	return true
 }
 
 func (r *Robot) vm() {

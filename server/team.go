@@ -13,6 +13,7 @@ const (
 )
 
 type TeamExecutor struct {
+	ae *AsyncExecutor
 	*Robot
 	*TeamMember
 }
@@ -31,6 +32,7 @@ func newTeamMember(tid int64) *TeamMember {
 func newTeamExecutor(r *Robot) *TeamExecutor {
 	return &TeamExecutor{
 		Robot: r,
+		ae: newAsyncExecutor(),
 	}
 }
 
@@ -38,16 +40,18 @@ func (t *TeamExecutor) exec(params []string, delta int) ExecState {
 	op, _ := parseOperation(params)
 	switch op {
 	case TO_CREATE:
-		t.create(params)
+		return t.create(params)
 	}
 	return EXEC_COMPLETED
 }
 
-func (t *TeamExecutor) create(params []string) {
+func (t *TeamExecutor) create(params []string) ExecState {
 	targetSn, _ := core.Str2Int(params[1])
 	teamType, _ := core.Str2Int(params[2])
 	request := msg.SerializeCSPlatCreateTeam(msg.MSG_CSPlatCreateTeam, int32(targetSn), int32(teamType))
 	t.sendPacket(request)
+	t.ae.setOngoing()
+	return t.ae.getState()
 }
 
 func parseOperation(params []string) (TeamOperation, error){
@@ -60,6 +64,10 @@ func parseOperation(params []string) (TeamOperation, error){
 }
 
 func (t *TeamExecutor) checkIfExec(params []string) bool {
+	if !t.ae.checkIfExec(params) {
+		return false
+	}
+
 	op, err := parseOperation(params)
 	if err != nil {
 		return false
