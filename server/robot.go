@@ -66,6 +66,7 @@ func (r *Robot) loadModules() {
 	r.executors["move"] = newMovement(r)
 	r.executors["quest"] = newQuestExecutor(r)
 	r.executors["match"] = newMatchExecutor(r)
+	r.executors["team"] = newTeamExecutor(r)
 }
 
 func (r *Robot) registerMsgHandler() {
