@@ -15,9 +15,10 @@ func (r *Robot) handleEnterStage(packet *core.Packet) {
 	msg := msg.ParseSCStageEnterResult(int32(packet.Type), packet.Data)
 	stageObjs := msg.GetObj()
 	for _, obj := range stageObjs {
-		core.Info(obj.GetType())
-		core.Info(obj.GetPos())
-		core.Info(obj.GetName())
+		wo := newWorldObj(obj.GetObjId())
+		wo.typ = WorldObjType(obj.GetType())
+		wo.pos = core.NewVec2(obj.GetPos().GetX(), obj.GetPos().GetY())
+		r.addVisibleObj(wo)
 	}
 
 	core.Info("enter stage, profession: ", r.profession)
@@ -47,12 +48,19 @@ func (r *Robot) handleObjAppear(packet *core.Packet) {
 	msg := msg.ParseSCStageObjectAppear(int32(msg.MSG_SCStageObjectAppear), packet.Data)
 	obj := msg.GetObjAppear()
 	if r.humanId == obj.GetObjId() {
-		core.Info("appear ", r.name)
+		return
 	}
+
+	wo := newWorldObj(obj.GetObjId())
+	wo.typ = WorldObjType(obj.GetType())
+	wo.pos = core.NewVec2(obj.GetPos().GetX(), obj.GetPos().GetY())
+	r.addVisibleObj(wo)
 }
 
 func (r *Robot) handleObjDisappear(packet *core.Packet) {
-
+	msg := msg.ParseSCStageObjectDisappear(int32(msg.MSG_SCStageObjectDisappear), packet.Data)
+	objId := msg.GetObjId()
+	r.removeVisibleObj(objId)
 }
 
 func (r *Robot) handleStageMove(packet *core.Packet) {

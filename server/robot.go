@@ -38,7 +38,6 @@ func newRobot(account *Account, robotMgr *RobotManager, fsm *RobotFsm) *Robot {
 	r := &Robot{
 		IDispatcher: core.NewMsgDispatcher(),
 		Character: newCharacter(),
-		VisibleRange: newVisibleRange(),
 		mgr : robotMgr,
 		account : account,
 		fsm : fsm,
@@ -50,6 +49,8 @@ func newRobot(account *Account, robotMgr *RobotManager, fsm *RobotFsm) *Robot {
 		executors: make(map[string]iExecutor),
 		isQuit: false,
 	}
+
+	r.VisibleRange = newVisibleRange(r)
 
 	if (r.account != nil) {
 		robotMgr.add(r.account.id, r)		
@@ -195,6 +196,10 @@ func (r *Robot) ready() {
 		r.awakeSoul()
 		return
 	}	
+
+	if serv.icount() == 0 {
+		return
+	}
 	
 	r.pc = core.GenRandomInt(serv.icount())
 }

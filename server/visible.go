@@ -1,23 +1,34 @@
 package server
 
+import (
+	_ "github.com/springstar/robot/core"
+)
+
 const (
 	MAX_VISIBLE_OBJS = 20
+	MAX_VISIBLE_DISTANCE = 10
 )
+
 type VisibleRange struct {
-	visibleObjs map[int][]*WorldObj
+	*Robot
+	visibleObjs map[int64]*WorldObj
 }
 
-func newVisibleRange() *VisibleRange {
+func newVisibleRange(r *Robot) *VisibleRange {
 	return &VisibleRange{
-		visibleObjs: make(map[int][]*WorldObj),
+		Robot: r,
+		visibleObjs: make(map[int64]*WorldObj),
 	}
 }
 
-func (v *VisibleRange) addVisibleObj(typ int, obj *WorldObj) {
+func (v *VisibleRange) addVisibleObj(obj *WorldObj) {
+	if v.pos.DistanceToSquared(obj.pos) > MAX_VISIBLE_DISTANCE * MAX_VISIBLE_DISTANCE {
+		return
+	}
 
+	v.visibleObjs[obj.id] = obj
 }
 
-func (v *VisibleRange) removeVisibleObj(typ int, objId int64) {
-
+func (v *VisibleRange) removeVisibleObj(id int64) {
+	delete(v.visibleObjs, id)
 }
-
