@@ -17,6 +17,7 @@ import (
 type Robot struct {
 	core.IDispatcher
 	*Character
+	*VisibleRange
 	conn core.NetConnection
 	packetQ chan []*core.Packet
 	buffer *core.PacketBuffer
@@ -37,6 +38,7 @@ func newRobot(account *Account, robotMgr *RobotManager, fsm *RobotFsm) *Robot {
 	r := &Robot{
 		IDispatcher: core.NewMsgDispatcher(),
 		Character: newCharacter(),
+		VisibleRange: newVisibleRange(),
 		mgr : robotMgr,
 		account : account,
 		fsm : fsm,
