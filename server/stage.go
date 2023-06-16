@@ -45,7 +45,8 @@ func (r *Robot) handleSwitchStage(packet *core.Packet) {
 
 func (r *Robot) handleObjAppear(packet *core.Packet) {
 	msg := msg.ParseSCStageObjectAppear(int32(msg.MSG_SCStageObjectAppear), packet.Data)
-	if r.humanId == msg.GetObjAppear().GetObjId() {
+	obj := msg.GetObjAppear()
+	if r.humanId == obj.GetObjId() {
 		core.Info("appear ", r.name)
 	}
 }
