@@ -124,7 +124,9 @@ func (r *Robot)waitForInit() {
 func (r *Robot)handleInitData(packet *core.Packet) {
 	// fmt.Println("recv init data")
 	msg := msg.ParseSCInitData(int32(packet.Type), packet.Data)
-	r.onInit(msg.Human, msg.Stage, msg.QuestInfo)
+	r.onInit(msg.Human, msg.Stage)
+	executor := r.findExecutor("quest").(*RobotQuestExecutor)
+	executor.initQuest(msg.QuestInfo)
 	r.fsm.trigger(r.fsm.state, "initok", r)
 }
 

@@ -28,13 +28,11 @@ type Character struct {
 	mapSn int32
 	pos *core.Vec2
 	dir *core.Vec2
-	qset *RobotQuestSet
 
 }
 
 func newCharacter() *Character {
 	return &Character{
-		qset: newQuestSet(),
 	}
 }
 
@@ -59,7 +57,7 @@ func (c *Character) onLoad(d *pb.DCharacter) {
 	c.sex = d.GetSex()
 }
 
-func (c *Character) onInit(human *pb.DHuman, stage *pb.DInitDataStage, quests []*pb.DQuest) {
+func (c *Character) onInit(human *pb.DHuman, stage *pb.DInitDataStage) {
 	c.curHp = human.HpCur
 	c.curMp = human.MpCur
 	c.curExp = human.ExpCur
@@ -69,16 +67,6 @@ func (c *Character) onInit(human *pb.DHuman, stage *pb.DInitDataStage, quests []
 
 	c.pos = core.NewVec2(stage.PosNow.GetX(), stage.PosNow.GetY())
 	c.dir = core.NewVec2(stage.DirNow.GetX(), stage.DirNow.GetY())
-
-	for _, quest := range quests {
-		q := newQuest()		
-		q.sn = quest.Sn
-		q.typ = quest.Type
-		q.status = quest.Status
-		q.total = quest.TargetProgress
-		q.step = quest.NowProgress
-		c.qset.addQuest(q)
-	}
 }
 
 func (r *Robot) awakeSoul() {
