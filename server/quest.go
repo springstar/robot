@@ -31,12 +31,12 @@ func (qs *RobotQuestSet) addQuest(q *Quest) {
 }
 
 type RobotQuestExecutor struct {
-	r *Robot
+	*Executor
 }
 
 func newQuestExecutor(r *Robot) *RobotQuestExecutor {
 	return &RobotQuestExecutor{
-		r: r,
+		Executor: newExecutor(r),
 	}
 }
 

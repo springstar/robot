@@ -8,6 +8,7 @@ import (
 )
 
 type Instruction struct {
+	pc int
 	cmd string
 	params []string
 }
@@ -18,6 +19,19 @@ func newInstruction() *Instruction {
 	return &Instruction{
 
 	}
+}
+
+func cloneInstructions(il *InstructionList) *InstructionList {
+	insList := newInstructionList()
+	for _, i := range *il {
+		ins := newInstruction()
+		ins.cmd = i.cmd
+		ins.params = i.params
+		insList.addInstrution(ins)
+	}
+
+	return insList
+
 }
 
 func loadInstructions(f string) *InstructionList {

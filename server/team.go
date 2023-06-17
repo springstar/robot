@@ -10,6 +10,7 @@ type TeamOperation int32
 const (
 	TO_NONE = iota
 	TO_CREATE
+	TO_LIST
 )
 
 type TeamExecutor struct {
@@ -32,7 +33,7 @@ func newTeamMember(tid int64, isLeader bool) *TeamMember {
 func newTeamExecutor(r *Robot) *TeamExecutor {
 	return &TeamExecutor{
 		Robot: r,
-		ae: newAsyncExecutor(),
+		ae: newAsyncExecutor(r),
 		TeamMember: newTeamMember(0, false),
 	}
 }
@@ -42,6 +43,8 @@ func (t *TeamExecutor) exec(params []string, delta int) ExecState {
 	switch op {
 	case TO_CREATE:
 		return t.create(params)
+	case TO_LIST:
+		return t.list(params)
 	}
 	return EXEC_COMPLETED
 }
@@ -52,6 +55,15 @@ func (t *TeamExecutor) create(params []string) ExecState {
 	targetSn, _ := core.Str2Int(params[1])
 	teamType, _ := core.Str2Int(params[2])
 	request := msg.SerializeCSPlatCreateTeam(msg.MSG_CSPlatCreateTeam, int32(targetSn), int32(teamType))
+	t.sendPacket(request)
+	t.ae.setOngoing()
+	return t.ae.getState()
+}
+
+func (t *TeamExecutor) list(params []string) ExecState {
+	core.Info("request team platform list")
+	targetSn, _ := core.Str2Int(params[1])
+	request := msg.SerializeCSPlatTeamListRequest(msg.MSG_CSPlatTeamListRequest, int32(targetSn))
 	t.sendPacket(request)
 	t.ae.setOngoing()
 	return t.ae.getState()
@@ -82,9 +94,9 @@ func (t *TeamExecutor) checkIfExec(params []string) bool {
 
 	switch op {
 	case TO_CREATE:
-		return t.teamId <= 0
+		return t.teamId <= 0	
 	default:
-		return false	
+		return true	
 	}
 	return true
 }
@@ -111,4 +123,16 @@ func (r *Robot) handleTeamDetail(packet *core.Packet) {
 
 func (r *Robot) isLeader(leaderId int64) bool {
 	return r.humanId == leaderId
+}
+
+func (r *Robot) handleTeamList(packet *core.Packet) {
+	core.Info("recv team platform list")
+	resp := msg.ParseSCPlatTeamListResponse(int32(msg.MSG_SCPlatTeamListResponse), packet.Data)
+	teams := resp.GetTeams()
+	for _, t := range teams {
+		core.Info(t)
+	}
+
+	e := r.findExecutor("team").(*TeamExecutor)
+	e.ae.setCompleted()
 }

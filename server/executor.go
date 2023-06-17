@@ -11,12 +11,14 @@ type iExecutor interface {
 }
 
 type Executor struct {
-	ExecState
+	*Robot
+	exstates map[int]ExecState
 }
 
-func newExecutor() *Executor {
+func newExecutor(r *Robot) *Executor {
 	return &Executor{
-		ExecState: EXEC_NO_START,
+		Robot: r,
+		exstates: make(map[int]ExecState),
 	}
 }
 
@@ -33,29 +35,29 @@ func (e *Executor) checkIfExec() bool {
 }
 
 func (e *Executor) setOngoing() {
-	e.ExecState = EXEC_ONGOING
+	e.exstates[e.pc] = EXEC_ONGOING
 }
 
 func (e *Executor) setCompleted() {
-	e.ExecState = EXEC_COMPLETED
+	e.exstates[e.pc] = EXEC_COMPLETED
 }
 
 func (e *Executor) getState() ExecState {
-	return e.ExecState
+	return e.exstates[e.pc]
 }
 
 type AsyncExecutor struct {
 	*Executor
 }
 
-func newAsyncExecutor() *AsyncExecutor {
+func newAsyncExecutor(r *Robot) *AsyncExecutor {
 	return &AsyncExecutor{
-		Executor: newExecutor(),
+		Executor: newExecutor(r),
 	}
 }
 
 func (ae *AsyncExecutor) checkIfExec(params []string) bool {
-	if ae.ExecState == EXEC_ONGOING {
+	if ae.getState() == EXEC_ONGOING {
 		return false
 	}
 
@@ -64,19 +66,20 @@ func (ae *AsyncExecutor) checkIfExec(params []string) bool {
 
 func (r *Robot) vm() {
 	if r.pc != -1 {
-		instruction := serv.fetch(r.pc)
+		instruction := r.fetch(r.pc)
 		executor := r.findExecutor(instruction.cmd)
 		if executor == nil {
 			core.Error("no executor ", instruction.cmd)
 		} else {
 			if !executor.checkIfExec(instruction.params) {
 				executor.handleBreak()
+				r.pc, _ = r.next(r.pc)
 				return
 			}
 			
 			state := executor.exec(instruction.params, 30)
 			if state == EXEC_COMPLETED {
-				r.pc, instruction = serv.next(r.pc)
+				r.pc, instruction = r.next(r.pc)
 			}
 		}
 	}	
