@@ -66,6 +66,7 @@ func (c *Character) onInit(human *pb.DHuman, stage *pb.DInitDataStage, quests []
 	c.combat = human.Combat
 	c.speed = human.Prop.Speed
 	c.mapSn = stage.GetSn()
+
 	c.pos = core.NewVec2(stage.PosNow.GetX(), stage.PosNow.GetY())
 	c.dir = core.NewVec2(stage.DirNow.GetX(), stage.DirNow.GetY())
 
@@ -92,6 +93,7 @@ func (r *Robot) handleSoulAwaken(packet *core.Packet) {
 	r.profession = awakeMsg.GetProfession()
 	r.roleSn = awakeMsg.GetRoleSn()
 	r.soul = awakeMsg.GetSoul()
+	
 	
 	request := msg.SerializeCSInstanceLeave(msg.MSG_CSInstanceLeave)
 	r.sendPacket(request)

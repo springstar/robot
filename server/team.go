@@ -17,13 +17,10 @@ type TeamExecutor struct {
 	*Robot
 	*TeamMember
 }
-
 type TeamMember struct {
 	teamId int64
 	isLeader bool
 }
-
-
 
 func newTeamMember(tid int64, isLeader bool) *TeamMember {
 	return &TeamMember{
@@ -56,7 +53,7 @@ func (t *TeamExecutor) create(params []string) ExecState {
 	teamType, _ := core.Str2Int(params[2])
 	request := msg.SerializeCSPlatCreateTeam(msg.MSG_CSPlatCreateTeam, int32(targetSn), int32(teamType))
 	t.sendPacket(request)
-	// t.ae.setOngoing()
+	t.ae.setOngoing()
 	return t.ae.getState()
 }
 
