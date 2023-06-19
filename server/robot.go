@@ -33,6 +33,10 @@ type Robot struct {
 	pc int
 	isQuit bool
 
+	lastPos *core.Vec2
+	path []*core.Vec2
+	lastSyncTime int64
+
 }
 
 func newRobot(account *Account, robotMgr *RobotManager, fsm *RobotFsm) *Robot {

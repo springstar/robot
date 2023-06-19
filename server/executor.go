@@ -46,6 +46,20 @@ func (e *Executor) getState() ExecState {
 	return e.exstates[e.pc]
 }
 
+type RepeatedExecutor struct {
+	*Executor
+}
+
+func newRepeatedExecutor(r *Robot) *RepeatedExecutor {
+	return &RepeatedExecutor{
+		Executor: newExecutor(r),
+	}
+}
+
+func (ae *RepeatedExecutor) checkIfExec(params []string) bool {
+	return true
+}
+
 type AsyncExecutor struct {
 	*Executor
 }

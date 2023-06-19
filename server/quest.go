@@ -124,6 +124,18 @@ func (q *RobotQuestExecutor) acceptQuest(quest int32) ExecState {
 }
 
 func (q *RobotQuestExecutor) execQuest(quest int32) ExecState {
+	// confQuest := config.FindConfQuest(quest)
+	// if confQuest == nil {
+	// 	return EXEC_COMPLETED
+	// }
+
+	// questPos := core.Str2Float32Slice(confQuest.QuestPosition)
+	// // mapSn := int(questPos[0])
+	// posX := questPos[1]
+	// posY := questPos[2]
+	// targetPos := core.NewVec2(posX, posY)
+
+
 	return EXEC_COMPLETED
 }
 

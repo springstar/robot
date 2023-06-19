@@ -10,9 +10,6 @@ import (
 
 type RobotMovement struct {
 	r *Robot
-	lastPos *core.Vec2
-	path []*core.Vec2
-	lastSyncTime int64
 }
 
 func newMovement(r *Robot) *RobotMovement {
@@ -21,21 +18,21 @@ func newMovement(r *Robot) *RobotMovement {
 	}
 }
 
-func (m *RobotMovement) sendMoveRequest() {
-	if len(m.path) == 0 {
+func (r *Robot) sendMoveRequest() {
+	if len(r.path) == 0 {
 		return
 	}
 
 	now := core.GetCurrentTime()
 
 	start := &pb.DVector3{
-		X: m.lastPos.X,
-		Y: m.lastPos.Y,
+		X: r.lastPos.X,
+		Y: r.lastPos.Y,
 		Z: 0,
 	}
 
 	var end []*pb.DVector3
-	for _, p := range m.path {
+	for _, p := range r.path {
 		pos := &pb.DVector3{
 			X: p.X,
 			Y: p.Y,
@@ -46,28 +43,28 @@ func (m *RobotMovement) sendMoveRequest() {
 	}
 
 	dir := &pb.DVector3{
-		X: m.r.dir.X,
-		Y: m.r.dir.Y,
+		X: r.dir.X,
+		Y: r.dir.Y,
 		Z: 0,
 	}
 
-	msg := msg.SerializeCSStageMove(msg.MSG_CSStageMove, m.r.humanId, start, end, dir, now)
-	m.r.sendPacket(msg)
+	msg := msg.SerializeCSStageMove(msg.MSG_CSStageMove, r.humanId, start, end, dir, now)
+	r.sendPacket(msg)
 	
 
-	m.updateSyncTime(now)
+	r.updateSyncTime(now)
 	
 	// clear path
-	m.path = m.path[:0]
-	m.lastPos = m.r.pos
+	r.path = r.path[:0]
+	r.lastPos = r.pos
 }
 
-func (m *RobotMovement) updateSyncTime(now int64) {
-	m.lastSyncTime = now
+func (r *Robot) updateSyncTime(now int64) {
+	r.lastSyncTime = now
 }
 
-func (m *RobotMovement) isTimeToSync(now int64) bool {
-	if m.lastSyncTime == 0 || m.lastSyncTime + 150 < now {
+func (r *Robot) isTimeToSync(now int64) bool {
+	if r.lastSyncTime == 0 || r.lastSyncTime + 150 < now {
 		return true
 	}
 
@@ -89,21 +86,8 @@ func (m *RobotMovement) exec(params []string, delta int) ExecState {
 		return EXEC_COMPLETED
 	}
 
-	if m.lastPos == nil {
-		m.lastPos = m.r.pos
-	}
-
 	target := serv.sceneMgr.getPoint(m.r.mapSn, v)
-
-	delta = 5
-	// delta = delta * int(m.r.speed)
-	now := core.GetCurrentTime()
-
-	r := m.moveto(target, float32(delta))
-
-	if m.isTimeToSync(now) {
-		m.sendMoveRequest()
-	}
+	r := m.r.move(target)
 
 	if r == -1 {
 		return EXEC_ONGOING
@@ -112,17 +96,35 @@ func (m *RobotMovement) exec(params []string, delta int) ExecState {
 	return EXEC_COMPLETED
 }
 
-func (m *RobotMovement)moveto(d *core.Vec2, delta float32) int {
-	// fmt.Println(m.r.pos, *d, delta)
-	v := core.MoveTowards(m.r.pos, d, delta)
+func (r *Robot) move(target *core.Vec2) int{
+	now := core.GetCurrentTime()
+
+	delta := 5
+	// delta = delta * int(m.r.speed)
+
+	if r.lastPos == nil {
+		r.lastPos = r.pos
+	}
+
+	ret := r.moveto(target, float32(delta))
+
+	if r.isTimeToSync(now) {
+		r.sendMoveRequest()
+	}
+
+	return ret
+}
+
+func (r *Robot) moveto(d *core.Vec2, delta float32) int {
+	v := core.MoveTowards(r.pos, d, delta)
 	if v.Equals(d) {
 		return 0
 	} else {
 		// fmt.Println(v)
 	}
 
-	m.r.pos = v
-	m.path = append(m.path, v)
+	r.pos = v
+	r.path = append(r.path, v)
 
 	return -1
 }
