@@ -20,5 +20,11 @@ func TestFindConf(t *testing.T) {
 		return
 	}
 	assert.Equal(t, conf.Sn, 102008)
+
+	confQuest := config.FindConfQuest(1001)
+	if confQuest == nil {
+		t.Error("conf quest 1001 nil")
+		return
+	}
 	
 }

@@ -101,7 +101,7 @@ func (qs *RobotQuestSet) findQuestToAccept() int32 {
 
 func (qs *RobotQuestSet) findQuestToExec() int32 {
 	for k, v := range qs.quests {
-		core.Info("find quest to accept ", k)
+		core.Info("find quest to exec ", k)
 		core.Info("quest status ", v.status)
 		if v.status == QSTATE_ONGOING {
 			return int32(k)
@@ -129,21 +129,26 @@ func newQuestExecutor(r *Robot) *RobotQuestExecutor {
 	}
 }
 
-func (q *RobotQuestExecutor) acceptQuest(quest int32) ExecState {
+func (q *RobotQuestExecutor) acceptQuest(quest int) ExecState {
 	return EXEC_COMPLETED
 }
 
-func (q *RobotQuestExecutor) execQuest(quest int32) ExecState {
-	confQuest := config.FindConfQuest(quest)
+func (q *RobotQuestExecutor) execQuest(quest int) ExecState {
+	confQuest := config.FindConfQuest(int(quest))
 	if confQuest == nil {
+		core.Info("no such quest ", quest)
 		return EXEC_COMPLETED
 	}
 
+	core.Info("exec quest ")
 	switch confQuest.Type {
 	case QT_DIALOG:
-		q.execDialogQuest(confQuest)
+		return q.execDialogQuest(confQuest)
 	case QT_ITEM:
-		q.execItemQuest()
+		return q.execItemQuest()
+	default:
+		return EXEC_NO_START	
+
 	}
 
 
@@ -156,14 +161,15 @@ func (q *RobotQuestExecutor) execDialogQuest(confQuest *config.ConfQuest) ExecSt
 		return EXEC_ONGOING
 	}
 
+	core.Info("complete quest")
 	msg := msg.SerializeCSCompleteQuest(uint32(msg.MSG_CSCompleteQuest), int32(confQuest.Sn))
 	q.sendPacket(msg)
 
 	return EXEC_COMPLETED
 }
 
-func (q *RobotQuestExecutor) execItemQuest() {
-
+func (q *RobotQuestExecutor) execItemQuest() ExecState {
+	return EXEC_COMPLETED
 }
 
 func (q *RobotQuestExecutor) commitQuest() {
@@ -173,12 +179,12 @@ func (q *RobotQuestExecutor) commitQuest() {
 func (q *RobotQuestExecutor) exec(params []string, delta int) ExecState {
 	quest := q.findQuestToExec()
 	if quest > 0 {
-		return q.execQuest(quest)
+		return q.execQuest(int(quest))
 	}
 
 	quest = q.findQuestToAccept()
 	if quest > 0 {
-		return q.acceptQuest(quest)
+		return q.acceptQuest(int(quest))
 	}
 
 	return EXEC_COMPLETED
