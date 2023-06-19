@@ -68,6 +68,8 @@ func (r *Robot) HandleMessage(packet *core.Packet) {
 			r.handleTeamList(packet)		
 		case msg.MSG_SCFightHpChg:
 			r.handleHpChange(packet)
+		case msg.MSG_SCQuestInfo:
+			r.handleQuestInfo(packet)	
 
 		default:
 			core.Warn("recv packet type ", packet.Type)	

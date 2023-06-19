@@ -86,6 +86,7 @@ func (m *RobotMovement) exec(params []string, delta int) ExecState {
 		return EXEC_COMPLETED
 	}
 
+	core.Info("move sn ", v)
 	target := serv.sceneMgr.getPoint(m.r.mapSn, v)
 	r := m.r.move(target)
 

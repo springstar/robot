@@ -1,6 +1,7 @@
 package server
 
 import (
+	"github.com/springstar/robot/msg"
 	"strconv"
 	"github.com/springstar/robot/core"
 	"github.com/springstar/robot/config"
@@ -22,6 +23,15 @@ const (
 	QSTATE_NOOPEN
 	QSTATE_WAITREFRESH
 	QSTATE_FAILED
+)
+
+type QuestType int32
+
+const (
+	QT_LEVEL = 1
+	QT_ESCORT = 74
+	QT_DIALOG = 12
+	QT_ITEM = 28
 )
 
 type Quest struct {
@@ -124,19 +134,40 @@ func (q *RobotQuestExecutor) acceptQuest(quest int32) ExecState {
 }
 
 func (q *RobotQuestExecutor) execQuest(quest int32) ExecState {
-	// confQuest := config.FindConfQuest(quest)
-	// if confQuest == nil {
-	// 	return EXEC_COMPLETED
-	// }
+	confQuest := config.FindConfQuest(quest)
+	if confQuest == nil {
+		return EXEC_COMPLETED
+	}
 
-	// questPos := core.Str2Float32Slice(confQuest.QuestPosition)
-	// // mapSn := int(questPos[0])
-	// posX := questPos[1]
-	// posY := questPos[2]
-	// targetPos := core.NewVec2(posX, posY)
+	switch confQuest.Type {
+	case QT_DIALOG:
+		q.execDialogQuest(confQuest)
+	case QT_ITEM:
+		q.execItemQuest()
+	}
 
 
 	return EXEC_COMPLETED
+}
+
+func (q *RobotQuestExecutor) execDialogQuest(confQuest *config.ConfQuest) ExecState {
+	ret := q.moveToQuestPosition(confQuest)
+	if ret == -1 {
+		return EXEC_ONGOING
+	}
+
+	msg := msg.SerializeCSCompleteQuest(uint32(msg.MSG_CSCompleteQuest), int32(confQuest.Sn))
+	q.sendPacket(msg)
+
+	return EXEC_COMPLETED
+}
+
+func (q *RobotQuestExecutor) execItemQuest() {
+
+}
+
+func (q *RobotQuestExecutor) commitQuest() {
+
 }
 
 func (q *RobotQuestExecutor) exec(params []string, delta int) ExecState {
@@ -154,6 +185,7 @@ func (q *RobotQuestExecutor) exec(params []string, delta int) ExecState {
 }
 
 func (q *RobotQuestExecutor) checkIfExec(params []string) bool {
+
 	return true
 }
 
@@ -161,3 +193,20 @@ func (q *RobotQuestExecutor) handleBreak() {
 
 }
 	 
+func (r *Robot) moveToQuestPosition(confQuest *config.ConfQuest) int {
+	questPos := core.Str2Float32Slice(confQuest.QuestPosition)
+	// mapSn := int(questPos[0])
+	posX := questPos[1]
+	posY := questPos[2]
+	targetPos := core.NewVec2(posX, posY)
+	ret := r.move(targetPos)
+	return ret
+}
+
+func (r *Robot) handleQuestInfo(packet *core.Packet) {
+	resp := msg.ParseSCQuestInfo(int32(msg.MSG_SCQuestInfo), packet.Data)
+	quests := resp.GetQuest()
+	for _, q := range quests {
+		core.Info("recv quest info ", q.GetSn(), q.GetStatus())
+	}
+}
