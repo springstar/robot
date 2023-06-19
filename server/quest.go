@@ -95,6 +95,14 @@ func (qs *RobotQuestSet) isPreCompleted(sn int) bool {
 	return false
 }
 
+func (qs *RobotQuestSet) findQuest(sn int) *Quest {
+	if quest, ok := qs.quests[sn]; ok {
+		return quest
+	}
+
+	return nil
+}
+
 func (qs *RobotQuestSet) findQuestToAccept() int32 {
 	return 0
 }
@@ -190,6 +198,15 @@ func (q *RobotQuestExecutor) exec(params []string, delta int) ExecState {
 	return EXEC_COMPLETED
 }
 
+func (q *RobotQuestExecutor) updateStatus(sn int, status QuestStatus) {
+	quest := q.findQuest(sn)
+	if quest == nil {
+		return
+	}
+
+	quest.status = int32(status)
+}
+
 func (q *RobotQuestExecutor) checkIfExec(params []string) bool {
 
 	return true
@@ -225,11 +242,14 @@ func getDialogNpcPosition(sn int) *core.Vec2{
 
 func (r *Robot) handleQuestInfo(packet *core.Packet) {
 	resp := msg.ParseSCQuestInfo(int32(msg.MSG_SCQuestInfo), packet.Data)
+	executor := r.findExecutor("quest").(*RobotQuestExecutor)
+
 	quests := resp.GetQuest()
 	for _, q := range quests {
 		core.Info("recv quest info ", q.GetSn(), q.GetStatus())
+		executor.updateStatus(int(q.GetSn()), QuestStatus(q.GetStatus()))
+
 	}
 
-	executor := r.findExecutor("quest").(*RobotQuestExecutor)
 	executor.setCompleted()
 }
