@@ -140,7 +140,6 @@ func (q *RobotQuestExecutor) execQuest(quest int) ExecState {
 		return EXEC_COMPLETED
 	}
 
-	core.Info("exec quest ")
 	switch confQuest.Type {
 	case QT_DIALOG:
 		return q.execDialogQuest(confQuest)
@@ -156,7 +155,8 @@ func (q *RobotQuestExecutor) execQuest(quest int) ExecState {
 }
 
 func (q *RobotQuestExecutor) execDialogQuest(confQuest *config.ConfQuest) ExecState {
-	ret := q.moveToQuestPosition(confQuest)
+	pos := getQuestPosition(confQuest)
+	ret := q.move(pos)
 	if ret == -1 {
 		return EXEC_ONGOING
 	}
@@ -198,15 +198,29 @@ func (q *RobotQuestExecutor) checkIfExec(params []string) bool {
 func (q *RobotQuestExecutor) handleBreak() {
 
 }
-	 
-func (r *Robot) moveToQuestPosition(confQuest *config.ConfQuest) int {
-	questPos := core.Str2Float32Slice(confQuest.QuestPosition)
-	// mapSn := int(questPos[0])
-	posX := questPos[1]
-	posY := questPos[2]
-	targetPos := core.NewVec2(posX, posY)
-	ret := r.move(targetPos)
-	return ret
+
+func getQuestPosition(confQuest *config.ConfQuest) *core.Vec2 {
+	target, _ := core.Str2IntSlice(confQuest.Target)
+	switch confQuest.Type {
+	case QT_DIALOG:
+		return getDialogNpcPosition(target[2])
+	default:
+		return core.NewZeroVec2()	
+	}
+
+	return core.NewZeroVec2()	
+
+}
+
+func getDialogNpcPosition(sn int) *core.Vec2{
+	confSceneChar := config.FindConfSceneCharacter(sn)
+	if confSceneChar == nil {
+		return core.NewZeroVec2()
+	}
+
+	position := core.Str2Float32Slice(confSceneChar.Position)
+
+	return core.NewVec2(position[0], position[1])
 }
 
 func (r *Robot) handleQuestInfo(packet *core.Packet) {
@@ -215,4 +229,7 @@ func (r *Robot) handleQuestInfo(packet *core.Packet) {
 	for _, q := range quests {
 		core.Info("recv quest info ", q.GetSn(), q.GetStatus())
 	}
+
+	executor := r.findExecutor("quest").(*RobotQuestExecutor)
+	executor.setCompleted()
 }
