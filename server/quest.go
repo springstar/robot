@@ -157,6 +157,7 @@ func (qs *RobotQuestSet) addQuest(q *Quest) {
 type RobotQuestExecutor struct {
 	*Executor
 	*RobotQuestSet
+	
 }
 
 func newQuestExecutor(r *Robot) *RobotQuestExecutor {
@@ -246,7 +247,20 @@ func getGatherPos(confQuest *config.ConfQuest) []*core.Vec2 {
 	return gatherObjPosList
 }
 
+func (q *RobotQuestExecutor) execGather(pos *core.Vec2) {
+
+}
+
 func (q *RobotQuestExecutor) execGatherQuest(confQuest *config.ConfQuest) ExecState {
+	posList := getGatherPos(confQuest)
+	if len(posList) == 0 {
+		return q.getState()
+	}
+
+	for _, pos := range posList {
+		q.execGather(pos)
+	}
+
 	return q.getState()
 }
 

@@ -22,9 +22,9 @@ func newVisibleRange(r *Robot) *VisibleRange {
 }
 
 func (v *VisibleRange) addVisibleObj(obj *WorldObj) {
-	// if v.pos.DistanceToSquared(obj.pos) > MAX_VISIBLE_DISTANCE * MAX_VISIBLE_DISTANCE {
-	// 	return
-	// }
+	if v.pos.DistanceToSquared(obj.pos) > MAX_VISIBLE_DISTANCE * MAX_VISIBLE_DISTANCE {
+		return
+	}
 
 	v.visibleObjs[obj.id] = obj
 }
