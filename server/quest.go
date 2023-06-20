@@ -215,8 +215,39 @@ func (q *RobotQuestExecutor) execDialogQuest(confQuest *config.ConfQuest) ExecSt
 	return EXEC_ONGOING
 }
 
+func getGatherPos(confQuest *config.ConfQuest) []*core.Vec2 {
+	var sceneCharSnList []int
+	infos := []string{confQuest.Target, confQuest.ArrParam, confQuest.ArrParam2}
+	for _, info := range infos {
+		gather, err := core.Str2IntSlice(info)
+		if err != nil {
+			continue
+		}
+
+		sceneCharSn := int(gather[2])
+		sceneCharSnList = append(sceneCharSnList, sceneCharSn)
+	}
+
+	var gatherObjPosList []*core.Vec2
+
+	for _, sn := range sceneCharSnList {
+		confScene := config.FindConfSceneCharacter(sn)
+		if confScene == nil {
+			core.Warn("no ConfSceneCharacter ", sn)
+			continue
+		}
+
+		position := core.Str2Float32Slice(confScene.Position)
+
+		pos := core.NewVec2(position[0], position[1])
+		gatherObjPosList = append(gatherObjPosList, pos)
+	}
+
+	return gatherObjPosList
+}
+
 func (q *RobotQuestExecutor) execGatherQuest(confQuest *config.ConfQuest) ExecState {
-	return EXEC_COMPLETED
+	return q.getState()
 }
 
 func (q *RobotQuestExecutor) commitQuest() {
