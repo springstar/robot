@@ -30,8 +30,18 @@ func (e *Executor) handleBreak(params []string) {
 	
 }
 
-func (e *Executor) checkIfExec() bool {
-	return false
+func (e *Executor) checkIfExec(params[]string) bool {
+	if e.getState() == EXEC_REPEATED {
+		return true
+	}else if e.getState() == EXEC_ONGOING {
+		return false
+	}
+
+	return true
+}
+
+func (e *Executor) setRepeated() {
+	e.exstates[e.pc] = EXEC_REPEATED
 }
 
 func (e *Executor) setOngoing() {
@@ -44,38 +54,6 @@ func (e *Executor) setCompleted() {
 
 func (e *Executor) getState() ExecState {
 	return e.exstates[e.pc]
-}
-
-type RepeatedExecutor struct {
-	*Executor
-}
-
-func newRepeatedExecutor(r *Robot) *RepeatedExecutor {
-	return &RepeatedExecutor{
-		Executor: newExecutor(r),
-	}
-}
-
-func (ae *RepeatedExecutor) checkIfExec(params []string) bool {
-	return true
-}
-
-type AsyncExecutor struct {
-	*Executor
-}
-
-func newAsyncExecutor(r *Robot) *AsyncExecutor {
-	return &AsyncExecutor{
-		Executor: newExecutor(r),
-	}
-}
-
-func (ae *AsyncExecutor) checkIfExec(params []string) bool {
-	if ae.getState() == EXEC_ONGOING {
-		return false
-	}
-
-	return true
 }
 
 func (r *Robot) vm() {

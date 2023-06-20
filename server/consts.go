@@ -18,5 +18,6 @@ type ExecState int32
 const (
 	EXEC_NO_START ExecState = iota
 	EXEC_ONGOING
+	EXEC_REPEATED
 	EXEC_COMPLETED
 )

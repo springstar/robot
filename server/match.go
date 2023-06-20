@@ -20,7 +20,7 @@ const (
 )
 
 type MatchExecutor struct {
-	*AsyncExecutor
+	*Executor
 	isMatching bool
 	mt MatchType
 	startTime int64
@@ -28,7 +28,7 @@ type MatchExecutor struct {
 
 func newMatchExecutor(r *Robot) *MatchExecutor {
 	return &MatchExecutor{
-		AsyncExecutor: newAsyncExecutor(r),
+		Executor: newExecutor(r),
 		isMatching: false,
 		startTime: 0,
 		mt: MT_NONE,

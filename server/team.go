@@ -14,7 +14,7 @@ const (
 )
 
 type TeamExecutor struct {
-	ae *AsyncExecutor
+	ae *Executor
 	*Robot
 	*TeamMember
 }
@@ -33,7 +33,7 @@ func newTeamMember(tid int64, isLeader bool) *TeamMember {
 func newTeamExecutor(r *Robot) *TeamExecutor {
 	return &TeamExecutor{
 		Robot: r,
-		ae: newAsyncExecutor(r),
+		ae: newExecutor(r),
 		TeamMember: newTeamMember(0, false),
 	}
 }

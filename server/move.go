@@ -91,7 +91,7 @@ func (m *RobotMovement) exec(params []string, delta int) ExecState {
 	r := m.r.move(target)
 
 	if r == -1 {
-		return EXEC_ONGOING
+		return EXEC_REPEATED
 	}
 
 	return EXEC_COMPLETED

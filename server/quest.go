@@ -203,14 +203,15 @@ func (q *RobotQuestExecutor) execDialogQuest(confQuest *config.ConfQuest) ExecSt
 	ret := q.move(pos)
 	if ret == -1 {
 		core.Info("exec moving to complete ", confQuest.Sn)
-		return EXEC_ONGOING
+		q.setRepeated()
+		return EXEC_REPEATED
 	}
 
 	core.Info("complete quest")
 	msg := msg.SerializeCSCompleteQuest(uint32(msg.MSG_CSCompleteQuest), int32(confQuest.Sn))
 	q.sendPacket(msg)
-
-	return EXEC_COMPLETED
+	q.setOngoing()
+	return EXEC_ONGOING
 }
 
 func (q *RobotQuestExecutor) execGatherQuest(confQuest *config.ConfQuest) ExecState {
@@ -250,10 +251,6 @@ func (q *RobotQuestExecutor) updateStatus(sn int, status QuestStatus) {
 	}
 }
 
-func (q *RobotQuestExecutor) checkIfExec(params []string) bool {
-
-	return true
-}
 
 func (q *RobotQuestExecutor) handleBreak() {
 
