@@ -119,7 +119,7 @@ func (qs *RobotQuestSet) findQuestToAccept() int32 {
 		}
 
 		if qs.isPreCompleted(k) {
-			return k
+			return int32(k)
 		}
 	}
 	return 0
