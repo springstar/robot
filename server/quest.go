@@ -188,9 +188,9 @@ func (q *RobotQuestExecutor) execQuest(quest int) ExecState {
 
 	switch confQuest.Type {
 	case QT_DIALOG:
-		return q.execDialogQuest(confQuest)
+		q.execDialogQuest(confQuest)
 	case QT_GATHER:
-		return q.execGatherQuest(confQuest)
+		q.execGatherQuest(confQuest)
 	default:
 		return EXEC_NO_START	
 
