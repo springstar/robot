@@ -1,8 +1,9 @@
 package server
 
 import (
-	"github.com/springstar/robot/msg"
 	"strconv"
+	"sort"
+	"github.com/springstar/robot/msg"
 	"github.com/springstar/robot/core"
 	"github.com/springstar/robot/config"
 	"github.com/springstar/robot/pb"
@@ -96,7 +97,8 @@ func (qs *RobotQuestSet) isPreCompleted(sn int) bool {
 	}
 
 	for _, v := range qs.quests {
-		if v.sn == int32(preSn) && v.status == QSTATE_COMPLETED {
+		// core.Info("sn pre cheking status", sn, preSn, v.sn, v.status)
+		if v.sn == int32(preSn) && (v.status == QSTATE_COMPLETED || v.status == QSTATE_REWARED) {
 			return true
 		}
 	}
@@ -113,15 +115,24 @@ func (qs *RobotQuestSet) findQuest(sn int) *Quest {
 }
 
 func (qs *RobotQuestSet) findQuestToAccept() int32 {
+	var canAccepts []int
 	for k, v := range qs.quests {
 		if v.status != QSTATE_CANACCEPT {
 			continue
 		}
 
-		if qs.isPreCompleted(k) {
-			return int32(k)
+		canAccepts = append(canAccepts, int(k))		
+	}
+
+	sort.Ints(canAccepts)
+	core.Info("sorted canAccepts ", canAccepts)
+	if len(canAccepts) > 0 {
+		quest := canAccepts[0]
+		if qs.isPreCompleted(quest) {
+			return int32(quest)
 		}
 	}
+
 	return 0
 }
 
@@ -156,7 +167,9 @@ func newQuestExecutor(r *Robot) *RobotQuestExecutor {
 }
 
 func (q *RobotQuestExecutor) acceptQuest(quest int) ExecState {
-
+	core.Info("accept quest ", quest)
+	request := msg.SerializeCSAcceptQuest(uint32(msg.MSG_CSAcceptQuest), int32(quest))
+	q.sendPacket(request)
 	return EXEC_COMPLETED
 }
 
@@ -168,6 +181,7 @@ func (q *RobotQuestExecutor) execQuest(quest int) ExecState {
 	}
 
 	if !q.isPreCompleted(quest) {
+		// core.Info("pre sn no completed ", quest)
 		return EXEC_COMPLETED
 	}
 
@@ -189,6 +203,7 @@ func (q *RobotQuestExecutor) execDialogQuest(confQuest *config.ConfQuest) ExecSt
 	pos := getQuestPosition(confQuest)
 	ret := q.move(pos)
 	if ret == -1 {
+		core.Info("exec moving to complete ", confQuest.Sn)
 		return EXEC_ONGOING
 	}
 
@@ -224,8 +239,11 @@ func (q *RobotQuestExecutor) exec(params []string, delta int) ExecState {
 func (q *RobotQuestExecutor) updateStatus(sn int, status QuestStatus) {
 	quest := q.findQuest(sn)
 	if quest != nil {
+		core.Info("update status ", sn, status)
 		quest.status = int32(status)	
 	} else {
+		core.Info("new quest ", sn, status)
+
 		quest = newQuest()
 		quest.sn = int32(sn)
 		quest.status = int32(status)
