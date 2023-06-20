@@ -27,6 +27,8 @@ func (r *Robot) registerMsgHandler() {
 	r.Register(msg.MSG_SCPlatTeamListResponse, r)
 	r.Register(msg.MSG_SCFightHpChg, r)
 	r.Register(msg.MSG_SCQuestInfo, r)
+	r.Register(msg.MSG_SCGatherFirst, r)
+	r.Register(msg.MSG_SCGatherSecond, r)
 }
 
 func (r *Robot) HandleMessage(packet *core.Packet) {
