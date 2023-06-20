@@ -34,6 +34,15 @@ const (
 	QT_ITEM = 28
 )
 
+type QuestAcceptType int32 
+
+const (
+	QAT_SYSTEM = 1
+	QAT_AUTO = 2
+	QAT_MANUAL = 3
+	QAT_UI = 4
+)
+
 type Quest struct {
 	sn int32
 	step int32
@@ -104,13 +113,22 @@ func (qs *RobotQuestSet) findQuest(sn int) *Quest {
 }
 
 func (qs *RobotQuestSet) findQuestToAccept() int32 {
+	for k, v := range qs.quests {
+		if v.status != QSTATE_CANACCEPT {
+			continue
+		}
+
+		if qs.isPreCompleted(k) {
+			return k
+		}
+	}
 	return 0
 }
 
 func (qs *RobotQuestSet) findQuestToExec() int32 {
 	for k, v := range qs.quests {
-		core.Info("find quest to exec ", k)
-		core.Info("quest status ", v.status)
+		// core.Info("find quest to exec ", k)
+		// core.Info("quest status ", v.status)
 		if v.status == QSTATE_ONGOING {
 			return int32(k)
 		}
@@ -138,6 +156,7 @@ func newQuestExecutor(r *Robot) *RobotQuestExecutor {
 }
 
 func (q *RobotQuestExecutor) acceptQuest(quest int) ExecState {
+
 	return EXEC_COMPLETED
 }
 
@@ -145,6 +164,10 @@ func (q *RobotQuestExecutor) execQuest(quest int) ExecState {
 	confQuest := config.FindConfQuest(int(quest))
 	if confQuest == nil {
 		core.Info("no such quest ", quest)
+		return EXEC_COMPLETED
+	}
+
+	if !q.isPreCompleted(quest) {
 		return EXEC_COMPLETED
 	}
 
@@ -200,11 +223,14 @@ func (q *RobotQuestExecutor) exec(params []string, delta int) ExecState {
 
 func (q *RobotQuestExecutor) updateStatus(sn int, status QuestStatus) {
 	quest := q.findQuest(sn)
-	if quest == nil {
-		return
+	if quest != nil {
+		quest.status = int32(status)	
+	} else {
+		quest = newQuest()
+		quest.sn = int32(sn)
+		quest.status = int32(status)
+		q.addQuest(quest)
 	}
-
-	quest.status = int32(status)
 }
 
 func (q *RobotQuestExecutor) checkIfExec(params []string) bool {
