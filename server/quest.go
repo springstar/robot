@@ -170,7 +170,8 @@ func (q *RobotQuestExecutor) acceptQuest(quest int) ExecState {
 	core.Info("accept quest ", quest)
 	request := msg.SerializeCSAcceptQuest(uint32(msg.MSG_CSAcceptQuest), int32(quest))
 	q.sendPacket(request)
-	return EXEC_COMPLETED
+	q.setOngoing()
+	return q.getState()
 }
 
 func (q *RobotQuestExecutor) execQuest(quest int) ExecState {
@@ -195,7 +196,7 @@ func (q *RobotQuestExecutor) execQuest(quest int) ExecState {
 
 	}
 
-	return EXEC_COMPLETED
+	return q.getState()
 }
 
 func (q *RobotQuestExecutor) execDialogQuest(confQuest *config.ConfQuest) ExecState {
