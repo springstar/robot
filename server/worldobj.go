@@ -22,6 +22,7 @@ const (
 
 type WorldObj struct {
 	id int64
+	
 	typ WorldObjType
 	pos *core.Vec2
 }
