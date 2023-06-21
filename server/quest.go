@@ -264,10 +264,18 @@ func (q *RobotQuestExecutor) execGather(d *GatherQuestData) ExecState {
 	if ret == -1 {
 		// core.Info("exec moving to complete ", confQuest.Sn)
 		q.setRepeated()
-		return EXEC_REPEATED
+		return q.getState()
 	}
 
-	
+	sn := d.getGatherSn()
+	obj := q.findGatherObj(sn)
+	if obj == nil {
+		core.Info("no gather obj found ", sn, pos.X, pos.Y, q.pos.X, q.pos.Y)
+		q.setRepeated()
+		return q.getState()
+	}
+
+	q.gatherFirst(obj.id)
 
 	return q.getState()
 }
@@ -288,8 +296,9 @@ func (q *RobotQuestExecutor) execGatherQuest(confQuest *config.ConfQuest) ExecSt
 		quest.attach(qd)
 	}
 
+	qd := quest.data.(*GatherQuestData)
 
-	return q.getState()
+	return q.execGather(qd)
 }
 
 func (q *RobotQuestExecutor) commitQuest() {

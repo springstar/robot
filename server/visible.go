@@ -21,7 +21,7 @@ func newVisibleRange(r *Robot) *VisibleRange {
 	}
 }
 
-func (v *VisibleRange) addVisibleObj(obj *WorldObj) {
+func (v *VisibleRange) addObj(obj *WorldObj) {
 	if v.pos.DistanceToSquared(obj.pos) > MAX_VISIBLE_DISTANCE * MAX_VISIBLE_DISTANCE {
 		return
 	}
@@ -29,6 +29,28 @@ func (v *VisibleRange) addVisibleObj(obj *WorldObj) {
 	v.visibleObjs[obj.id] = obj
 }
 
-func (v *VisibleRange) removeVisibleObj(id int64) {
+func (v *VisibleRange) removeObj(id int64) {
 	delete(v.visibleObjs, id)
+}
+
+func (v *VisibleRange) findObj(id int64) *WorldObj {
+	if obj, ok := v.visibleObjs[id]; ok {
+		return obj
+	}
+
+	return nil
+}
+
+func (v *VisibleRange) findGatherObj(sn int) *WorldObj {
+	for _, obj := range v.visibleObjs {
+		if obj.typ != WOT_PICK {
+			continue
+		}
+
+		if obj.sn == sn {
+			return obj
+		}
+	}
+
+	return nil
 }

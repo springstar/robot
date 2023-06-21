@@ -16,6 +16,7 @@ func (r *Robot) registerMsgHandler() {
 	r.Register(msg.MSG_SCStageSwitch, r)
 	r.Register(msg.MSG_SCHumanKick, r)
 	r.Register(msg.MSG_SCStageMove, r)
+	r.Register(msg.MSG_SCStageMoveStop, r)
 	r.Register(msg.MSG_SCAccountLoginQueue, r)
 	r.Register(msg.MSG_SCSoulAwaken, r)
 	r.Register(msg.MSG_SCStageObjectAppear, r)
