@@ -1,6 +1,7 @@
 package server
 
 import (
+	"github.com/springstar/robot/msg"
 	"github.com/springstar/robot/config"
 )
 
@@ -11,4 +12,9 @@ func isRep(mapSn int) bool {
 	}
 
 	return false
+}
+
+func (r *Robot) sendEnterInstance(repSn int, questSn int) {
+	request := msg.SerializeCSInstanceEnter(uint32(msg.MSG_CSInstanceEnter), int32(repSn), int32(questSn), false)
+	r.sendPacket(request)
 }
