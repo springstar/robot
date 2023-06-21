@@ -64,6 +64,9 @@ func (r *Robot) HandleGatherFirst(packet *core.Packet) {
 		return
 	}
 
+	core.Info("recv gather first")
+
+
 	r.gatherSecond(objId)
 }
 
@@ -74,5 +77,5 @@ func (r *Robot) HandleGatherSecond(packet *core.Packet) {
 		return
 	}
 
-
+	core.Info("recv gather second")
 }	

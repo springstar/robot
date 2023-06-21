@@ -251,7 +251,7 @@ func getGatherInfo(confQuest *config.ConfQuest) ([]int, []*core.Vec2) {
 
 		position := core.Str2Float32Slice(confScene.Position)
 
-		pos := core.NewVec2(position[0], position[1])
+		pos := core.NewVec2(position[0], position[2])
 		gatherObjPosList = append(gatherObjPosList, pos)
 	}
 
@@ -360,7 +360,7 @@ func getDialogNpcPosition(sn int) *core.Vec2{
 
 	position := core.Str2Float32Slice(confSceneChar.Position)
 
-	return core.NewVec2(position[0], position[1])
+	return core.NewVec2(position[0], position[2])
 }
 
 func (r *Robot) handleQuestInfo(packet *core.Packet) {
