@@ -45,7 +45,7 @@ const (
 )
 
 type iQuestData interface {
-	onStatusUpdate(status QuestStatus)
+	onStatusUpdate(executor *RobotQuestExecutor, sn int, status QuestStatus)
 }
 
 type Quest struct {
@@ -224,9 +224,11 @@ func (q *RobotQuestExecutor) execDialogQuest(confQuest *config.ConfQuest) ExecSt
 		return EXEC_REPEATED
 	}
 
-	core.Info("complete quest")
-	msg := msg.SerializeCSCompleteQuest(uint32(msg.MSG_CSCompleteQuest), int32(confQuest.Sn))
-	q.sendPacket(msg)
+	if confQuest.CommitType == 1 {
+		msg := msg.SerializeCSCompleteQuest(uint32(msg.MSG_CSCompleteQuest), int32(confQuest.Sn))
+		q.sendPacket(msg)
+	}
+
 	q.setOngoing()
 	return EXEC_ONGOING
 }
@@ -306,8 +308,10 @@ func (q *RobotQuestExecutor) execGatherQuest(confQuest *config.ConfQuest) ExecSt
 	return q.execGather(qd)
 }
 
-func (q *RobotQuestExecutor) commitQuest() {
-
+func (q *RobotQuestExecutor) commitQuest(sn int) {
+	request := msg.SerializeCSCommitQuestNormal(uint32(msg.MSG_CSCommitQuestNormal), int32(sn))
+	q.sendPacket(request)
+	q.setOngoing()
 }
 
 func (q *RobotQuestExecutor) exec(params []string, delta int) ExecState {
@@ -339,7 +343,7 @@ func (q *RobotQuestExecutor) updateStatus(sn int, status QuestStatus) {
 	}
 
 	if quest.data != nil {
-		quest.data.onStatusUpdate(status)
+		quest.data.onStatusUpdate(q, sn, status)
 	}
 }
 

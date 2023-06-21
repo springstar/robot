@@ -46,9 +46,11 @@ func (d *GatherQuestData) getGatherSn() int {
 
 }
 
-func (d *GatherQuestData) onStatusUpdate(status QuestStatus) {
+func (d *GatherQuestData) onStatusUpdate(executor *RobotQuestExecutor, sn int, status QuestStatus) {
 	if status == QSTATE_ONGOING {
 		d.next()
+	} else if status == QSTATE_COMPLETED {
+		executor.commitQuest(sn)
 	}
 }
 
