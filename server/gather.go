@@ -5,6 +5,14 @@ import (
 	"github.com/springstar/robot/core"
 )
 
+type GatherQuestData struct {
+
+}
+
+func newGatherQuestData() *GatherQuestData {
+	return &GatherQuestData{}
+}
+
 func (r *Robot) gatherFirst(id int64) {
 	request := msg.SerializeCSGatherFirst(uint32(msg.MSG_CSGatherFirst), id, 0)
 	r.sendPacket(request)
@@ -16,9 +24,20 @@ func (r *Robot) gatherSecond(id int64) {
 }
 
 func (r *Robot) HandleGatherFirst(packet *core.Packet) {
+	msg := msg.ParseSCGatherFirst(int32(msg.MSG_SCGatherFirst), packet.Data)
+	objId := msg.GetId()
+	robotId := msg.GetHumanId()
+	if r.humanId != robotId {
+		return
+	}
 
+	r.gatherSecond(objId)
 }
 
 func (r *Robot) HandleGatherSecond(packet *core.Packet) {
-
-}
+	msg := msg.ParseSCGatherSecond(int32(msg.MSG_SCGatherSecond), packet.Data)
+	robotId := msg.GetHumanId()
+	if r.humanId != robotId {
+		return
+	}
+}	
