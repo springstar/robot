@@ -6,11 +6,44 @@ import (
 )
 
 type GatherQuestData struct {
-
+	snList []int
+	posList []*core.Vec2
+	idx int
 }
 
-func newGatherQuestData() *GatherQuestData {
-	return &GatherQuestData{}
+func newGatherQuestData(snList []int, posList []*core.Vec2) *GatherQuestData {
+	return &GatherQuestData{
+		snList: snList,
+		posList: posList,
+		idx: 0,
+	}
+}
+
+func (d *GatherQuestData) hasNext() bool {
+	return (len(d.posList) > 0 && d.idx < len(d.posList) - 1)
+}
+
+func (d *GatherQuestData) next() {
+	if d.hasNext() {
+		d.idx += 1
+	}
+}
+
+func (d *GatherQuestData) getGatherPos() *core.Vec2 {
+	if d.idx < 0 || d.idx > len(d.posList) - 1 {
+		return nil
+	}
+
+	return d.posList[d.idx]
+}
+
+func (d *GatherQuestData) getGatherSn() int {
+	if d.idx < 0 || d.idx > len(d.posList) - 1 {
+		return 0
+	}
+
+	return d.snList[d.idx]
+
 }
 
 func (r *Robot) gatherFirst(id int64) {
@@ -41,5 +74,5 @@ func (r *Robot) HandleGatherSecond(packet *core.Packet) {
 		return
 	}
 
-	
+
 }	

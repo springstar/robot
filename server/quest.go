@@ -50,12 +50,23 @@ type Quest struct {
 	total int32
 	status int32
 	typ int32
+	data interface{}
 }
 
 func newQuest() *Quest {
 	return &Quest{
 
 	}
+}
+
+func (q *Quest) attach(data interface{}) {
+	if data != nil {
+		q.data = data
+	}
+}
+
+func (q *Quest) detach() {
+	q.data = nil
 }
 
 type RobotQuestSet struct {
@@ -157,7 +168,7 @@ func (qs *RobotQuestSet) addQuest(q *Quest) {
 type RobotQuestExecutor struct {
 	*Executor
 	*RobotQuestSet
-	
+
 }
 
 func newQuestExecutor(r *Robot) *RobotQuestExecutor {
@@ -216,7 +227,7 @@ func (q *RobotQuestExecutor) execDialogQuest(confQuest *config.ConfQuest) ExecSt
 	return EXEC_ONGOING
 }
 
-func getGatherPos(confQuest *config.ConfQuest) []*core.Vec2 {
+func getGatherInfo(confQuest *config.ConfQuest) ([]int, []*core.Vec2) {
 	var sceneCharSnList []int
 	infos := []string{confQuest.Target, confQuest.ArrParam, confQuest.ArrParam2}
 	for _, info := range infos {
@@ -244,22 +255,39 @@ func getGatherPos(confQuest *config.ConfQuest) []*core.Vec2 {
 		gatherObjPosList = append(gatherObjPosList, pos)
 	}
 
-	return gatherObjPosList
+	return sceneCharSnList, gatherObjPosList
 }
 
-func (q *RobotQuestExecutor) execGather(pos *core.Vec2) {
+func (q *RobotQuestExecutor) execGather(d *GatherQuestData) ExecState {
+	pos := d.getGatherPos()
+	ret := q.move(pos)
+	if ret == -1 {
+		// core.Info("exec moving to complete ", confQuest.Sn)
+		q.setRepeated()
+		return EXEC_REPEATED
+	}
 
+	
+
+	return q.getState()
 }
 
 func (q *RobotQuestExecutor) execGatherQuest(confQuest *config.ConfQuest) ExecState {
-	posList := getGatherPos(confQuest)
-	if len(posList) == 0 {
+	quest := q.findQuest(confQuest.Sn)
+	if quest == nil {
 		return q.getState()
 	}
 
-	for _, pos := range posList {
-		q.execGather(pos)
+	if quest.data == nil {
+		snList, posList := getGatherInfo(confQuest)
+		if len(posList) == 0 {
+			return q.getState()
+		}
+
+		qd := newGatherQuestData(snList, posList)
+		quest.attach(qd)
 	}
+
 
 	return q.getState()
 }
