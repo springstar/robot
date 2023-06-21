@@ -207,6 +207,8 @@ func (q *RobotQuestExecutor) execQuest(quest int) ExecState {
 		q.execDialogQuest(confQuest)
 	case QT_GATHER:
 		q.execGatherQuest(confQuest)
+	case QT_ESCORT:
+		q.execEscortQuest(confQuest)
 	default:
 		return EXEC_NO_START	
 
@@ -284,6 +286,10 @@ func (q *RobotQuestExecutor) execGather(d *GatherQuestData) ExecState {
 	q.stepGather(obj.id)
 	q.setOngoing()
 
+	return q.getState()
+}
+
+func (q *RobotQuestExecutor) execEscortQuest(confQuest *config.ConfQuest) ExecState {
 	return q.getState()
 }
 
