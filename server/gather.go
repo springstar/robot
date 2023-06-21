@@ -40,4 +40,6 @@ func (r *Robot) HandleGatherSecond(packet *core.Packet) {
 	if r.humanId != robotId {
 		return
 	}
+
+	
 }	
