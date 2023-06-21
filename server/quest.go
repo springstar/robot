@@ -44,13 +44,17 @@ const (
 	QAT_UI = 4
 )
 
+type iQuestData interface {
+	onStatusUpdate(status QuestStatus)
+}
+
 type Quest struct {
 	sn int32
 	step int32
 	total int32
 	status int32
 	typ int32
-	data interface{}
+	data iQuestData
 }
 
 func newQuest() *Quest {
@@ -59,7 +63,7 @@ func newQuest() *Quest {
 	}
 }
 
-func (q *Quest) attach(data interface{}) {
+func (q *Quest) attach(data iQuestData) {
 	if data != nil {
 		q.data = data
 	}
@@ -275,7 +279,8 @@ func (q *RobotQuestExecutor) execGather(d *GatherQuestData) ExecState {
 		return q.getState()
 	}
 
-	q.gatherFirst(obj.id)
+	q.stepGather(obj.id)
+	q.setOngoing()
 
 	return q.getState()
 }
@@ -332,6 +337,10 @@ func (q *RobotQuestExecutor) updateStatus(sn int, status QuestStatus) {
 		quest.status = int32(status)
 		q.addQuest(quest)
 	}
+
+	if quest.data != nil {
+		quest.data.onStatusUpdate(status)
+	}
 }
 
 
@@ -371,7 +380,6 @@ func (r *Robot) handleQuestInfo(packet *core.Packet) {
 	for _, q := range quests {
 		core.Info("recv quest info ", q.GetSn(), q.GetStatus())
 		executor.updateStatus(int(q.GetSn()), QuestStatus(q.GetStatus()))
-
 	}
 
 	executor.setCompleted()

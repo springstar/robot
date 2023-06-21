@@ -46,6 +46,17 @@ func (d *GatherQuestData) getGatherSn() int {
 
 }
 
+func (d *GatherQuestData) onStatusUpdate(status QuestStatus) {
+	if status == QSTATE_ONGOING {
+		d.next()
+	}
+}
+
+func (r *Robot) stepGather(id int64) {
+	r.gatherFirst(id)
+	r.gatherSecond(id)
+}
+
 func (r *Robot) gatherFirst(id int64) {
 	request := msg.SerializeCSGatherFirst(uint32(msg.MSG_CSGatherFirst), id, 0)
 	r.sendPacket(request)
