@@ -312,6 +312,8 @@ func (q *RobotQuestExecutor) execEscortQuest(confQuest *config.ConfQuest) ExecSt
 		return q.getState()
 	}
 
+
+
 	return q.getState()
 }
 
@@ -354,6 +356,17 @@ func (q *RobotQuestExecutor) exec(params []string, delta int) ExecState {
 	}
 
 	return EXEC_COMPLETED
+}
+
+func (q *RobotQuestExecutor) onEvent(k EventKey) {
+	switch (k) {
+	case EK_STAGE_SWITCH:
+		q.onStageSwitch()
+	}
+}
+
+func (q *RobotQuestExecutor) onStageSwitch() {
+
 }
 
 func (q *RobotQuestExecutor) updateStatus(sn int, status QuestStatus) {

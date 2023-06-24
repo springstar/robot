@@ -51,6 +51,7 @@ func (r *Robot) handleSwitchStage(packet *core.Packet) {
 	core.Info(stageId, mapSn, repSn, pos, dir, lineNum)
 	core.Info("switch stage curr state ", r.fsm.state)
 	r.fsm.trigger(r.fsm.state, "switch", r)
+	r.fireEvent(EK_STAGE_SWITCH)
 	queueStat(STAT_SWITCH_STAGE, 1)
 
 }
