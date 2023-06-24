@@ -49,6 +49,10 @@ func (t *TeamExecutor) exec(params []string, delta int) ExecState {
 	return EXEC_COMPLETED
 }
 
+func (t *TeamExecutor) onEvent(k EventKey) {
+	
+}
+
 func (t *TeamExecutor) create(params []string) ExecState {
 	core.Info("send create team request")
 

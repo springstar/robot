@@ -227,11 +227,13 @@ func (q *RobotQuestExecutor) moveToQuestPos(confQuest *config.ConfQuest) ExecSta
 			return EXEC_REPEATED
 		}	
 	} else {
-		//todo: switch map
+		q.sendEnterInstance(mapSn, confQuest.Sn)
+		q.setOngoing()
 		return q.getState()
 	}
 
-	return EXEC_COMPLETED
+	q.setCompleted()
+	return q.getState()
 
 }
 
@@ -305,6 +307,10 @@ func (q *RobotQuestExecutor) execGather(d *GatherQuestData) ExecState {
 }
 
 func (q *RobotQuestExecutor) execEscortQuest(confQuest *config.ConfQuest) ExecState {
+	es := q.moveToQuestPos(confQuest)
+	if es != EXEC_COMPLETED {
+		return q.getState()
+	}
 
 	return q.getState()
 }

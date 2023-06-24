@@ -8,6 +8,7 @@ type iExecutor interface {
 	exec(params []string, delta int) ExecState
 	checkIfExec(params []string) bool
 	handleBreak()
+	onEvent(k EventKey)
 }
 
 type Executor struct {
@@ -27,6 +28,10 @@ func (e *Executor) exec(params []string, delta int) ExecState {
 }
 
 func (e *Executor) handleBreak(params []string) {
+	
+}
+
+func (e *Executor) onEvent(k EventKey) {
 	
 }
 

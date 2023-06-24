@@ -79,6 +79,10 @@ func (m *RobotMovement) handleBreak() {
 
 }
 
+func (m *RobotMovement) onEvent(k EventKey) {
+	
+}
+
 func (m *RobotMovement) exec(params []string, delta int) ExecState {
 	v, err := core.Str2Int(params[0])
 	if err != nil {
