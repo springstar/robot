@@ -217,7 +217,7 @@ func (q *RobotQuestExecutor) execQuest(quest int) ExecState {
 	return q.getState()
 }
 
-func (q *RobotQuestExecutor) execDialogQuest(confQuest *config.ConfQuest) ExecState {
+func (q *RobotQuestExecutor) moveToQuestPos(confQuest *config.ConfQuest) ExecState {
 	mapSn, pos := getQuestPosition(confQuest)
 	if int(q.mapSn) == mapSn {
 		ret := q.move(pos)
@@ -228,6 +228,17 @@ func (q *RobotQuestExecutor) execDialogQuest(confQuest *config.ConfQuest) ExecSt
 		}	
 	} else {
 		//todo: switch map
+		return q.getState()
+	}
+
+	return EXEC_COMPLETED
+
+}
+
+func (q *RobotQuestExecutor) execDialogQuest(confQuest *config.ConfQuest) ExecState {
+	es := q.moveToQuestPos(confQuest)
+	if es != EXEC_COMPLETED {
+		return es
 	}
 
 	if confQuest.CommitType == 1 {
