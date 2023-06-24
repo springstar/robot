@@ -217,30 +217,29 @@ func (q *RobotQuestExecutor) execQuest(quest int) ExecState {
 	return q.getState()
 }
 
-func (q *RobotQuestExecutor) moveToQuestPos(confQuest *config.ConfQuest) ExecState {
+func (q *RobotQuestExecutor) moveToQuestPos(confQuest *config.ConfQuest) {
 	mapSn, pos := getQuestPosition(confQuest)
 	if int(q.mapSn) == mapSn {
 		ret := q.move(pos)
 		if ret == -1 {
 			core.Info("exec moving to complete ", confQuest.Sn)
 			q.setRepeated()
-			return EXEC_REPEATED
+			return
 		}	
 	} else {
 		q.sendEnterInstance(mapSn, confQuest.Sn)
 		q.setOngoing()
-		return q.getState()
+		return
 	}
 
 	q.setCompleted()
-	return q.getState()
 
 }
 
 func (q *RobotQuestExecutor) execDialogQuest(confQuest *config.ConfQuest) ExecState {
-	es := q.moveToQuestPos(confQuest)
-	if es != EXEC_COMPLETED {
-		return es
+	q.moveToQuestPos(confQuest)
+	if q.getState() != EXEC_COMPLETED {
+		return q.getState()
 	}
 
 	if confQuest.CommitType == 1 {
@@ -307,10 +306,20 @@ func (q *RobotQuestExecutor) execGather(d *GatherQuestData) ExecState {
 }
 
 func (q *RobotQuestExecutor) execEscortQuest(confQuest *config.ConfQuest) ExecState {
-	es := q.moveToQuestPos(confQuest)
-	if es != EXEC_COMPLETED {
+	quest := q.findQuest(confQuest.Sn)
+	if quest == nil {
 		return q.getState()
 	}
+
+	if quest.data == nil {
+
+	}
+	
+	q.moveToQuestPos(confQuest)
+	if q.getState() != EXEC_COMPLETED {
+		return q.getState()
+	}
+
 
 
 

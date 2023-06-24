@@ -69,6 +69,8 @@ func (r *Robot) handleObjAppear(packet *core.Packet) {
 	switch wo.typ {
 	case WOT_PICK:
 		wo.sn = int(msg.GetObjAppear().Pick.GetStageObjectSn())
+	case WOT_MONSTER:
+		wo.sn = int(msg.GetObjAppear().Monster.GetStageObjectSn())	
 	default:
 		break	
 	}

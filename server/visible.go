@@ -54,3 +54,18 @@ func (v *VisibleRange) findGatherObj(sn int) *WorldObj {
 
 	return nil
 }
+
+func (v *VisibleRange) findMonsterObj(sn int) *WorldObj {
+	for _, obj := range v.visibleObjs {
+		if obj.typ != WOT_MONSTER {
+			continue
+		}
+
+		if obj.sn == sn {
+			return obj
+		}
+	}
+
+	return nil
+}
+
