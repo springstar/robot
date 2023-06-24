@@ -218,12 +218,16 @@ func (q *RobotQuestExecutor) execQuest(quest int) ExecState {
 }
 
 func (q *RobotQuestExecutor) execDialogQuest(confQuest *config.ConfQuest) ExecState {
-	pos := getQuestPosition(confQuest)
-	ret := q.move(pos)
-	if ret == -1 {
-		core.Info("exec moving to complete ", confQuest.Sn)
-		q.setRepeated()
-		return EXEC_REPEATED
+	mapSn, pos := getQuestPosition(confQuest)
+	if int(q.mapSn) == mapSn {
+		ret := q.move(pos)
+		if ret == -1 {
+			core.Info("exec moving to complete ", confQuest.Sn)
+			q.setRepeated()
+			return EXEC_REPEATED
+		}	
+	} else {
+		//todo: switch map
 	}
 
 	if confQuest.CommitType == 1 {
@@ -290,6 +294,7 @@ func (q *RobotQuestExecutor) execGather(d *GatherQuestData) ExecState {
 }
 
 func (q *RobotQuestExecutor) execEscortQuest(confQuest *config.ConfQuest) ExecState {
+
 	return q.getState()
 }
 
@@ -358,20 +363,26 @@ func (q *RobotQuestExecutor) handleBreak() {
 
 }
 
-func getQuestPosition(confQuest *config.ConfQuest) *core.Vec2 {
+// func getEscortInfo(confQuest *config.ConfQuest) (repSn int, pos *core.Vec2) {
+
+
+// }
+
+func getQuestPosition(confQuest *config.ConfQuest) (mapSn int, pos *core.Vec2) {
 	target, _ := core.Str2IntSlice(confQuest.Target)
 	switch confQuest.Type {
 	case QT_DIALOG:
-		return getDialogNpcPosition(target[2])
+	case QT_ESCORT:	
+		return target[1], getQuestNpcPosition(target[2])
 	default:
-		return core.NewZeroVec2()	
+		return target[1], core.NewZeroVec2()	
 	}
 
-	return core.NewZeroVec2()	
+	return target[1], core.NewZeroVec2()	
 
 }
 
-func getDialogNpcPosition(sn int) *core.Vec2{
+func getQuestNpcPosition(sn int) *core.Vec2{
 	confSceneChar := config.FindConfSceneCharacter(sn)
 	if confSceneChar == nil {
 		return core.NewZeroVec2()
