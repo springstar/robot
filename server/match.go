@@ -35,11 +35,11 @@ func newMatchExecutor(r *Robot) *MatchExecutor {
 	}
 }
 
-func (m *MatchExecutor) exec(params []string, delta int) ExecState {
+func (m *MatchExecutor) exec(params []string, delta int) {
 	t, err := core.Str2Int(params[0])
 	if err != nil {
 		core.Error("match type error %s", params)
-		return EXEC_COMPLETED
+		return
 	}
 
 	if m.isPVEMatch(MatchType(t)) {
@@ -49,9 +49,11 @@ func (m *MatchExecutor) exec(params []string, delta int) ExecState {
 	} else {
 		core.Error("error match type ", t)
 	}
-
-	return EXEC_COMPLETED
 }
+
+func (m *MatchExecutor) resume(params []string, delta int) {
+}
+
 
 func (m *MatchExecutor) isPVEMatch(t MatchType) bool {
 	if t == MT_REP {

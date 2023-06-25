@@ -9,11 +9,13 @@ import (
 )
 
 type RobotMovement struct {
+	*Executor
 	r *Robot
 }
 
 func newMovement(r *Robot) *RobotMovement {
 	return &RobotMovement{
+		Executor: newExecutor(r),
 		r: r,
 	}
 }
@@ -71,34 +73,36 @@ func (r *Robot) isTimeToSync(now int64) bool {
 	return false
 }
 
-func (m *RobotMovement) checkIfExec(params []string) bool {
-	return true
-}
-
 func (m *RobotMovement) handleBreak() {
 
 }
 
 func (m *RobotMovement) onEvent(k EventKey) {
-	
+
 }
 
-func (m *RobotMovement) exec(params []string, delta int) ExecState {
+func (m *RobotMovement) resume(params []string, delta int) {
+
+}
+
+func (m *RobotMovement) exec(params []string, delta int) {
+	core.Info("start move")
 	v, err := core.Str2Int(params[0])
 	if err != nil {
 		core.Error("path point error %s", params)
-		return EXEC_COMPLETED
+		return
 	}
 
-	// core.Info("move sn ", v)
+	core.Info("move sn ", v)
 	target := serv.sceneMgr.getPoint(m.r.mapSn, v)
 	r := m.r.move(target)
 
 	if r == -1 {
-		return EXEC_REPEATED
+		m.setRepeated()
+		return
 	}
 
-	return EXEC_COMPLETED
+	m.setCompleted()	
 }
 
 func (r *Robot) move(target *core.Vec2) int{

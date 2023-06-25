@@ -3,16 +3,19 @@ package server
 import (
 	"github.com/springstar/robot/msg"
 	"github.com/springstar/robot/core"
+	"github.com/springstar/robot/config"
 )
 
 type GatherQuestData struct {
+	questSn int
 	snList []int
 	posList []*core.Vec2
 	idx int
 }
 
-func newGatherQuestData(snList []int, posList []*core.Vec2) *GatherQuestData {
+func newGatherQuestData(questSn int, snList []int, posList []*core.Vec2) *GatherQuestData {
 	return &GatherQuestData{
+		questSn: questSn,
 		snList: snList,
 		posList: posList,
 		idx: 0,
@@ -44,6 +47,14 @@ func (d *GatherQuestData) getGatherSn() int {
 
 	return d.snList[d.idx]
 
+}
+
+func (d *GatherQuestData) resume(executor *RobotQuestExecutor) {
+
+}
+
+func (d *GatherQuestData) getQuestSn() int {
+	return d.questSn
 }
 
 func (d *GatherQuestData) onStatusUpdate(executor *RobotQuestExecutor, sn int, status QuestStatus) {
@@ -92,3 +103,34 @@ func (r *Robot) HandleGatherSecond(packet *core.Packet) {
 
 	core.Info("recv gather second")
 }	
+
+func getGatherInfo(confQuest *config.ConfQuest) ([]int, []*core.Vec2) {
+	var sceneCharSnList []int
+	infos := []string{confQuest.Target, confQuest.ArrParam, confQuest.ArrParam2}
+	for _, info := range infos {
+		gather, err := core.Str2IntSlice(info)
+		if err != nil {
+			continue
+		}
+
+		sceneCharSn := int(gather[2])
+		sceneCharSnList = append(sceneCharSnList, sceneCharSn)
+	}
+
+	var gatherObjPosList []*core.Vec2
+
+	for _, sn := range sceneCharSnList {
+		confScene := config.FindConfSceneCharacter(sn)
+		if confScene == nil {
+			core.Warn("no ConfSceneCharacter ", sn)
+			continue
+		}
+
+		position := core.Str2Float32Slice(confScene.Position)
+
+		pos := core.NewVec2(position[0], position[2])
+		gatherObjPosList = append(gatherObjPosList, pos)
+	}
+
+	return sceneCharSnList, gatherObjPosList
+}

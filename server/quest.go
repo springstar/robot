@@ -45,7 +45,9 @@ const (
 )
 
 type iQuestData interface {
+	getQuestSn() int
 	onStatusUpdate(executor *RobotQuestExecutor, sn int, status QuestStatus)
+	resume(executor *RobotQuestExecutor)
 }
 
 type Quest struct {
@@ -172,7 +174,7 @@ func (qs *RobotQuestSet) addQuest(q *Quest) {
 type RobotQuestExecutor struct {
 	*Executor
 	*RobotQuestSet
-
+	curQuest int
 }
 
 func newQuestExecutor(r *Robot) *RobotQuestExecutor {
@@ -198,7 +200,7 @@ func (q *RobotQuestExecutor) execQuest(quest int) ExecState {
 	}
 
 	if !q.isPreCompleted(quest) {
-		// core.Info("pre sn no completed ", quest)
+		core.Info("pre sn no completed ", quest)
 		return EXEC_COMPLETED
 	}
 
@@ -214,26 +216,29 @@ func (q *RobotQuestExecutor) execQuest(quest int) ExecState {
 
 	}
 
+	q.curQuest = quest
+
 	return q.getState()
 }
 
 func (q *RobotQuestExecutor) moveToQuestPos(confQuest *config.ConfQuest) {
+	if q.getState() == EXEC_ONGOING {
+		return
+	}
+
 	mapSn, pos := getQuestPosition(confQuest)
 	if int(q.mapSn) == mapSn {
 		ret := q.move(pos)
 		if ret == -1 {
 			core.Info("exec moving to complete ", confQuest.Sn)
 			q.setRepeated()
-			return
+		} else {
+			q.setCompleted()
 		}	
-	} else {
-		q.sendEnterInstance(mapSn, confQuest.Sn)
-		q.setOngoing()
-		return
 	}
 
-	q.setCompleted()
-
+	q.sendEnterInstance(mapSn, confQuest.Sn)
+	q.setOngoing()
 }
 
 func (q *RobotQuestExecutor) execDialogQuest(confQuest *config.ConfQuest) ExecState {
@@ -251,44 +256,13 @@ func (q *RobotQuestExecutor) execDialogQuest(confQuest *config.ConfQuest) ExecSt
 	return EXEC_ONGOING
 }
 
-func getGatherInfo(confQuest *config.ConfQuest) ([]int, []*core.Vec2) {
-	var sceneCharSnList []int
-	infos := []string{confQuest.Target, confQuest.ArrParam, confQuest.ArrParam2}
-	for _, info := range infos {
-		gather, err := core.Str2IntSlice(info)
-		if err != nil {
-			continue
-		}
-
-		sceneCharSn := int(gather[2])
-		sceneCharSnList = append(sceneCharSnList, sceneCharSn)
-	}
-
-	var gatherObjPosList []*core.Vec2
-
-	for _, sn := range sceneCharSnList {
-		confScene := config.FindConfSceneCharacter(sn)
-		if confScene == nil {
-			core.Warn("no ConfSceneCharacter ", sn)
-			continue
-		}
-
-		position := core.Str2Float32Slice(confScene.Position)
-
-		pos := core.NewVec2(position[0], position[2])
-		gatherObjPosList = append(gatherObjPosList, pos)
-	}
-
-	return sceneCharSnList, gatherObjPosList
-}
-
-func (q *RobotQuestExecutor) execGather(d *GatherQuestData) ExecState {
+func (q *RobotQuestExecutor) execGather(d *GatherQuestData)  {
 	pos := d.getGatherPos()
 	ret := q.move(pos)
 	if ret == -1 {
-		// core.Info("exec moving to complete ", confQuest.Sn)
+		confQuest := config.FindConfQuest(d.questSn)
+		core.Info("exec moving to complete ", confQuest.Sn)
 		q.setRepeated()
-		return q.getState()
 	}
 
 	sn := d.getGatherSn()
@@ -296,55 +270,59 @@ func (q *RobotQuestExecutor) execGather(d *GatherQuestData) ExecState {
 	if obj == nil {
 		core.Info("no gather obj found ", sn, pos.X, pos.Y, q.pos.X, q.pos.Y)
 		q.setRepeated()
-		return q.getState()
+		return
 	}
 
 	q.stepGather(obj.id)
 	q.setOngoing()
 
-	return q.getState()
 }
 
 func (q *RobotQuestExecutor) execEscortQuest(confQuest *config.ConfQuest) ExecState {
+	q.moveToQuestPos(confQuest)
+	if q.getState() != EXEC_COMPLETED {
+		return q.getState()	
+	}
+
 	quest := q.findQuest(confQuest.Sn)
 	if quest == nil {
 		return q.getState()
 	}
 
 	if quest.data == nil {
-
-	}
-	
-	q.moveToQuestPos(confQuest)
-	if q.getState() != EXEC_COMPLETED {
-		return q.getState()
+		qd := newEscortQuestData(confQuest.Sn)
+		qd.genPath(confQuest)
+		quest.attach(qd)
 	}
 
-
-
+	q.execEscort()
 
 	return q.getState()
 }
 
-func (q *RobotQuestExecutor) execGatherQuest(confQuest *config.ConfQuest) ExecState {
+func (q *RobotQuestExecutor) execEscort() {
+
+}
+
+func (q *RobotQuestExecutor) execGatherQuest(confQuest *config.ConfQuest)  {
 	quest := q.findQuest(confQuest.Sn)
 	if quest == nil {
-		return q.getState()
+		return
 	}
 
 	if quest.data == nil {
 		snList, posList := getGatherInfo(confQuest)
 		if len(posList) == 0 {
-			return q.getState()
+			return
 		}
 
-		qd := newGatherQuestData(snList, posList)
+		qd := newGatherQuestData(confQuest.Sn, snList, posList)
 		quest.attach(qd)
 	}
 
 	qd := quest.data.(*GatherQuestData)
 
-	return q.execGather(qd)
+	q.execGather(qd)
 }
 
 func (q *RobotQuestExecutor) commitQuest(sn int) {
@@ -353,29 +331,41 @@ func (q *RobotQuestExecutor) commitQuest(sn int) {
 	q.setOngoing()
 }
 
-func (q *RobotQuestExecutor) exec(params []string, delta int) ExecState {
+func (q *RobotQuestExecutor) exec(params []string, delta int) {
 	quest := q.findQuestToExec()
 	if quest > 0 {
-		return q.execQuest(int(quest))
+		q.execQuest(int(quest))
+		return
 	}
 
 	quest = q.findQuestToAccept()
 	if quest > 0 {
-		return q.acceptQuest(int(quest))
+		q.acceptQuest(int(quest))
 	}
+}
 
-	return EXEC_COMPLETED
+func (q *RobotQuestExecutor) resume(params []string, delta int) {
+
 }
 
 func (q *RobotQuestExecutor) onEvent(k EventKey) {
 	switch (k) {
 	case EK_STAGE_SWITCH:
 		q.onStageSwitch()
+	default:
+		break	
 	}
 }
 
 func (q *RobotQuestExecutor) onStageSwitch() {
+	quest := q.findQuest(q.curQuest)
+	if quest == nil {
+		return
+	}
 
+	if quest.data != nil {
+		quest.data.resume(q)
+	}
 }
 
 func (q *RobotQuestExecutor) updateStatus(sn int, status QuestStatus) {
@@ -383,6 +373,9 @@ func (q *RobotQuestExecutor) updateStatus(sn int, status QuestStatus) {
 	if quest != nil {
 		core.Info("update status ", sn, status)
 		quest.status = int32(status)	
+		if quest.status == QSTATE_COMPLETED || quest.status == QSTATE_REWARED {
+			q.curQuest = 0
+		}
 	} else {
 		core.Info("new quest ", sn, status)
 
@@ -397,15 +390,6 @@ func (q *RobotQuestExecutor) updateStatus(sn int, status QuestStatus) {
 	}
 }
 
-
-func (q *RobotQuestExecutor) handleBreak() {
-
-}
-
-// func getEscortInfo(confQuest *config.ConfQuest) (repSn int, pos *core.Vec2) {
-
-
-// }
 
 func getQuestPosition(confQuest *config.ConfQuest) (mapSn int, pos *core.Vec2) {
 	target, _ := core.Str2IntSlice(confQuest.Target)

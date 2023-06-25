@@ -4,10 +4,21 @@ import (
 	"github.com/springstar/robot/core"
 )
 
+type ExecState int32
+
+const (
+	EXEC_NO_START ExecState = iota
+	EXEC_ONGOING // 进行中，不可重入
+	EXEC_REPEATED // 可重入
+	EXEC_PAUSE
+	EXEC_RESUME
+	EXEC_COMPLETED
+)
+
 type iExecutor interface {
-	exec(params []string, delta int) ExecState
-	checkIfExec(params []string) bool
-	handleBreak()
+	exec(params []string, delta int)
+	resume(params []string, delta int)
+	getStatus(pc int) ExecState
 	onEvent(k EventKey)
 }
 
@@ -23,27 +34,22 @@ func newExecutor(r *Robot) *Executor {
 	}
 }
 
-func (e *Executor) exec(params []string, delta int) ExecState {
-	return EXEC_COMPLETED
+func (e *Executor) exec(params []string, delta int) {
+	
 }
 
-func (e *Executor) handleBreak(params []string) {
-	
+func (e *Executor) resumt(params []string, delta int) {
+
+}
+
+func (e *Executor) getStatus(pc int) ExecState {
+	return e.exstates[pc]
 }
 
 func (e *Executor) onEvent(k EventKey) {
-	
+
 }
 
-func (e *Executor) checkIfExec(params[]string) bool {
-	if e.getState() == EXEC_REPEATED {
-		return true
-	}else if e.getState() == EXEC_ONGOING {
-		return false
-	}
-
-	return true
-}
 
 func (e *Executor) setRepeated() {
 	e.exstates[e.pc] = EXEC_REPEATED
@@ -61,23 +67,43 @@ func (e *Executor) getState() ExecState {
 	return e.exstates[e.pc]
 }
 
+type AsyncContext struct {
+
+}
+
+func newAsyncContext() *AsyncContext {
+	return &AsyncContext{
+
+	}
+}
+
+
 func (r *Robot) vm() {
 	if r.pc != -1 {
 		instruction := r.fetch(r.pc)
 		executor := r.findExecutor(instruction.cmd)
 		if executor == nil {
 			core.Error("no executor ", instruction.cmd)
-		} else {
-			if !executor.checkIfExec(instruction.params) {
-				executor.handleBreak()
-				r.pc, _ = r.next(r.pc)
-				return
-			}
-			
-			state := executor.exec(instruction.params, 30)
-			if state == EXEC_COMPLETED {
-				r.pc, instruction = r.next(r.pc)
-			}
+			return
+		}
+
+		status := executor.getStatus(r.pc)
+
+		switch status {
+		case EXEC_NO_START, EXEC_REPEATED:
+			executor.exec(instruction.params, 30)
+		case EXEC_RESUME:
+			executor.resume(instruction.params, 30)	
+		default:
+			break	
+		}
+		
+		status = executor.getStatus(r.pc)
+		if status == EXEC_COMPLETED {
+			r.pc, _ = r.next(r.pc)
+			executor.exec(instruction.params, 30)
 		}
 	}	
+
+	
 }

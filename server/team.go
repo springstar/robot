@@ -14,7 +14,7 @@ const (
 )
 
 type TeamExecutor struct {
-	ae *Executor
+	*Executor
 	*Robot
 	*TeamMember
 }
@@ -33,24 +33,27 @@ func newTeamMember(tid int64, isLeader bool) *TeamMember {
 func newTeamExecutor(r *Robot) *TeamExecutor {
 	return &TeamExecutor{
 		Robot: r,
-		ae: newExecutor(r),
+		Executor: newExecutor(r),
 		TeamMember: newTeamMember(0, false),
 	}
 }
 
-func (t *TeamExecutor) exec(params []string, delta int) ExecState {
+func (t *TeamExecutor) resume(params []string, delta int) {
+
+}
+
+func (t *TeamExecutor) exec(params []string, delta int) {
 	op, _ := parseOperation(params)
 	switch op {
 	case TO_CREATE:
-		return t.create(params)
+		t.create(params)
 	case TO_LIST:
-		return t.list(params)
+		t.list(params)
 	}
-	return EXEC_COMPLETED
 }
 
 func (t *TeamExecutor) onEvent(k EventKey) {
-	
+
 }
 
 func (t *TeamExecutor) create(params []string) ExecState {
@@ -60,8 +63,8 @@ func (t *TeamExecutor) create(params []string) ExecState {
 	teamType, _ := core.Str2Int(params[2])
 	request := msg.SerializeCSPlatCreateTeam(msg.MSG_CSPlatCreateTeam, int32(targetSn), int32(teamType))
 	t.sendPacket(request)
-	t.ae.setOngoing()
-	return t.ae.getState()
+	t.setOngoing()
+	return t.getState()
 }
 
 func (t *TeamExecutor) list(params []string) ExecState {
@@ -69,8 +72,8 @@ func (t *TeamExecutor) list(params []string) ExecState {
 	targetSn, _ := core.Str2Int(params[1])
 	request := msg.SerializeCSPlatTeamListRequest(msg.MSG_CSPlatTeamListRequest, int32(targetSn))
 	t.sendPacket(request)
-	t.ae.setOngoing()
-	return t.ae.getState()
+	t.setOngoing()
+	return t.getState()
 }
 
 func parseOperation(params []string) (TeamOperation, error){
@@ -83,14 +86,6 @@ func parseOperation(params []string) (TeamOperation, error){
 }
 
 func (t *TeamExecutor) checkIfExec(params []string) bool {
-	if !t.ae.checkIfExec(params) {
-		return false
-	}
-
-	if t.profession == 0 {
-		return false
-	}
-
 	op, err := parseOperation(params)
 	if err != nil {
 		return false
@@ -121,7 +116,7 @@ func (r *Robot) handleTeamDetail(packet *core.Packet) {
 	isLeader := r.isLeader(detail.GetLeaderId())
 	e.TeamMember.teamId = detail.GetTeamId()
 	e.TeamMember.isLeader = isLeader
-	e.ae.setCompleted()
+	e.setCompleted()
 	core.Info("team detail ", detail)
 }
 
@@ -138,5 +133,5 @@ func (r *Robot) handleTeamList(packet *core.Packet) {
 	}
 
 	e := r.findExecutor("team").(*TeamExecutor)
-	e.ae.setCompleted()
+	e.setCompleted()
 }

@@ -6,14 +6,19 @@ import (
 )
 
 type EscortQuestData struct {
+	questSn int
 	path []*core.Vec2
 }
 
-func newEscortQuestData() *EscortQuestData {
-	return &EscortQuestData{}
+func newEscortQuestData(questSn int) *EscortQuestData {
+	return &EscortQuestData{
+		questSn: questSn,
+	}
 }
 
-func (d *EscortQuestData) genPath(sn int) {
+func (d *EscortQuestData) genPath(confQuest *config.ConfQuest) {
+	target, _ := core.Str2IntSlice(confQuest.Target)
+	sn := target[2]
 	confScenePath := config.FindConfScenePath(sn)
 	if confScenePath == nil {
 		return
@@ -33,3 +38,14 @@ func (d *EscortQuestData) genPath(sn int) {
 
 }
 
+func (d *EscortQuestData) onStatusUpdate(executor *RobotQuestExecutor, sn int, status QuestStatus) {
+
+}
+
+func (d *EscortQuestData) resume(executor *RobotQuestExecutor) {
+	
+}
+
+func (d *EscortQuestData) getQuestSn() int {
+	return d.questSn
+}
