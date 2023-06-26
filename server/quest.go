@@ -61,7 +61,7 @@ type Quest struct {
 
 func newQuest() *Quest {
 	return &Quest{
-
+		data: nil,
 	}
 }
 
@@ -230,15 +230,16 @@ func (q *RobotQuestExecutor) moveToQuestPos(confQuest *config.ConfQuest) {
 	if int(q.mapSn) == mapSn {
 		ret := q.move(pos)
 		if ret == -1 {
-			core.Info("exec moving to complete ", confQuest.Sn)
+			core.Info("exec moving to complete ", confQuest.Sn, mapSn, pos)
 			q.setRepeated()
 		} else {
 			q.setCompleted()
 		}	
+		return
 	}
 
 	q.sendEnterInstance(mapSn, confQuest.Sn)
-	q.setOngoing()
+	q.setPause()
 }
 
 func (q *RobotQuestExecutor) execDialogQuest(confQuest *config.ConfQuest) ExecState {
@@ -280,8 +281,8 @@ func (q *RobotQuestExecutor) execGather(d *GatherQuestData)  {
 
 func (q *RobotQuestExecutor) execEscortQuest(confQuest *config.ConfQuest) ExecState {
 	q.moveToQuestPos(confQuest)
-	if q.getState() != EXEC_COMPLETED {
-		return q.getState()	
+	if q.getState() == EXEC_PAUSE {
+		q.attachCtxFun(asyncEscort, q)
 	}
 
 	quest := q.findQuest(confQuest.Sn)
@@ -290,18 +291,36 @@ func (q *RobotQuestExecutor) execEscortQuest(confQuest *config.ConfQuest) ExecSt
 	}
 
 	if quest.data == nil {
+		core.Info("attach escort quest data ", confQuest.Sn)
 		qd := newEscortQuestData(confQuest.Sn)
 		qd.genPath(confQuest)
 		quest.attach(qd)
+	} else {
+		core.Info("no need to attach escort quest data ", confQuest.Sn)
 	}
-
-	q.execEscort()
 
 	return q.getState()
 }
 
-func (q *RobotQuestExecutor) execEscort() {
+func asyncEscort(e iExecutor) {
+	core.Info("async escort")
+	q := e.(*RobotQuestExecutor)
+	q.execEscort()
+}
 
+func (q *RobotQuestExecutor) execEscort() {
+	core.Info("exec escort")
+	quest := q.findQuest(q.curQuest)
+	if quest == nil {
+		core.Info("execEscort no quest found ", q.curQuest)
+		return
+	}
+
+	if quest.data != nil {
+		quest.data.resume(q)
+	} else {
+		core.Info("escort quest data nil ", q.curQuest)
+	}
 }
 
 func (q *RobotQuestExecutor) execGatherQuest(confQuest *config.ConfQuest)  {
@@ -345,7 +364,7 @@ func (q *RobotQuestExecutor) exec(params []string, delta int) {
 }
 
 func (q *RobotQuestExecutor) resume(params []string, delta int) {
-
+	q.Executor.resume()
 }
 
 func (q *RobotQuestExecutor) onEvent(k EventKey) {
@@ -358,13 +377,8 @@ func (q *RobotQuestExecutor) onEvent(k EventKey) {
 }
 
 func (q *RobotQuestExecutor) onStageSwitch() {
-	quest := q.findQuest(q.curQuest)
-	if quest == nil {
-		return
-	}
-
-	if quest.data != nil {
-		quest.data.resume(q)
+	if q.getState() == EXEC_PAUSE {
+		q.setResume()
 	}
 }
 
@@ -390,15 +404,11 @@ func (q *RobotQuestExecutor) updateStatus(sn int, status QuestStatus) {
 	}
 }
 
-
 func getQuestPosition(confQuest *config.ConfQuest) (mapSn int, pos *core.Vec2) {
 	target, _ := core.Str2IntSlice(confQuest.Target)
 	switch confQuest.Type {
-	case QT_DIALOG:
-	case QT_ESCORT:	
-		return target[1], getQuestNpcPosition(target[2])
-	default:
-		return target[1], core.NewZeroVec2()	
+	case QT_DIALOG, QT_ESCORT:
+		return target[1], getQuestNpcPosition(target[2])	
 	}
 
 	return target[1], core.NewZeroVec2()	
@@ -412,7 +422,7 @@ func getQuestNpcPosition(sn int) *core.Vec2{
 	}
 
 	position := core.Str2Float32Slice(confSceneChar.Position)
-
+	core.Info("quest position ", sn, position[0], position[2])
 	return core.NewVec2(position[0], position[2])
 }
 

@@ -19,6 +19,11 @@ func Str2Int(s string) (int, error) {
 	return int(n), nil
 }
 
+func Str2StrSlice(s string) ([]string) {
+	strSlice := strings.Split(s, ",")
+	return strSlice
+}
+
 func Str2IntSlice(s string) ([]int, error) {
 	strSlice := strings.Split(s, ",")
 	var intSlice []int
