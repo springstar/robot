@@ -37,6 +37,7 @@ type Robot struct {
 	path []*core.Vec2
 	lastSyncTime int64
 
+	skills map[int32]*Skill
 }
 
 func newRobot(account *Account, robotMgr *RobotManager, fsm *RobotFsm) *Robot {
@@ -54,6 +55,7 @@ func newRobot(account *Account, robotMgr *RobotManager, fsm *RobotFsm) *Robot {
 		pc: -1,
 		executors: make(map[string]iExecutor),
 		isQuit: false,
+		skills: make(map[int32]*Skill),
 	}
 
 	r.VisibleRange = newVisibleRange(r)
