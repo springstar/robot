@@ -62,6 +62,7 @@ func (d *EscortQuestData) getEscortPos() *core.Vec2 {
 func (d *EscortQuestData) onStatusUpdate(e *RobotQuestExecutor, sn int, status QuestStatus) {
 	core.Info("esocrt data onStatusUpdate ", sn, status)
 	if status == QSTATE_COMPLETED {
+		core.Info("commit escort quest ", sn)
 		e.commitQuest(sn)
 	}
 }

@@ -351,9 +351,18 @@ func (q *RobotQuestExecutor) execGatherQuest(confQuest *config.ConfQuest)  {
 }
 
 func (q *RobotQuestExecutor) commitQuest(sn int) {
+	confQuest := config.FindConfQuest(sn)
+	if confQuest == nil {
+		return
+	}
+
+	if confQuest.CommitType == 1 {
+		return
+	}
+
 	request := msg.SerializeCSCommitQuestNormal(uint32(msg.MSG_CSCommitQuestNormal), int32(sn))
 	q.sendPacket(request)
-	q.setOngoing()
+	// q.setOngoing()
 }
 
 func (q *RobotQuestExecutor) exec(params []string, delta int) {
@@ -386,6 +395,15 @@ func (q *RobotQuestExecutor) onStageSwitch() {
 	if q.getState() == EXEC_PAUSE {
 		q.setResume()
 	}
+
+	quest := q.findQuest(q.curQuest)
+	if quest == nil {
+		return
+	}
+
+	if quest.status == QSTATE_COMPLETED {
+		q.commitQuest(q.curQuest)
+	}
 }
 
 func (q *RobotQuestExecutor) updateStatus(sn int, status QuestStatus) {
@@ -394,7 +412,7 @@ func (q *RobotQuestExecutor) updateStatus(sn int, status QuestStatus) {
 		core.Info("update status ", sn, status)
 		quest.status = int32(status)	
 		if quest.status == QSTATE_COMPLETED || quest.status == QSTATE_REWARED {
-			q.curQuest = 0
+			// q.curQuest = 0
 		}
 	} else {
 		core.Info("new quest ", sn, status)
