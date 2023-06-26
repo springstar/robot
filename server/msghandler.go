@@ -30,6 +30,7 @@ func (r *Robot) registerMsgHandler() {
 	r.Register(msg.MSG_SCQuestInfo, r)
 	r.Register(msg.MSG_SCGatherFirst, r)
 	r.Register(msg.MSG_SCGatherSecond, r)
+	r.Register(msg.MSG_SCSkillUpdate, r)
 }
 
 func (r *Robot) HandleMessage(packet *core.Packet) {
@@ -76,6 +77,8 @@ func (r *Robot) HandleMessage(packet *core.Packet) {
 			r.handleQuestInfo(packet)
 		case msg.MSG_SCRemoveQuest:
 			r.handleRemoveQuest(packet)		
+		case msg.MSG_SCSkillUpdate:
+			r.handleSkillChange(packet)	
 
 		default:
 			core.Warn("recv packet type ", packet.Type)	
