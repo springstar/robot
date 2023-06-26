@@ -1,6 +1,7 @@
 package server
 
 import (
+	"github.com/springstar/robot/msg"
 	"github.com/springstar/robot/pb"
 	"github.com/springstar/robot/core"
 )
@@ -20,8 +21,15 @@ func newSkill(sn int32, lv int32, pos int32, nextRelease int64) *Skill {
 	}
 }
 
-func (r *Robot) handleSkillChange(packet *core.Packet) {
+func (r *Robot) handleSkillUpdate(packet *core.Packet) {
 	core.Info("recv skill change")
+	msg := msg.ParseSCSkillUpdate(int32(msg.MSG_SCSkillUpdate), packet.Data)
+	changes := msg.GetChanges()
+	for _, c := range changes {
+		skill := newSkill(c.GetSkillId(), c.GetLevel(), c.GetSlot(), c.GetSkillCd())
+		r.addSkill(skill.sn, skill)
+	}
+
 }
 
 func (r *Robot) handleHpChange(packet *core.Packet) {

@@ -78,7 +78,7 @@ func (r *Robot) HandleMessage(packet *core.Packet) {
 		case msg.MSG_SCRemoveQuest:
 			r.handleRemoveQuest(packet)		
 		case msg.MSG_SCSkillUpdate:
-			r.handleSkillChange(packet)	
+			r.handleSkillUpdate(packet)	
 
 		default:
 			core.Warn("recv packet type ", packet.Type)	
