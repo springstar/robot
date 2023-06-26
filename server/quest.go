@@ -32,6 +32,7 @@ const (
 	QT_LEVEL = 1
 	QT_ESCORT = 74
 	QT_DIALOG = 12
+	QT_MIRROR = 13
 	QT_GATHER = 28
 )
 
@@ -217,6 +218,8 @@ func (q *RobotQuestExecutor) execQuest(quest int) ExecState {
 		q.execGatherQuest(confQuest)
 	case QT_ESCORT:
 		q.execEscortQuest(confQuest)
+	case QT_MIRROR:
+		q.execMirrorQuest(confQuest)
 	default:
 		return EXEC_NO_START	
 
@@ -283,6 +286,10 @@ func (q *RobotQuestExecutor) execGather(d *GatherQuestData)  {
 	q.stepGather(obj.id)
 	q.setOngoing()
 
+}
+
+func (q *RobotQuestExecutor) execMirrorQuest(confQuest *config.ConfQuest) ExecState {
+	return EXEC_COMPLETED
 }
 
 func (q *RobotQuestExecutor) execEscortQuest(confQuest *config.ConfQuest) ExecState {
