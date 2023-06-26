@@ -171,6 +171,12 @@ func (qs *RobotQuestSet) addQuest(q *Quest) {
 	}
 }
 
+func (qs *RobotQuestSet) removeQuest(questSn int) {
+	if _, ok := qs.quests[questSn]; ok {
+		delete(qs.quests, questSn)
+	}
+}
+
 type RobotQuestExecutor struct {
 	*Executor
 	*RobotQuestSet
@@ -437,4 +443,14 @@ func (r *Robot) handleQuestInfo(packet *core.Packet) {
 	}
 
 	executor.setCompleted()
+}
+
+func (r *Robot) handleRemoveQuest(packet *core.Packet) {
+	msg := msg.ParseSCRemoveQuest(int32(msg.MSG_SCRemoveQuest), packet.Data)
+	executor := r.findExecutor("quest").(*RobotQuestExecutor)
+
+	quests := msg.GetQuestIds()
+	for _, q := range quests {
+		executor.removeQuest(int(q))
+	}
 }

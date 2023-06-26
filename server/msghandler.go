@@ -57,9 +57,7 @@ func (r *Robot) HandleMessage(packet *core.Packet) {
 		case msg.MSG_SCHumanKick:
 			r.handleKick(packet)
 		case msg.MSG_SCStageMove:
-			r.handleStageMove(packet)
-		case msg.MSG_SCStageMoveStop:
-				
+			r.handleStageMove(packet)				
 		case msg.MSG_SCSoulAwaken:
 			r.handleSoulAwaken(packet)
 		case msg.MSG_SCMatchEnrollResponse:
@@ -75,7 +73,9 @@ func (r *Robot) HandleMessage(packet *core.Packet) {
 		case msg.MSG_SCFightHpChg:
 			r.handleHpChange(packet)
 		case msg.MSG_SCQuestInfo:
-			r.handleQuestInfo(packet)	
+			r.handleQuestInfo(packet)
+		case msg.MSG_SCRemoveQuest:
+			r.handleRemoveQuest(packet)		
 
 		default:
 			core.Warn("recv packet type ", packet.Type)	
