@@ -6,6 +6,12 @@ import (
 	"github.com/springstar/robot/config"
 )
 
+type SceneEventType int32
+
+const (
+	SEVT_FLUSHMONSTER = 5
+)
+
 
 type SceneManager struct {
 	pathpoints map[int32][]*core.Vec2
