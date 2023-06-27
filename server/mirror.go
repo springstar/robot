@@ -9,7 +9,7 @@ type StageClearQuestData struct {
 
 }
 
-func getStageClearInfo(confQuest config.ConfQuest) (count int, repSn int){
+func getStageClearTarget(confQuest config.ConfQuest) (count int, repSn int){
 	infos, err := core.Str2IntSlice(confQuest.Target)
 	if err != nil {
 		core.Error("StageClear quest target error ", confQuest.Sn)
