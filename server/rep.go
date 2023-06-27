@@ -18,3 +18,8 @@ func (r *Robot) sendEnterInstance(repSn int, questSn int) {
 	request := msg.SerializeCSInstanceEnter(uint32(msg.MSG_CSInstanceEnter), int32(repSn), int32(questSn), false)
 	r.sendPacket(request)
 }
+
+func (r *Robot) sendLeaveInstance() {
+	request := msg.SerializeCSInstanceLeave(uint32(msg.MSG_CSInstanceLeave))
+	r.sendPacket(request)
+}

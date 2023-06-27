@@ -93,7 +93,11 @@ func (d *StageClearQuestData) genEnemyPosList(confQuest *config.ConfQuest) {
 }
 
 func (d *StageClearQuestData) onStatusUpdate(e *RobotQuestExecutor, sn int, status QuestStatus) {
-
+	core.Info("StageClearQuestData data onStatusUpdate ", sn, status)
+	if status == QSTATE_COMPLETED {
+		core.Info("StageClearQuest leave stage ", sn)
+		e.sendLeaveInstance()
+	}
 }
 
 func (d *StageClearQuestData) getQuestSn() int {

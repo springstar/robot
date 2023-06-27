@@ -110,7 +110,7 @@ func (r *Robot) dumpSkills() {
 }
 
 func (r *Robot) pickSkill() int32 {
-	r.dumpSkills()
+	// r.dumpSkills()
 	now := core.GetCurrentTime()
 	for sn, skill := range r.skills {
 		confSkill := config.FindConfSkill(int(sn))
