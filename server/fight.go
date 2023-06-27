@@ -88,7 +88,7 @@ func (r *Robot) fight(enemyId int64) {
 		return
 	}
 
-	confSkill := config.FindConfSkill(sn)
+	confSkill := config.FindConfSkill(int(sn))
 	if confSkill.TargetType == STT_FRIEND {
 		tarId = r.humanId
 		tarPos = r.pos
@@ -102,12 +102,20 @@ func (r *Robot) fight(enemyId int64) {
 	r.sendPacket(msg)
 }
 
-func (r *Robot) pickSkill() int32 {
-	now := core.GetCurrentTime()
-	core.Info("pickSkill skills ", len(r.skills))
+func (r *Robot) dumpSkills() {
+	core.Info("dump skills ", len(r.skills))
 	for sn, skill := range r.skills {
-		confSkill := config.FindConfSkill(sn)
+		core.Info("skill ", sn, skill.level, skill.nextRelease)
+	}
+}
+
+func (r *Robot) pickSkill() int32 {
+	r.dumpSkills()
+	now := core.GetCurrentTime()
+	for sn, skill := range r.skills {
+		confSkill := config.FindConfSkill(int(sn))
 		if confSkill == nil {
+			core.Info("no config for skill ", sn)
 			continue
 		}
 
