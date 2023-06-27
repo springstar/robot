@@ -7,12 +7,12 @@ import (
 
 type StageClearQuestData struct {
 	clearCount int
-	enemyPosList []*core.Vec2
+	enemysInfo map[int]*core.Vec2
 }
 
 func newStageClearQuestData() *StageClearQuestData {
 	return &StageClearQuestData{
-
+		enemysInfo: make(map[int]*core.Vec2),
 	}
 }
 
@@ -74,8 +74,7 @@ func (d *StageClearQuestData) getEnemyPosList(confQuest *config.ConfQuest) {
 
 				if confCharacterMonster.Camp == CAMP_ENEMY || confCharacterMonster.Camp == CAPM_MONSTER {
 					enemyPos := core.Str2Float32Slice(confSceneCharacter.Position)
-
-					d.enemyPosList = append(d.enemyPosList, core.NewVec2(enemyPos[0], enemyPos[2]))
+					d.enemysInfo[smid] = core.NewVec2(enemyPos[0], enemyPos[2])
 				}
 
 			}
