@@ -46,7 +46,6 @@ func (d *StageClearQuestData) genEnemyPosList(confQuest *config.ConfQuest) {
 
 	plotIds := core.Str2StrSlice(confScene.PlotIDs)
 	for _, plotId := range plotIds {
-		core.Info("check plotId ", plotId)
 		confScenePlot := config.FindConfScenePlot(plotId)
 		if confScenePlot == nil {
 			continue
@@ -54,7 +53,6 @@ func (d *StageClearQuestData) genEnemyPosList(confQuest *config.ConfQuest) {
 
 		evIdList := core.Str2StrSlice(confScenePlot.DoEventIDs)
 		for _, eid := range evIdList {
-			core.Info("check eventId ", eid)
 			confSceneEvent := config.FindConfSceneEvent(eid)
 			if confSceneEvent == nil {
 				continue
@@ -73,14 +71,14 @@ func (d *StageClearQuestData) genEnemyPosList(confQuest *config.ConfQuest) {
 			for _, smid := range sceneMonsterIds {
 				confSceneCharacter := config.FindConfSceneCharacter(smid)
 				if confSceneCharacter == nil {
-					core.Info("genEnemyPosList no sceneChar ", smid)
+					// core.Info("genEnemyPosList no sceneChar ", smid)
 					continue
 				}
 
 				monsterSn := confSceneCharacter.MonsterSn
 				confCharacterMonster := config.FindConfCharacterMonster(monsterSn)
 				if confCharacterMonster == nil {
-					core.Info("genEnemyPosList no monster ", monsterSn)
+					// core.Info("genEnemyPosList no monster ", monsterSn)
 					continue
 				}
 
@@ -91,8 +89,6 @@ func (d *StageClearQuestData) genEnemyPosList(confQuest *config.ConfQuest) {
 			}
 		}
 	}
-
-	d.dumpEnemyList()
 
 }
 

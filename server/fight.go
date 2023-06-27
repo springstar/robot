@@ -84,7 +84,7 @@ func (r *Robot) fight(enemyId int64) {
 
 	sn := r.pickSkill()
 	if sn == 0 {
-		core.Info("no skill pick")
+		core.Info("no skill pick, enemy id ", enemyId)
 		return
 	}
 
@@ -104,6 +104,7 @@ func (r *Robot) fight(enemyId int64) {
 
 func (r *Robot) pickSkill() int32 {
 	now := core.GetCurrentTime()
+	core.Info("pickSkill skills ", len(r.skills))
 	for sn, skill := range r.skills {
 		confSkill := config.FindConfSkill(sn)
 		if confSkill == nil {
