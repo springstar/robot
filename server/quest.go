@@ -239,9 +239,10 @@ func (q *RobotQuestExecutor) moveToQuestPos(confQuest *config.ConfQuest) {
 	if int(q.mapSn) == mapSn {
 		ret := q.move(pos)
 		if ret == -1 {
-			core.Info("exec moving to complete ", confQuest.Sn, mapSn, pos)
+			// core.Info("exec moving to complete ", confQuest.Sn, mapSn, pos)
 			q.setRepeated()
 		} else {
+			// core.Info("move ok ", confQuest.Sn, mapSn, pos, q.getState())
 			q.setCompleted()
 		}	
 		return
@@ -300,7 +301,7 @@ func (q *RobotQuestExecutor) execStageClearQuest(confQuest *config.ConfQuest) Ex
 	}
 
 	if quest.data == nil {
-		core.Info("attach stage clear quest data ", confQuest.Sn)
+		core.Info("attach stage clear quest data ", confQuest.Sn, q.getState())
 		qd := newStageClearQuestData(confQuest.Sn)
 		qd.genEnemyPosList(confQuest)
 		quest.attach(qd)
@@ -421,6 +422,7 @@ func (q *RobotQuestExecutor) exec(params []string, delta int) {
 }
 
 func (q *RobotQuestExecutor) resume(params []string, delta int) {
+	core.Info("RobotQuestExecutor resume exec")
 	q.Executor.resume()
 }
 
@@ -434,12 +436,15 @@ func (q *RobotQuestExecutor) onEvent(k EventKey) {
 }
 
 func (q *RobotQuestExecutor) onStageSwitch() {
+	core.Info("onStageSwitch state ", q.getState())
 	if q.getState() == EXEC_PAUSE {
+		core.Info("set resume state")
 		q.setResume()
 	}
 
 	quest := q.findQuest(q.curQuest)
 	if quest == nil {
+		core.Info("find quest to commit quest after stage switch ", q.curQuest)
 		return
 	}
 

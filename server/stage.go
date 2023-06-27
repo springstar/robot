@@ -28,8 +28,9 @@ func (r *Robot) handleEnterStage(packet *core.Packet) {
 		core.Info("recv stage enter result ", wo.id, wo.typ, wo.sn)
 		
 		r.addObj(wo)
-		r.fireEvent(EK_STAGE_SWITCH)
 	}
+
+	r.fireEvent(EK_STAGE_SWITCH)
 
 	core.Info("enter stage, profession: ", r.profession)
 	core.Info("map ", r.mapSn)

@@ -1,9 +1,17 @@
 package server
 
 import (
+	"github.com/springstar/robot/config"
 	"github.com/springstar/robot/msg"
 	"github.com/springstar/robot/pb"
 	"github.com/springstar/robot/core"
+)
+
+type SkillTargetType int32
+
+const (
+	STT_ENEMY = 1
+	STT_FRIEND = 2
 )
 type Skill struct {
 	sn int32
@@ -34,6 +42,11 @@ func (r *Robot) handleSkillUpdate(packet *core.Packet) {
 
 func (r *Robot) handleHpChange(packet *core.Packet) {
 	core.Info("recv hp change")
+	resp := msg.ParseSCFightHpChg(int32(msg.MSG_SCFightHpChg), packet.Data)
+	targets := resp.GetDhpChgTar()
+	for _, t := range targets {
+		core.Info("hp chg ", t.Id)
+	}
 }
 
 func (r *Robot) initSkills(skillA []*pb.DSkill, skillB []*pb.DSkill) {
@@ -50,4 +63,63 @@ func (r *Robot) initSkills(skillA []*pb.DSkill, skillB []*pb.DSkill) {
 
 func (r *Robot) addSkill(sn int32, s *Skill) {
 	r.skills[sn] = s
+}
+
+func (r *Robot) fight(enemyId int64) {
+	enemy := r.findObj(enemyId)
+	if enemy == nil {
+		return
+	}
+
+	tarId := enemyId
+	tarPos := enemy.pos
+	dirX := tarPos.X - r.pos.X
+	dirY := tarPos.Y - r.pos.Y
+	dir := &pb.DVector2{}
+	dir.X = dirX
+	dir.Y = dirY
+	spos := &pb.DVector2{}
+	spos.X = r.pos.X
+	spos.Y = r.pos.Y
+
+	sn := r.pickSkill()
+	if sn == 0 {
+		core.Info("no skill pick")
+		return
+	}
+
+	confSkill := config.FindConfSkill(sn)
+	if confSkill.TargetType == STT_FRIEND {
+		tarId = r.humanId
+		tarPos = r.pos
+	}
+
+	tpos := &pb.DVector2{}
+	tpos.X = tarPos.X
+	tpos.Y = tarPos.Y
+	
+	msg := msg.SerializeCSFightAtk(uint32(msg.MSG_CSFightAtk), r.humanId, sn, tarId, tpos, 0, false, dir, spos, 1)
+	r.sendPacket(msg)
+}
+
+func (r *Robot) pickSkill() int32 {
+	now := core.GetCurrentTime()
+	for sn, skill := range r.skills {
+		confSkill := config.FindConfSkill(sn)
+		if confSkill == nil {
+			continue
+		}
+
+		if !confSkill.Active {
+			continue
+		}
+
+		if skill.nextRelease > 0 && skill.nextRelease < now {
+			continue
+		}
+
+		return sn
+	}
+
+	return 0
 }
