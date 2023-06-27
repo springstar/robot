@@ -334,17 +334,30 @@ func (q *RobotQuestExecutor) execEscortQuest(confQuest *config.ConfQuest) ExecSt
 }
 
 func asyncStageClear(e iExecutor) {
+	q := e.(*RobotQuestExecutor)
+	q.execStageClear()
+}
 
+func (q *RobotQuestExecutor) execStageClear() {
+	quest := q.findQuest(q.curQuest)
+	if quest == nil {
+		core.Info("execStageClear no quest found ", q.curQuest)
+		return
+	}
+
+	if quest.data != nil {
+		quest.data.resume(q)
+	} else {
+		core.Info("stage clear quest data nil ", q.curQuest)
+	}
 }
 
 func asyncEscort(e iExecutor) {
-	core.Info("async escort")
 	q := e.(*RobotQuestExecutor)
 	q.execEscort()
 }
 
 func (q *RobotQuestExecutor) execEscort() {
-	core.Info("exec escort")
 	quest := q.findQuest(q.curQuest)
 	if quest == nil {
 		core.Info("execEscort no quest found ", q.curQuest)
