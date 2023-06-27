@@ -6,12 +6,14 @@ import (
 )
 
 type StageClearQuestData struct {
+	questSn int
 	clearCount int
 	enemysInfo map[int]*core.Vec2
 }
 
-func newStageClearQuestData() *StageClearQuestData {
+func newStageClearQuestData(sn int) *StageClearQuestData {
 	return &StageClearQuestData{
+		questSn: sn,
 		enemysInfo: make(map[int]*core.Vec2),
 	}
 }
@@ -25,7 +27,7 @@ func getStageClearTarget(confQuest *config.ConfQuest) (count int, repSn int){
 	return infos[0], infos[1]
 }
 
-func (d *StageClearQuestData) getEnemyPosList(confQuest *config.ConfQuest) {
+func (d *StageClearQuestData) genEnemyPosList(confQuest *config.ConfQuest) {
 	c, repSn := getStageClearTarget(confQuest)
 	d.clearCount = c
 	confScene := config.FindConfScene(repSn)
@@ -83,3 +85,14 @@ func (d *StageClearQuestData) getEnemyPosList(confQuest *config.ConfQuest) {
 
 }
 
+func (d *StageClearQuestData) onStatusUpdate(e *RobotQuestExecutor, sn int, status QuestStatus) {
+
+}
+
+func (d *StageClearQuestData) getQuestSn() int {
+	return d.questSn
+}
+
+func (d *StageClearQuestData) resume(e *RobotQuestExecutor) {
+
+}

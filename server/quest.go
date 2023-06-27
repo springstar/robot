@@ -289,7 +289,25 @@ func (q *RobotQuestExecutor) execGather(d *GatherQuestData)  {
 }
 
 func (q *RobotQuestExecutor) execStageClearQuest(confQuest *config.ConfQuest) ExecState {
-	return EXEC_COMPLETED
+	q.moveToQuestPos(confQuest)
+	if q.getState() == EXEC_PAUSE {
+		q.attachCtxFun(asyncStageClear, q)
+	}
+
+	quest := q.findQuest(confQuest.Sn)
+	if quest == nil {
+		return q.getState()
+	}
+
+	if quest.data == nil {
+		core.Info("attach stage clear quest data ", confQuest.Sn)
+		qd := newStageClearQuestData(confQuest.Sn)
+		qd.genEnemyPosList(confQuest)
+		quest.attach(qd)
+	} 
+
+	return q.getState()
+	
 }
 
 func (q *RobotQuestExecutor) execEscortQuest(confQuest *config.ConfQuest) ExecState {
@@ -313,6 +331,10 @@ func (q *RobotQuestExecutor) execEscortQuest(confQuest *config.ConfQuest) ExecSt
 	}
 
 	return q.getState()
+}
+
+func asyncStageClear(e iExecutor) {
+
 }
 
 func asyncEscort(e iExecutor) {
@@ -439,7 +461,9 @@ func getQuestPosition(confQuest *config.ConfQuest) (mapSn int, pos *core.Vec2) {
 	target, _ := core.Str2IntSlice(confQuest.Target)
 	switch confQuest.Type {
 	case QT_DIALOG, QT_ESCORT:
-		return target[1], getQuestNpcPosition(target[2])	
+		return target[1], getQuestNpcPosition(target[2])
+	case QT_STAGECLEAR:
+		return target[1], core.NewZeroVec2()
 	}
 
 	return target[1], core.NewZeroVec2()	
@@ -453,7 +477,6 @@ func getQuestNpcPosition(sn int) *core.Vec2{
 	}
 
 	position := core.Str2Float32Slice(confSceneChar.Position)
-	core.Info("quest position ", sn, position[0], position[2])
 	return core.NewVec2(position[0], position[2])
 }
 
