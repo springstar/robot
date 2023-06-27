@@ -30,10 +30,12 @@ type QuestType int32
 
 const (
 	QT_LEVEL = 1
-	QT_ESCORT = 74
+	QT_SKILL = 5
 	QT_DIALOG = 12
 	QT_STAGECLEAR = 13
 	QT_GATHER = 28
+	QT_ESCORT = 74
+
 )
 
 type QuestAcceptType int32 
@@ -220,7 +222,9 @@ func (q *RobotQuestExecutor) execQuest(quest int) ExecState {
 		q.execEscortQuest(confQuest)
 	case QT_STAGECLEAR:
 		q.execStageClearQuest(confQuest)
-	default:
+	case QT_SKILL:
+		q.execSkillQuest(confQuest)
+	default:	
 		return EXEC_NO_START	
 
 	}
@@ -265,6 +269,11 @@ func (q *RobotQuestExecutor) execDialogQuest(confQuest *config.ConfQuest) ExecSt
 
 	q.setOngoing()
 	return EXEC_ONGOING
+}
+
+func (q *RobotQuestExecutor) execSkillQuest(confQuest *config.ConfQuest) ExecState {
+	q.upgradeSkill()
+	return EXEC_COMPLETED
 }
 
 func (q *RobotQuestExecutor) execGather(d *GatherQuestData)  {

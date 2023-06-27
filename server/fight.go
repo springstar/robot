@@ -132,3 +132,10 @@ func (r *Robot) pickSkill() int32 {
 
 	return 0
 }
+
+func (r *Robot) upgradeSkill() {
+	for sn, _ := range r.skills {
+		request := msg.SerializeCSSkillLevelup(msg.MSG_CSSkillLevelup, sn)
+		r.sendPacket(request)
+	}
+}
