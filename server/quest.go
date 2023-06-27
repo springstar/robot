@@ -272,8 +272,20 @@ func (q *RobotQuestExecutor) execDialogQuest(confQuest *config.ConfQuest) ExecSt
 }
 
 func (q *RobotQuestExecutor) execSkillQuest(confQuest *config.ConfQuest) ExecState {
+	quest := q.findQuest(confQuest.Sn)
+	if quest == nil {
+		q.setCompleted()
+		return q.getState()
+	}
+
+	if quest.data == nil {
+		qd := newSkillQuestData()
+		quest.attach(qd)
+	}
+
 	q.upgradeSkill()
-	return EXEC_COMPLETED
+	q.setOngoing()
+	return q.getState()
 }
 
 func (q *RobotQuestExecutor) execGather(d *GatherQuestData)  {

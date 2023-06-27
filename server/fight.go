@@ -20,6 +20,29 @@ type Skill struct {
 	nextRelease int64
 }
 
+type SkillQuestData struct {
+	sn int
+}
+
+func newSkillQuestData() *SkillQuestData {
+	return &SkillQuestData{}
+}
+
+func (d *SkillQuestData) resume(executor *RobotQuestExecutor) {
+
+}
+
+func (d *SkillQuestData) getQuestSn() int {
+	return d.sn
+}
+
+func (d *SkillQuestData) onStatusUpdate(executor *RobotQuestExecutor, sn int, status QuestStatus) {
+	if status == QSTATE_COMPLETED{
+		executor.commitQuest(sn)
+	}
+}
+
+
 func newSkill(sn int32, lv int32, pos int32, nextRelease int64) *Skill {
 	return &Skill{
 		sn: sn,
