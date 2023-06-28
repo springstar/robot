@@ -35,6 +35,7 @@ const (
 	QT_STAGECLEAR = 13
 	QT_GATHER = 28
 	QT_ESCORT = 74
+	QT_MONSTER = 81
 
 )
 
@@ -224,6 +225,8 @@ func (q *RobotQuestExecutor) execQuest(quest int) ExecState {
 		q.execStageClearQuest(confQuest)
 	case QT_SKILL:
 		q.execSkillQuest(confQuest)
+	case QT_MONSTER:
+		q.execMonsterQuest(confQuest)	
 	default:	
 		return EXEC_NO_START	
 
@@ -308,6 +311,10 @@ func (q *RobotQuestExecutor) execGather(d *GatherQuestData)  {
 	q.stepGather(obj.id)
 	q.setOngoing()
 
+}
+
+func (q *RobotQuestExecutor) execMonsterQuest(confQuest *config.ConfQuest) ExecState {
+	return q.getState()
 }
 
 func (q *RobotQuestExecutor) execStageClearQuest(confQuest *config.ConfQuest) ExecState {
