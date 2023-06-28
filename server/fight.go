@@ -171,6 +171,10 @@ func (r *Robot) handleDeath(packet *core.Packet) {
 		return
 	}
 
+	if obj.getType() == WOT_MONSTER {
+		monsterObj := obj.(*MonsterObj)
+		monsterObj.curHp = 0
+	}
 
 
 }

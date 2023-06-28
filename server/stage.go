@@ -26,6 +26,10 @@ func (r *Robot) handleEnterStage(packet *core.Packet) {
 		switch typ {
 		case WOT_PICK:
 			vo = createGather(id, typ, pos, int(obj.GetPick().GetStageObjectSn()))
+		case WOT_MONSTER:
+			vo = createMonster(id, typ, pos, int(obj.GetMonster().GetStageObjectSn()), obj.GetMonster().GetHpCur(), obj.GetMonster().GetHpMax())	
+		default:
+			vo = newWorldObj(id, typ, pos)	
 		}
 		
 		// core.Info("recv stage enter result ", wo.id, wo.typ, wo.sn)
@@ -77,7 +81,7 @@ func (r *Robot) handleObjAppear(packet *core.Packet) {
 		sn := int(msg.GetObjAppear().Monster.GetStageObjectSn())	
 		vo = createMonster(id, typ, pos, sn, obj.GetMonster().GetHpCur(), obj.GetMonster().GetHpMax())
 	default:
-		break	
+		vo = newWorldObj(id, typ, pos)	
 	}
 
 	// core.Info("recv obj appear ", wo.id, wo.typ, wo.sn)

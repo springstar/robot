@@ -40,7 +40,7 @@ func (obj *WorldObj) getId() int64 {
 }
 
 func (obj *WorldObj) getType() WorldObjType {
-	return obj.getType()
+	return obj.typ
 }
 
 func (obj *WorldObj) getPos() *core.Vec2 {
