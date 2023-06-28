@@ -162,3 +162,7 @@ func (r *Robot) upgradeSkill() {
 		r.sendPacket(request)
 	}
 }
+
+func (r *Robot) handleDeath(packet *core.Packet) {
+	
+}
