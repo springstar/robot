@@ -10,6 +10,7 @@ type MonsterQuestData struct {
 	count int
 	monsterSn int
 	monsters map[int]*core.Vec2
+	curEnemy int64
 }
 
 func newMonsterQuestData(sn int) *MonsterQuestData {
@@ -19,9 +20,34 @@ func newMonsterQuestData(sn int) *MonsterQuestData {
 	}
 }
 
-func (d *MonsterQuestData) resume(executor *RobotQuestExecutor) {
+func (d *MonsterQuestData) resume(e *RobotQuestExecutor) {
+	if d.curEnemy > 0 {
+		e.fight(d.curEnemy)
+		return
+	}
 
 }
+
+func (d *MonsterQuestData) lockEnemy(e *RobotQuestExecutor) int64 {
+	for sn, pos := range d.monsters {
+		ret := e.move(pos)
+		if ret == -1 {
+			break
+		}
+
+		enemy := e.findMonsterObj(sn)
+		if enemy == nil {
+			core.Info("monster quest no monster ", sn)
+			continue
+		}
+
+		return enemy.getId()
+	}
+
+	return 0
+}
+
+
 
 func (d *MonsterQuestData) getQuestSn() int {
 	return d.questSn

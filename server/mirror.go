@@ -133,7 +133,7 @@ func (d *StageClearQuestData) lockEnemy(e *RobotQuestExecutor) int64 {
 			continue
 		}
 
-		return enemy.id
+		return enemy.getId()
 	}
 
 	return 0

@@ -308,7 +308,7 @@ func (q *RobotQuestExecutor) execGather(d *GatherQuestData)  {
 		return
 	}
 
-	q.stepGather(obj.id)
+	q.stepGather(obj.getId())
 	q.setOngoing()
 
 }

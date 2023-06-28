@@ -95,7 +95,7 @@ func (r *Robot) fight(enemyId int64) {
 	}
 
 	tarId := enemyId
-	tarPos := enemy.pos
+	tarPos := enemy.getPos()
 	dirX := tarPos.X - r.pos.X
 	dirY := tarPos.Y - r.pos.Y
 	dir := &pb.DVector2{}
@@ -164,6 +164,13 @@ func (r *Robot) upgradeSkill() {
 }
 
 func (r *Robot) handleDeath(packet *core.Packet) {
-	// resp := msg.ParseSCStageObjectDead(int32(msg.MSG_SCStageObjectDead), packet.Data)
+	resp := msg.ParseSCStageObjectDead(int32(msg.MSG_SCStageObjectDead), packet.Data)
+	objId := resp.GetObjId()
+	obj := r.findObj(objId)
+	if obj == nil {
+		return
+	}
+
+
 
 }

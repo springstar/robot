@@ -15,19 +15,22 @@ func (r *Robot) enterStage() {
 func (r *Robot) handleEnterStage(packet *core.Packet) {
 	msg := msg.ParseSCStageEnterResult(int32(packet.Type), packet.Data)
 	stageObjs := msg.GetObj()
-	for _, obj := range stageObjs {
-		wo := newWorldObj(obj.GetObjId())
-		wo.typ = WorldObjType(obj.GetType())
-		wo.pos = core.NewVec2(obj.GetPos().GetX(), obj.GetPos().GetY())
 
-		switch wo.typ {
+	for _, obj := range stageObjs {
+		var vo iVisible
+
+		id := obj.GetObjId()
+		typ := WorldObjType(obj.GetType())
+		pos := core.NewVec2(obj.GetPos().GetX(), obj.GetPos().GetY())
+
+		switch typ {
 		case WOT_PICK:
-			wo.sn = int(obj.GetPick().GetStageObjectSn())
+			vo = createGather(id, typ, pos, int(obj.GetPick().GetStageObjectSn()))
 		}
 		
-		core.Info("recv stage enter result ", wo.id, wo.typ, wo.sn)
+		// core.Info("recv stage enter result ", wo.id, wo.typ, wo.sn)
 		
-		r.addObj(wo)
+		r.addObj(vo)
 	}
 
 	r.fireEvent(EK_STAGE_SWITCH)
@@ -62,21 +65,24 @@ func (r *Robot) handleObjAppear(packet *core.Packet) {
 	// 	return
 	// }
 
-	wo := newWorldObj(obj.GetObjId())
-	wo.typ = WorldObjType(obj.GetType())
-	wo.pos = core.NewVec2(obj.GetPos().GetX(), obj.GetPos().GetY())
-	switch wo.typ {
+	id := obj.GetObjId()
+	typ := WorldObjType(obj.GetType())
+	pos := core.NewVec2(obj.GetPos().GetX(), obj.GetPos().GetY())
+	var vo iVisible	
+	switch typ {
 	case WOT_PICK:
-		wo.sn = int(msg.GetObjAppear().Pick.GetStageObjectSn())
+		sn := int(msg.GetObjAppear().Pick.GetStageObjectSn())
+		vo = createGather(id, typ, pos, sn)
 	case WOT_MONSTER:
-		wo.sn = int(msg.GetObjAppear().Monster.GetStageObjectSn())	
+		sn := int(msg.GetObjAppear().Monster.GetStageObjectSn())	
+		vo = createMonster(id, typ, pos, sn, obj.GetMonster().GetHpCur(), obj.GetMonster().GetHpMax())
 	default:
 		break	
 	}
 
-	core.Info("recv obj appear ", wo.id, wo.typ, wo.sn)
+	// core.Info("recv obj appear ", wo.id, wo.typ, wo.sn)
 
-	r.addObj(wo)
+	r.addObj(vo)
 }
 
 func (r *Robot) handleObjDisappear(packet *core.Packet) {
