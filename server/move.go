@@ -106,6 +106,10 @@ func (m *RobotMovement) exec(params []string, delta int) {
 }
 
 func (r *Robot) move(target *core.Vec2) int{
+	if target == nil {
+		return -1
+	}
+	
 	now := core.GetCurrentTime()
 
 	delta := 5

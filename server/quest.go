@@ -314,15 +314,29 @@ func (q *RobotQuestExecutor) execGather(d *GatherQuestData)  {
 }
 
 func (q *RobotQuestExecutor) execMonsterQuest(confQuest *config.ConfQuest) ExecState {
+	quest := q.findQuest(confQuest.Sn)
+	if quest == nil {
+		return q.getState()
+	}
+
+	if quest.data == nil {
+		core.Info("attach kill monster quest data ", confQuest.Sn, q.getState())
+		qd := newMonsterQuestData(confQuest.Sn)
+		qd.genMonsterInfo(confQuest)
+		quest.attach(qd)
+	} 
+	
+	q.moveToQuestPos(confQuest)
+	if q.getState() == EXEC_PAUSE {
+		q.attachCtxFun(asyncKillMonster, q)
+	} else {
+		quest.data.resume(q)
+	}
+
 	return q.getState()
 }
 
 func (q *RobotQuestExecutor) execStageClearQuest(confQuest *config.ConfQuest) ExecState {
-	q.moveToQuestPos(confQuest)
-	if q.getState() == EXEC_PAUSE {
-		q.attachCtxFun(asyncStageClear, q)
-	}
-
 	quest := q.findQuest(confQuest.Sn)
 	if quest == nil {
 		return q.getState()
@@ -335,16 +349,18 @@ func (q *RobotQuestExecutor) execStageClearQuest(confQuest *config.ConfQuest) Ex
 		quest.attach(qd)
 	} 
 
+	q.moveToQuestPos(confQuest)
+	if q.getState() == EXEC_PAUSE {	
+		q.attachCtxFun(asyncStageClear, q)
+	} else {
+		quest.data.resume(q)
+	}
+
 	return q.getState()
 	
 }
 
 func (q *RobotQuestExecutor) execEscortQuest(confQuest *config.ConfQuest) ExecState {
-	q.moveToQuestPos(confQuest)
-	if q.getState() == EXEC_PAUSE {
-		q.attachCtxFun(asyncEscort, q)
-	}
-
 	quest := q.findQuest(confQuest.Sn)
 	if quest == nil {
 		return q.getState()
@@ -359,7 +375,32 @@ func (q *RobotQuestExecutor) execEscortQuest(confQuest *config.ConfQuest) ExecSt
 		core.Info("no need to attach escort quest data ", confQuest.Sn)
 	}
 
+	q.moveToQuestPos(confQuest)
+	if q.getState() == EXEC_PAUSE {
+		q.attachCtxFun(asyncEscort, q)
+	}
+
 	return q.getState()
+}
+
+func asyncKillMonster(e iExecutor) {
+	q := e.(*RobotQuestExecutor)
+	q.execKillMonster()
+}
+
+// todo : refactor duplicate function
+func (q *RobotQuestExecutor) execKillMonster() {
+	quest := q.findQuest(q.curQuest)
+	if quest == nil {
+		core.Info("kill monster no quest found ", q.curQuest)
+		return
+	}
+
+	if quest.data != nil {
+		quest.data.resume(q)
+	} else {
+		core.Info("kill monster quest data nil ", q.curQuest)
+	}
 }
 
 func asyncStageClear(e iExecutor) {
@@ -450,7 +491,7 @@ func (q *RobotQuestExecutor) exec(params []string, delta int) {
 }
 
 func (q *RobotQuestExecutor) resume(params []string, delta int) {
-	core.Info("RobotQuestExecutor resume exec")
+	// core.Info("RobotQuestExecutor resume exec")
 	q.Executor.resume()
 }
 
@@ -506,10 +547,14 @@ func (q *RobotQuestExecutor) updateStatus(sn int, status QuestStatus) {
 func getQuestPosition(confQuest *config.ConfQuest) (mapSn int, pos *core.Vec2) {
 	target, _ := core.Str2IntSlice(confQuest.Target)
 	switch confQuest.Type {
-	case QT_DIALOG, QT_ESCORT:
+	case QT_DIALOG:
 		return target[1], getQuestNpcPosition(target[2])
+	case QT_ESCORT:
+		return target[1], nil	
 	case QT_STAGECLEAR:
-		return target[1], core.NewZeroVec2()
+		return target[1], nil
+	case QT_MONSTER:
+		return target[0], nil	
 	}
 
 	return target[1], core.NewZeroVec2()	

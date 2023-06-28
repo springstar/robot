@@ -164,5 +164,6 @@ func (r *Robot) upgradeSkill() {
 }
 
 func (r *Robot) handleDeath(packet *core.Packet) {
-	
+	// resp := msg.ParseSCStageObjectDead(int32(msg.MSG_SCStageObjectDead), packet.Data)
+
 }
