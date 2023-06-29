@@ -255,6 +255,7 @@ func (q *RobotQuestExecutor) moveToQuestPos(confQuest *config.ConfQuest) {
 		return
 	}
 
+	core.Info("enter instarnce ", mapSn, confQuest.Sn)
 	q.sendEnterInstance(mapSn, confQuest.Sn)
 	q.setPause()
 }
@@ -320,7 +321,7 @@ func (q *RobotQuestExecutor) execMonsterQuest(confQuest *config.ConfQuest) ExecS
 	}
 
 	if quest.data == nil {
-		core.Info("attach kill monster quest data ", confQuest.Sn, q.getState())
+		core.Info("attach kill monster quest data ", confQuest.Sn, q.getState(), q.mapSn)
 		qd := newMonsterQuestData(confQuest.Sn)
 		qd.genMonsterInfo(confQuest)
 		quest.attach(qd)
@@ -328,6 +329,7 @@ func (q *RobotQuestExecutor) execMonsterQuest(confQuest *config.ConfQuest) ExecS
 	
 	q.moveToQuestPos(confQuest)
 	if q.getState() == EXEC_PAUSE {
+		core.Info("monster quest attach ctx function ", q.mapSn)
 		q.attachCtxFun(asyncKillMonster, q)
 	} else {
 		quest.data.resume(q)

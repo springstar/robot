@@ -37,7 +37,9 @@ func (r *Robot) handleEnterStage(packet *core.Packet) {
 		r.addObj(vo)
 	}
 
-	r.fireEvent(EK_STAGE_SWITCH)
+	if r.fsm.state == "enterstage" {
+		r.fireEvent(EK_STAGE_SWITCH)
+	}
 
 	core.Info("enter stage, profession: ", r.profession)
 	core.Info("map ", r.mapSn)

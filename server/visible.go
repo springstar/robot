@@ -31,6 +31,9 @@ func (v *VisibleRange) addObj(obj iVisible) {
 	// if v.pos.DistanceToSquared(obj.pos) > MAX_VISIBLE_DISTANCE * MAX_VISIBLE_DISTANCE {
 	// 	return
 	// }
+	if _, ok := v.visibleObjs[obj.getId()]; ok {
+		return
+	}
 
 	v.visibleObjs[obj.getId()] = obj
 }

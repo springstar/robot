@@ -123,6 +123,7 @@ func (r *Robot) fight(enemyId int64) {
 	
 	msg := msg.SerializeCSFightAtk(uint32(msg.MSG_CSFightAtk), r.humanId, sn, tarId, tpos, 0, false, dir, spos, 1)
 	r.sendPacket(msg)
+	core.Info("send CSFightAtk to attack ", tarId)
 }
 
 func (r *Robot) dumpSkills() {

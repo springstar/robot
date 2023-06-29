@@ -61,6 +61,7 @@ func (d *MonsterQuestData) lockEnemy(e *RobotQuestExecutor) int64 {
 			continue
 		}
 
+		core.Info("lock monster ", sn , enemy.getId())
 		return enemy.getId()
 
 	}
