@@ -227,7 +227,9 @@ func (q *RobotQuestExecutor) execQuest(quest int) ExecState {
 	case QT_SKILL:
 		q.execSkillQuest(confQuest)
 	case QT_MONSTER:
-		q.execMonsterQuest(confQuest)	
+		q.execMonsterQuest(confQuest)
+	case QT_GATHER:
+		q.execGatherQuest(confQuest)
 	default:	
 		return EXEC_NO_START	
 
@@ -442,6 +444,10 @@ func (q *RobotQuestExecutor) execEscort() {
 	} else {
 		core.Info("escort quest data nil ", q.curQuest)
 	}
+}
+
+func (q *RobotQuestExecutor) execGatherQuest(confQuest *config.ConfQuest) {
+
 }
 
 func (q *RobotQuestExecutor) execExploreQuest(confQuest *config.ConfQuest)  {
