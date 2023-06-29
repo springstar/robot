@@ -107,18 +107,29 @@ func (d *StageClearQuestData) getQuestSn() int {
 
 func (d *StageClearQuestData) resume(e *RobotQuestExecutor) {
 	if d.curEnemy > 0 {
+		curObj := e.findObj(d.curEnemy).(*MonsterObj)
+		if curObj.isDead() {
+			d.curEnemy = 0
+			return
+		}
+
+		ret := e.move(curObj.pos)
+		if ret == -1 {
+			return
+		}
+
 		e.fight(d.curEnemy)
 		return
 	}
 
 	enemyId := d.lockEnemy(e)	
 	if enemyId == 0 {
-		core.Info("no enemy locked")
+		core.Info("stageclear quest no enemy locked")
 		return
 	}
 
 	d.curEnemy = enemyId
-	e.fight(enemyId)
+
 }
 
 func (d *StageClearQuestData) lockEnemy(e *RobotQuestExecutor) int64 {

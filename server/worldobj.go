@@ -47,6 +47,11 @@ func (obj *WorldObj) getPos() *core.Vec2 {
 	return obj.pos
 }
 
+func (obj *WorldObj) setPos(x, y float32) {
+	obj.pos.X = x
+	obj.pos.Y = y
+}
+
 type GatherObj struct {
 	*WorldObj
 }

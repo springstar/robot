@@ -98,7 +98,23 @@ func (r *Robot) handleObjDisappear(packet *core.Packet) {
 }
 
 func (r *Robot) handleStageMove(packet *core.Packet) {
-	// msg := msg.ParseSCStageMove(int32(msg.MSG_SCStageMove), packet.Data)
+	msg := msg.ParseSCStageMove(int32(msg.MSG_SCStageMove), packet.Data)
+	objId := msg.GetObjId()
+	obj := r.findObj(objId)
+	if obj == nil {
+		return
+	}
+
+	posBegin := msg.GetPosBegin()
+	posEnd := msg.GetPosEnd()
+	if len(posEnd) == 0 {
+		obj.setPos(posBegin.GetX(), posBegin.GetZ())
+		return
+	}
+
+	for _, p := range posEnd {
+		obj.setPos(p.GetX(), p.GetZ())
+	}
 	
 }
 

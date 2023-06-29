@@ -13,6 +13,7 @@ type iVisible interface {
 	getPos() *core.Vec2
 	getId() int64
 	getType() WorldObjType
+	setPos(x, y float32)
 }
 
 type VisibleRange struct {

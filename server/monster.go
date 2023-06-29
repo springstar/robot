@@ -27,6 +27,12 @@ func (d *MonsterQuestData) resume(e *RobotQuestExecutor) {
 			d.curEnemy = 0
 			return
 		}
+
+		ret := e.move(curObj.pos)
+		if ret == -1 {
+			return
+		}
+		
 		e.fight(d.curEnemy)
 		return
 	}
@@ -38,7 +44,6 @@ func (d *MonsterQuestData) resume(e *RobotQuestExecutor) {
 	}
 
 	d.curEnemy = enemyId
-	e.fight(enemyId)
 
 }
 
