@@ -118,6 +118,20 @@ func (r *Robot) handleStageMove(packet *core.Packet) {
 	
 }
 
+func (r *Robot) handleStageSetPos(packet *core.Packet) {
+	msg := msg.ParseSCStageSetPos(int32(msg.MSG_SCStageSetPos), packet.Data)
+	humanId := msg.GetId()
+	if r.humanId != humanId {
+		return
+	}
+
+	pos := msg.GetPos()
+	dir := msg.GetDir()
+	r.pos.Set(pos.GetX(), pos.GetY())
+	r.dir.Set(dir.GetX(), dir.GetY())
+	
+}
+
 func (r *Robot) handleStagePull(packet *core.Packet) {
 	msg := msg.ParseSCStagePullTo(int32(msg.MSG_SCStagePullTo), packet.Data)
 	pos := msg.GetPos()
