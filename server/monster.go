@@ -26,10 +26,20 @@ func (d *MonsterQuestData) resume(e *RobotQuestExecutor) {
 		return
 	}
 
+	enemyId := d.lockEnemy(e)	
+	if enemyId == 0 {
+		core.Info("monster quest no enemy locked")
+		return
+	}
+
+	d.curEnemy = enemyId
+	e.fight(enemyId)
+
 }
 
 func (d *MonsterQuestData) lockEnemy(e *RobotQuestExecutor) int64 {
 	for sn, pos := range d.monsters {
+		core.Info("MonsterQuestData locking enemy ", sn)
 		ret := e.move(pos)
 		if ret == -1 {
 			break
@@ -41,20 +51,28 @@ func (d *MonsterQuestData) lockEnemy(e *RobotQuestExecutor) int64 {
 			continue
 		}
 
+		if enemy.isDead() {
+			core.Info("monster already dead ", sn)
+			continue
+		}
+
 		return enemy.getId()
+
 	}
 
 	return 0
 }
 
-
-
 func (d *MonsterQuestData) getQuestSn() int {
 	return d.questSn
 }
 
-func (d *MonsterQuestData) onStatusUpdate(executor *RobotQuestExecutor, sn int, status QuestStatus) {
-
+func (d *MonsterQuestData) onStatusUpdate(e *RobotQuestExecutor, sn int, status QuestStatus) {
+	core.Info("MonsterQuestData data onStatusUpdate ", sn, status)
+	if status == QSTATE_COMPLETED {
+		core.Info("MonsterQuestData leave stage ", sn)
+		e.commitQuest(sn)
+	}
 }
 
 func (d *MonsterQuestData) genMonsterInfo(confQuest *config.ConfQuest) {

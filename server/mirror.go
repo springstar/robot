@@ -97,6 +97,7 @@ func (d *StageClearQuestData) onStatusUpdate(e *RobotQuestExecutor, sn int, stat
 	if status == QSTATE_COMPLETED {
 		core.Info("StageClearQuest leave stage ", sn)
 		e.sendLeaveInstance()
+		e.setOngoing()
 	}
 }
 
