@@ -33,7 +33,8 @@ const (
 	QT_SKILL = 5
 	QT_DIALOG = 12
 	QT_STAGECLEAR = 13
-	QT_GATHER = 28
+	QT_EXPLORE = 28
+	QT_GATHER = 73
 	QT_ESCORT = 74
 	QT_MONSTER = 81
 
@@ -217,8 +218,8 @@ func (q *RobotQuestExecutor) execQuest(quest int) ExecState {
 	switch confQuest.Type {
 	case QT_DIALOG:
 		q.execDialogQuest(confQuest)
-	case QT_GATHER:
-		q.execGatherQuest(confQuest)
+	case QT_EXPLORE:
+		q.execExploreQuest(confQuest)
 	case QT_ESCORT:
 		q.execEscortQuest(confQuest)
 	case QT_STAGECLEAR:
@@ -443,14 +444,14 @@ func (q *RobotQuestExecutor) execEscort() {
 	}
 }
 
-func (q *RobotQuestExecutor) execGatherQuest(confQuest *config.ConfQuest)  {
+func (q *RobotQuestExecutor) execExploreQuest(confQuest *config.ConfQuest)  {
 	quest := q.findQuest(confQuest.Sn)
 	if quest == nil {
 		return
 	}
 
 	if quest.data == nil {
-		snList, posList := getGatherInfo(confQuest)
+		snList, posList := getExploreInfo(confQuest)
 		if len(posList) == 0 {
 			return
 		}

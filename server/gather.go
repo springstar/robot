@@ -104,7 +104,7 @@ func (r *Robot) HandleGatherSecond(packet *core.Packet) {
 	core.Info("recv gather second")
 }	
 
-func getGatherInfo(confQuest *config.ConfQuest) ([]int, []*core.Vec2) {
+func getExploreInfo(confQuest *config.ConfQuest) ([]int, []*core.Vec2) {
 	var sceneCharSnList []int
 	infos := []string{confQuest.Target, confQuest.ArrParam, confQuest.ArrParam2}
 	for _, info := range infos {
