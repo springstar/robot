@@ -108,12 +108,12 @@ func (r *Robot) handleStageMove(packet *core.Packet) {
 	posBegin := msg.GetPosBegin()
 	posEnd := msg.GetPosEnd()
 	if len(posEnd) == 0 {
-		obj.setPos(posBegin.GetX(), posBegin.GetZ())
+		obj.setPos(posBegin.GetX(), posBegin.GetY())
 		return
 	}
 
 	for _, p := range posEnd {
-		obj.setPos(p.GetX(), p.GetZ())
+		obj.setPos(p.GetX(), p.GetY())
 	}
 	
 }

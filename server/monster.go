@@ -22,17 +22,19 @@ func newMonsterQuestData(sn int) *MonsterQuestData {
 
 func (d *MonsterQuestData) resume(e *RobotQuestExecutor) {
 	if d.curEnemy > 0 {
-		curObj := e.findObj(d.curEnemy).(*MonsterObj)
-		if curObj.isDead() {
+		vo := e.findObj(d.curEnemy)
+		if vo == nil {
 			d.curEnemy = 0
 			return
 		}
+
+		curObj := vo.(*MonsterObj)
 
 		ret := e.move(curObj.pos)
 		if ret == -1 {
 			return
 		}
-		
+
 		e.fight(d.curEnemy)
 		return
 	}

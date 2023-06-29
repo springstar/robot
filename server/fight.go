@@ -111,6 +111,10 @@ func (r *Robot) fight(enemyId int64) {
 		return
 	}
 
+	// distance := r.pos.DistanceTo(tarPos)
+	core.Info("fighting robot pos ", r.pos.X, r.pos.Y)
+	core.Info("fighting target pos ", tarPos.X, tarPos.Y)
+
 	confSkill := config.FindConfSkill(int(sn))
 	if confSkill.TargetType == STT_FRIEND {
 		tarId = r.humanId

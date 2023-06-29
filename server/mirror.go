@@ -107,7 +107,14 @@ func (d *StageClearQuestData) getQuestSn() int {
 
 func (d *StageClearQuestData) resume(e *RobotQuestExecutor) {
 	if d.curEnemy > 0 {
-		curObj := e.findObj(d.curEnemy).(*MonsterObj)
+		vo := e.findObj(d.curEnemy)
+		if vo == nil {
+			d.curEnemy = 0
+			return
+		}
+
+		curObj := vo.(*MonsterObj)
+
 		if curObj.isDead() {
 			d.curEnemy = 0
 			return
