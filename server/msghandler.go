@@ -59,7 +59,9 @@ func (r *Robot) HandleMessage(packet *core.Packet) {
 		case msg.MSG_SCHumanKick:
 			r.handleKick(packet)
 		case msg.MSG_SCStageMove:
-			r.handleStageMove(packet)				
+			r.handleStageMove(packet)
+		case msg.MSG_SCStagePullTo:
+			r.handleStagePull(packet)					
 		case msg.MSG_SCSoulAwaken:
 			r.handleSoulAwaken(packet)
 		case msg.MSG_SCMatchEnrollResponse:

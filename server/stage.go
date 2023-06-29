@@ -118,6 +118,14 @@ func (r *Robot) handleStageMove(packet *core.Packet) {
 	
 }
 
+func (r *Robot) handleStagePull(packet *core.Packet) {
+	msg := msg.ParseSCStagePullTo(int32(msg.MSG_SCStagePullTo), packet.Data)
+	pos := msg.GetPos()
+	dir := msg.GetDir()
+	r.pos.Set(pos.GetX(), pos.GetY())
+	r.dir.Set(dir.GetX(), dir.GetY())
+}
+
 func (r *Robot) sendMoveStop(x, y float32) {
 	dpos := &pb.DVector2{}
 	dpos.X = x
