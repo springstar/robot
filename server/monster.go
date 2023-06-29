@@ -22,6 +22,11 @@ func newMonsterQuestData(sn int) *MonsterQuestData {
 
 func (d *MonsterQuestData) resume(e *RobotQuestExecutor) {
 	if d.curEnemy > 0 {
+		curObj := e.findObj(d.curEnemy).(*MonsterObj)
+		if curObj.isDead() {
+			d.curEnemy = 0
+			return
+		}
 		e.fight(d.curEnemy)
 		return
 	}
