@@ -47,7 +47,7 @@ func (d *MonsterQuestData) lockEnemy(e *RobotQuestExecutor) int64 {
 		core.Info("MonsterQuestData locking enemy ", sn)
 		ret := e.move(pos)
 		if ret == -1 {
-			break
+			continue
 		}
 
 		enemy := e.findMonsterObj(sn)
