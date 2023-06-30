@@ -6,10 +6,12 @@ import (
 	"github.com/springstar/robot/config"
 )
 
+// 采集成功率百分百，先简单做了
 type GatherQuestData struct {
 	questSn int
 	snList []int
 	posList []*core.Vec2
+	counts []int
 	idx int
 }
 
@@ -20,11 +22,33 @@ func newGatherQuestData(questSn int) *GatherQuestData {
 	}
 }
 
+func (d *GatherQuestData) decCount() {
+	if d.idx >= 0 && d.idx < len(d.counts) - 1 {
+		if d.counts[d.idx] > 0 {
+			d.counts[d.idx] = d.counts[d.idx] - 1
+		} else {
+			d.counts[d.idx] = 0
+		}
+	}
+}
+
+func (d *GatherQuestData) isCountOk() bool {
+	if d.idx >= 0 && d.idx < len(d.counts) - 1 {
+		return d.counts[d.idx] == 0
+	}
+
+	return false
+}
+
 func (d *GatherQuestData) hasNext() bool {
 	return (len(d.posList) > 0 && d.idx < len(d.posList) - 1)
 }
 
 func (d *GatherQuestData) next() {
+	if !d.isCountOk() {
+		return
+	}
+
 	if d.hasNext() {
 		d.idx += 1
 	}
@@ -57,6 +81,7 @@ func (d *GatherQuestData) getQuestSn() int {
 
 func (d *GatherQuestData) onStatusUpdate(executor *RobotQuestExecutor, sn int, status QuestStatus) {
 	if status == QSTATE_ONGOING {
+		core.Info("gather move to next")
 		d.next()
 	} else if status == QSTATE_COMPLETED{
 		executor.commitQuest(sn)
@@ -73,6 +98,9 @@ func (d *GatherQuestData)genGatherInfo(confQuest *config.ConfQuest) {
 
 		sceneCharSn := int(gather[2])
 		d.snList = append(d.snList, sceneCharSn)
+
+		count := int(gather[0])
+		d.counts = append(d.counts, count)
 	}
 
 	for _, sn := range d.snList {
@@ -92,6 +120,14 @@ func (d *GatherQuestData)genGatherInfo(confQuest *config.ConfQuest) {
 func (r *Robot) stepGather(id int64) {
 	r.gatherFirst(id)
 	r.gatherSecond(id)
+
+	e := r.findExecutor("quest").(*RobotQuestExecutor)
+	quest := e.findQuest(e.curQuest)
+	qd := quest.data.(*GatherQuestData)
+	if qd != nil {
+		qd.decCount()
+	}
+
 }
 
 func (r *Robot) gatherFirst(id int64) {
@@ -112,7 +148,7 @@ func (r *Robot) HandleGatherFirst(packet *core.Packet) {
 		return
 	}
 
-	core.Info("recv gather first")
+	core.Info("recv gather first ", objId)
 
 
 	r.gatherSecond(objId)
@@ -126,4 +162,8 @@ func (r *Robot) HandleGatherSecond(packet *core.Packet) {
 	}
 
 	core.Info("recv gather second")
+
+
+
+	// e.setRepeated()
 }	

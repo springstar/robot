@@ -85,7 +85,11 @@ func (r *Robot) HandleMessage(packet *core.Packet) {
 		case msg.MSG_SCSkillUpdate:
 			r.handleSkillUpdate(packet)
 		case msg.MSG_SCStageObjectDead:
-			r.handleDeath(packet)		
+			r.handleDeath(packet)	
+		case msg.MSG_SCGatherFirst:
+			r.HandleGatherFirst(packet)		
+		case msg.MSG_SCGatherSecond:
+			r.HandleGatherSecond(packet)	
 
 		default:
 			core.Warn("recv packet type ", packet.Type)	

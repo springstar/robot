@@ -215,10 +215,12 @@ func (q *RobotQuestExecutor) execQuest(quest int) ExecState {
 		return EXEC_COMPLETED
 	}
 
+	q.curQuest = quest
+
 	switch confQuest.Type {
 	case QT_DIALOG:
 		q.execDialogQuest(confQuest)
-	case QT_GATHER:	
+	
 	case QT_EXPLORE:
 		q.execExploreQuest(confQuest)
 	case QT_ESCORT:
@@ -230,11 +232,9 @@ func (q *RobotQuestExecutor) execQuest(quest int) ExecState {
 	case QT_MONSTER:
 		q.execMonsterQuest(confQuest)
 	default:	
-		return EXEC_NO_START	
+		break	
 
 	}
-
-	q.curQuest = quest
 
 	return q.getState()
 }
@@ -312,7 +312,7 @@ func (q *RobotQuestExecutor) execGather(d *GatherQuestData)  {
 	}
 
 	q.stepGather(obj.getId())
-	q.setOngoing()
+	q.setRepeated()
 
 }
 
@@ -456,6 +456,7 @@ func (q *RobotQuestExecutor) execExploreQuest(confQuest *config.ConfQuest)  {
 	}
 
 	if quest.data == nil {
+		core.Info("attach gather quest data ", confQuest.Sn)
 		qd := newGatherQuestData(confQuest.Sn)
 		qd.genGatherInfo(confQuest)
 		quest.attach(qd)
