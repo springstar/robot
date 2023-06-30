@@ -13,11 +13,9 @@ type GatherQuestData struct {
 	idx int
 }
 
-func newGatherQuestData(questSn int, snList []int, posList []*core.Vec2) *GatherQuestData {
+func newGatherQuestData(questSn int) *GatherQuestData {
 	return &GatherQuestData{
 		questSn: questSn,
-		snList: snList,
-		posList: posList,
 		idx: 0,
 	}
 }
@@ -65,6 +63,32 @@ func (d *GatherQuestData) onStatusUpdate(executor *RobotQuestExecutor, sn int, s
 	}
 }
 
+func (d *GatherQuestData)genGatherInfo(confQuest *config.ConfQuest) {
+	infos := []string{confQuest.Target, confQuest.ArrParam, confQuest.ArrParam2}
+	for _, info := range infos {
+		gather, err := core.Str2IntSlice(info)
+		if err != nil {
+			continue
+		}
+
+		sceneCharSn := int(gather[2])
+		d.snList = append(d.snList, sceneCharSn)
+	}
+
+	for _, sn := range d.snList {
+		confScene := config.FindConfSceneCharacter(sn)
+		if confScene == nil {
+			core.Warn("no ConfSceneCharacter ", sn)
+			continue
+		}
+
+		position := core.Str2Float32Slice(confScene.Position)
+
+		pos := core.NewVec2(position[0], position[2])
+		d.posList = append(d.posList, pos)
+	}
+}
+
 func (r *Robot) stepGather(id int64) {
 	r.gatherFirst(id)
 	r.gatherSecond(id)
@@ -103,34 +127,3 @@ func (r *Robot) HandleGatherSecond(packet *core.Packet) {
 
 	core.Info("recv gather second")
 }	
-
-func getExploreInfo(confQuest *config.ConfQuest) ([]int, []*core.Vec2) {
-	var sceneCharSnList []int
-	infos := []string{confQuest.Target, confQuest.ArrParam, confQuest.ArrParam2}
-	for _, info := range infos {
-		gather, err := core.Str2IntSlice(info)
-		if err != nil {
-			continue
-		}
-
-		sceneCharSn := int(gather[2])
-		sceneCharSnList = append(sceneCharSnList, sceneCharSn)
-	}
-
-	var gatherObjPosList []*core.Vec2
-
-	for _, sn := range sceneCharSnList {
-		confScene := config.FindConfSceneCharacter(sn)
-		if confScene == nil {
-			core.Warn("no ConfSceneCharacter ", sn)
-			continue
-		}
-
-		position := core.Str2Float32Slice(confScene.Position)
-
-		pos := core.NewVec2(position[0], position[2])
-		gatherObjPosList = append(gatherObjPosList, pos)
-	}
-
-	return sceneCharSnList, gatherObjPosList
-}

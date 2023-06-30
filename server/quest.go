@@ -218,6 +218,7 @@ func (q *RobotQuestExecutor) execQuest(quest int) ExecState {
 	switch confQuest.Type {
 	case QT_DIALOG:
 		q.execDialogQuest(confQuest)
+	case QT_GATHER:	
 	case QT_EXPLORE:
 		q.execExploreQuest(confQuest)
 	case QT_ESCORT:
@@ -228,8 +229,6 @@ func (q *RobotQuestExecutor) execQuest(quest int) ExecState {
 		q.execSkillQuest(confQuest)
 	case QT_MONSTER:
 		q.execMonsterQuest(confQuest)
-	case QT_GATHER:
-		q.execGatherQuest(confQuest)
 	default:	
 		return EXEC_NO_START	
 
@@ -457,12 +456,8 @@ func (q *RobotQuestExecutor) execExploreQuest(confQuest *config.ConfQuest)  {
 	}
 
 	if quest.data == nil {
-		snList, posList := getExploreInfo(confQuest)
-		if len(posList) == 0 {
-			return
-		}
-
-		qd := newGatherQuestData(confQuest.Sn, snList, posList)
+		qd := newGatherQuestData(confQuest.Sn)
+		qd.genGatherInfo(confQuest)
 		quest.attach(qd)
 	}
 
