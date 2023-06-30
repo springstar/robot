@@ -220,9 +220,8 @@ func (q *RobotQuestExecutor) execQuest(quest int) ExecState {
 	switch confQuest.Type {
 	case QT_DIALOG:
 		q.execDialogQuest(confQuest)
-	
-	case QT_EXPLORE:
-		q.execExploreQuest(confQuest)
+	case QT_EXPLORE, QT_GATHER:
+		q.execGatherQuest(confQuest)
 	case QT_ESCORT:
 		q.execEscortQuest(confQuest)
 	case QT_STAGECLEAR:
@@ -445,11 +444,7 @@ func (q *RobotQuestExecutor) execEscort() {
 	}
 }
 
-func (q *RobotQuestExecutor) execGatherQuest(confQuest *config.ConfQuest) {
-
-}
-
-func (q *RobotQuestExecutor) execExploreQuest(confQuest *config.ConfQuest)  {
+func (q *RobotQuestExecutor) execGatherQuest(confQuest *config.ConfQuest)  {
 	quest := q.findQuest(confQuest.Sn)
 	if quest == nil {
 		return
