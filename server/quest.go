@@ -35,8 +35,11 @@ const (
 	QT_STAGECLEAR = 13
 	QT_EXPLORE = 28
 	QT_DELIVERY = 71
+	QT_WAIT = 72
 	QT_GATHER = 73
 	QT_ESCORT = 74
+	QT_TRANSFORM = 75
+	QT_SOUL = 77
 	QT_MONSTER = 81
 
 )
@@ -233,6 +236,8 @@ func (q *RobotQuestExecutor) execQuest(quest int) ExecState {
 		q.execMonsterQuest(confQuest)
 	case QT_DELIVERY:
 		q.execDeliverQuest(confQuest)
+	case QT_SOUL:
+		q.execSoulQuest(confQuest)
 	default:	
 		break	
 
@@ -292,6 +297,23 @@ func (q *RobotQuestExecutor) execDeliverQuest(confQuest *config.ConfQuest) ExecS
 
 	q.setOngoing()
 
+	return q.getState()
+}
+
+func (q *RobotQuestExecutor) execSoulQuest(confQuest *config.ConfQuest) ExecState {
+	quest := q.findQuest(confQuest.Sn)
+	if quest == nil {
+		q.setCompleted()
+		return q.getState()
+	}
+	// 先用SkillQuestData，其实应该是一个DumbAsyncQuestData
+	if quest.data == nil {
+		qd := newSkillQuestData()
+		quest.attach(qd)
+	}
+
+	q.sendUpgradeSoulRequest()
+	q.setOngoing()
 	return q.getState()
 }
 

@@ -86,3 +86,8 @@ func (r *Robot) handleSoulAwaken(packet *core.Packet) {
 	request := msg.SerializeCSInstanceLeave(msg.MSG_CSInstanceLeave)
 	r.sendPacket(request)
 }
+
+func (r *Robot) sendUpgradeSoulRequest() {
+	request := msg.SerializeCSIncSoulPointRequest(uint32(msg.MSG_CSIncSoulPointRequest))
+	r.sendPacket(request)
+}
