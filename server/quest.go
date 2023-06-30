@@ -34,6 +34,7 @@ const (
 	QT_DIALOG = 12
 	QT_STAGECLEAR = 13
 	QT_EXPLORE = 28
+	QT_DELIVERY = 71
 	QT_GATHER = 73
 	QT_ESCORT = 74
 	QT_MONSTER = 81
@@ -230,6 +231,8 @@ func (q *RobotQuestExecutor) execQuest(quest int) ExecState {
 		q.execSkillQuest(confQuest)
 	case QT_MONSTER:
 		q.execMonsterQuest(confQuest)
+	case QT_DELIVERY:
+		q.execDeliverQuest(confQuest)
 	default:	
 		break	
 
@@ -274,6 +277,22 @@ func (q *RobotQuestExecutor) execDialogQuest(confQuest *config.ConfQuest) ExecSt
 
 	q.setOngoing()
 	return EXEC_ONGOING
+}
+
+func (q *RobotQuestExecutor) execDeliverQuest(confQuest *config.ConfQuest) ExecState {
+	q.moveToQuestPos(confQuest)
+	if q.getState() != EXEC_COMPLETED {
+		return q.getState()
+	}
+
+	if confQuest.CommitType == 1 {
+		msg := msg.SerializeCSCompleteQuest(uint32(msg.MSG_CSCompleteQuest), int32(confQuest.Sn))
+		q.sendPacket(msg)
+	}
+
+	q.setOngoing()
+
+	return q.getState()
 }
 
 func (q *RobotQuestExecutor) execSkillQuest(confQuest *config.ConfQuest) ExecState {
@@ -555,10 +574,21 @@ func getQuestPosition(confQuest *config.ConfQuest) (mapSn int, pos *core.Vec2) {
 		return target[1], nil
 	case QT_MONSTER:
 		return target[0], nil	
+	case QT_DELIVERY:
+		return getQuestNpcMap(target[2]), getQuestNpcPosition(target[2])
 	}
 
 	return target[1], core.NewZeroVec2()	
 
+}
+
+func getQuestNpcMap(sn int) int {
+	confSceneChar := config.FindConfSceneCharacter(sn)
+	if confSceneChar == nil {
+		return 0
+	}
+
+	return confSceneChar.SceneID
 }
 
 func getQuestNpcPosition(sn int) *core.Vec2{
