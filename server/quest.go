@@ -96,7 +96,7 @@ func newQuestSet() *RobotQuestSet{
 
 func (qs *RobotQuestSet) initQuest(quests []*pb.DQuest) {
 	for _, quest := range quests {
-		core.Info("init quest ", quest.Sn)
+		core.Info("init quest ", quest.Sn, quest.Status)
 		q := newQuest()		
 		q.sn = quest.Sn
 		q.typ = quest.Type
@@ -117,12 +117,17 @@ func (qs *RobotQuestSet) isPreCompleted(sn int) bool {
 		return false
 	}
 
+	quest := qs.findQuest(sn)
+	if quest != nil && quest.status == QSTATE_ONGOING {
+		return true
+	}
+
 	preSn, _ := strconv.Atoi(confQuest.PreSn)
 	if preSn <= 0 {
 		return true
 	}
 
-	for _, v := range qs.quests {
+	for _, v := range qs.quests { 
 		// core.Info("sn pre cheking status", sn, preSn, v.sn, v.status)
 		if v.sn == int32(preSn) && (v.status == QSTATE_COMPLETED || v.status == QSTATE_REWARED) {
 			return true
@@ -238,6 +243,8 @@ func (q *RobotQuestExecutor) execQuest(quest int) ExecState {
 		q.execDeliverQuest(confQuest)
 	case QT_SOUL:
 		q.execSoulQuest(confQuest)
+	case QT_TRANSFORM:
+		q.execTransformQuest(confQuest)
 	default:	
 		break	
 
@@ -252,6 +259,7 @@ func (q *RobotQuestExecutor) moveToQuestPos(confQuest *config.ConfQuest) {
 	}
 
 	mapSn, pos := getQuestPosition(confQuest)
+	core.Info("quest ", confQuest.Sn, mapSn, pos.X, pos.Y)
 	if int(q.mapSn) == mapSn {
 		ret := q.move(pos)
 		if ret == -1 {
@@ -332,6 +340,27 @@ func (q *RobotQuestExecutor) execSkillQuest(confQuest *config.ConfQuest) ExecSta
 	q.upgradeSkill()
 	q.setOngoing()
 	return q.getState()
+}
+
+func (q *RobotQuestExecutor) execTransformQuest(confQuest *config.ConfQuest) {
+	quest := q.findQuest(confQuest.Sn)
+	if quest == nil {
+		q.setCompleted()
+		return
+	}
+
+	q.moveToQuestPos(confQuest)
+	if q.getState() == EXEC_REPEATED {
+		return
+	}
+
+	//借用一下SkillQuestData，以后改掉
+	if quest.data == nil {
+		qd := newSkillQuestData()
+		quest.attach(qd)
+	}
+
+	q.completeQuest(confQuest.Sn)
 }
 
 func (q *RobotQuestExecutor) execGather(d *GatherQuestData)  {
@@ -503,6 +532,16 @@ func (q *RobotQuestExecutor) execGatherQuest(confQuest *config.ConfQuest)  {
 	q.execGather(qd)
 }
 
+func (q *RobotQuestExecutor) completeQuest(sn int) {
+	confQuest := config.FindConfQuest(sn)
+	if confQuest == nil {
+		return
+	}
+
+	msg := msg.SerializeCSCompleteQuest(uint32(msg.MSG_CSCompleteQuest), int32(confQuest.Sn))
+	q.sendPacket(msg)
+}
+
 func (q *RobotQuestExecutor) commitQuest(sn int) {
 	confQuest := config.FindConfQuest(sn)
 	if confQuest == nil {
@@ -517,6 +556,8 @@ func (q *RobotQuestExecutor) commitQuest(sn int) {
 	q.sendPacket(request)
 	// q.setOngoing()
 }
+
+
 
 func (q *RobotQuestExecutor) exec(params []string, delta int) {
 	quest := q.findQuestToExec()
@@ -598,6 +639,8 @@ func getQuestPosition(confQuest *config.ConfQuest) (mapSn int, pos *core.Vec2) {
 		return target[0], nil	
 	case QT_DELIVERY:
 		return getQuestNpcMap(target[2]), getQuestNpcPosition(target[2])
+	case QT_TRANSFORM:
+		return getQuestNpcMap(target[1]), getQuestNpcPosition(target[1])
 	}
 
 	return target[1], core.NewZeroVec2()	
