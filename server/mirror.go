@@ -152,6 +152,11 @@ func (d *StageClearQuestData) lockEnemy(e *RobotQuestExecutor) int64 {
 			continue
 		}
 
+		if enemy.isDead() {
+			core.Info("monster is dead ", sn)
+			continue
+		}
+
 		return enemy.getId()
 	}
 

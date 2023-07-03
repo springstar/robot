@@ -310,7 +310,16 @@ func (q *RobotQuestExecutor) execDeliverQuest(confQuest *config.ConfQuest) ExecS
 }
 
 func (q *RobotQuestExecutor) execWaitQuest(confQuest *config.ConfQuest) ExecState {
+	quest := q.findQuest(confQuest.Sn)
+	if quest == nil {
+		q.setCompleted()
+		return q.getState()
+	}
 
+	if quest.status == QSTATE_COMPLETED {
+		q.commitQuest(confQuest.Sn)
+	}
+	
 	return q.getState()
 }
 

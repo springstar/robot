@@ -82,11 +82,13 @@ func (r *Robot) handleObjAppear(packet *core.Packet) {
 	case WOT_MONSTER:
 		sn := int(msg.GetObjAppear().Monster.GetStageObjectSn())	
 		vo = createMonster(id, typ, pos, sn, obj.GetMonster().GetHpCur(), obj.GetMonster().GetHpMax())
+		mo := vo.(*MonsterObj)
+		core.Info("recv obj appear ", vo.getId(), vo.getType(), mo.sn)
 	default:
 		vo = newWorldObj(id, typ, pos)	
 	}
 
-	// core.Info("recv obj appear ", wo.id, wo.typ, wo.sn)
+
 
 	r.addObj(vo)
 }
