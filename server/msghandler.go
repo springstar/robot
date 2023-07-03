@@ -60,6 +60,8 @@ func (r *Robot) HandleMessage(packet *core.Packet) {
 			r.handleKick(packet)
 		case msg.MSG_SCStageMove:
 			r.handleStageMove(packet)
+		case msg.MSG_SCStageMoveStop:
+			r.handleMoveStop(packet)	
 		case msg.MSG_SCStageSetPos:
 			r.handleStageSetPos(packet)	
 		case msg.MSG_SCStagePullTo:

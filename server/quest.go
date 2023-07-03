@@ -245,6 +245,8 @@ func (q *RobotQuestExecutor) execQuest(quest int) ExecState {
 		q.execSoulQuest(confQuest)
 	case QT_TRANSFORM:
 		q.execTransformQuest(confQuest)
+	case QT_WAIT:
+		q.execWaitQuest(confQuest)	
 	default:	
 		break	
 
@@ -259,7 +261,6 @@ func (q *RobotQuestExecutor) moveToQuestPos(confQuest *config.ConfQuest) {
 	}
 
 	mapSn, pos := getQuestPosition(confQuest)
-	core.Info("quest ", confQuest.Sn, mapSn, pos.X, pos.Y)
 	if int(q.mapSn) == mapSn {
 		ret := q.move(pos)
 		if ret == -1 {
@@ -304,6 +305,11 @@ func (q *RobotQuestExecutor) execDeliverQuest(confQuest *config.ConfQuest) ExecS
 	}
 
 	q.setOngoing()
+
+	return q.getState()
+}
+
+func (q *RobotQuestExecutor) execWaitQuest(confQuest *config.ConfQuest) ExecState {
 
 	return q.getState()
 }
