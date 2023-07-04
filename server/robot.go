@@ -208,6 +208,10 @@ func (r *Robot) ready() {
 	if serv.icount() == 0 {
 		return
 	}
+
+	if r.profession == 0 {
+		return
+	}
 	
 	r.pc = core.GenRandomInt(serv.icount())
 }

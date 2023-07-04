@@ -95,8 +95,13 @@ func newQuestSet() *RobotQuestSet{
 }
 
 func (qs *RobotQuestSet) initQuest(quests []*pb.DQuest) {
+	// 临时处理，忽略非主线任务
 	for _, quest := range quests {
 		core.Info("init quest ", quest.Sn, quest.Status)
+		if quest.Status == 0 {
+			continue
+		}
+
 		q := newQuest()		
 		q.sn = quest.Sn
 		q.typ = quest.Type
@@ -264,7 +269,7 @@ func (q *RobotQuestExecutor) moveToQuestPos(confQuest *config.ConfQuest) {
 	if int(q.mapSn) == mapSn {
 		ret := q.move(pos)
 		if ret == -1 {
-			// core.Info("exec moving to complete ", confQuest.Sn, mapSn, pos)
+			// core.Info("exec moving to complete ", confQuest.Sn, mapSn, pos.X, pos.Y)
 			q.setRepeated()
 		} else {
 			// core.Info("move ok ", confQuest.Sn, mapSn, pos, q.getState())
@@ -273,7 +278,7 @@ func (q *RobotQuestExecutor) moveToQuestPos(confQuest *config.ConfQuest) {
 		return
 	}
 
-	core.Info("enter instarnce ", mapSn, confQuest.Sn)
+	// core.Info("enter instarnce ", mapSn, confQuest.Sn)
 	q.sendEnterInstance(mapSn, confQuest.Sn)
 	q.setPause()
 }
@@ -383,15 +388,12 @@ func (q *RobotQuestExecutor) execGather(d *GatherQuestData)  {
 	pos := d.getGatherPos()
 	ret := q.move(pos)
 	if ret == -1 {
-		confQuest := config.FindConfQuest(d.questSn)
-		core.Info("exec moving to complete ", confQuest.Sn)
 		q.setRepeated()
 	}
 
 	sn := d.getGatherSn()
 	obj := q.findGatherObj(sn)
 	if obj == nil {
-		core.Info("no gather obj found ", sn, pos.X, pos.Y, q.pos.X, q.pos.Y)
 		q.setRepeated()
 		return
 	}
@@ -461,7 +463,7 @@ func (q *RobotQuestExecutor) execEscortQuest(confQuest *config.ConfQuest) ExecSt
 		qd.genPath(confQuest)
 		quest.attach(qd)
 	} else {
-		core.Info("no need to attach escort quest data ", confQuest.Sn)
+		// core.Info("no need to attach escort quest data ", confQuest.Sn)
 	}
 
 	q.moveToQuestPos(confQuest)
@@ -603,9 +605,8 @@ func (q *RobotQuestExecutor) onEvent(k EventKey) {
 }
 
 func (q *RobotQuestExecutor) onStageSwitch() {
-	core.Info("onStageSwitch state ", q.getState())
 	if q.getState() == EXEC_PAUSE {
-		core.Info("set resume state")
+		// core.Info("set resume state")
 		q.setResume()
 	}
 
@@ -625,9 +626,6 @@ func (q *RobotQuestExecutor) updateStatus(sn int, status QuestStatus) {
 	if quest != nil {
 		core.Info("update status ", sn, status)
 		quest.status = int32(status)	
-		if quest.status == QSTATE_COMPLETED || quest.status == QSTATE_REWARED {
-			// q.curQuest = 0
-		}
 	} else {
 		core.Info("new quest ", sn, status)
 

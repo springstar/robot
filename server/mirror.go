@@ -144,13 +144,13 @@ func (d *StageClearQuestData) lockEnemy(e *RobotQuestExecutor) int64 {
 	for sn, pos := range d.enemysInfo {
 		ret := e.move(pos)
 		if ret == -1 {
+			// core.Info("move to ", pos.X, pos.Y, e.pos.X, e.pos.Y)
 			break
 		}
 
 		enemy := e.findMonsterObj(sn)
 		if enemy == nil {
-			core.Info("no monster ", sn, pos.X, pos.Y, e.pos.X, e.pos.Y)
-			break
+			continue
 		}
 
 		if enemy.isDead() {

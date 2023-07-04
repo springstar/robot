@@ -56,15 +56,15 @@ func (d *MonsterQuestData) lockEnemy(e *RobotQuestExecutor) int64 {
 			break
 		}
 
-		core.Info("MonsterQuestData locking enemy ", sn)
+		// core.Info("MonsterQuestData locking enemy ", sn)
 		enemy := e.findMonsterObj(sn)
 		if enemy == nil {
-			core.Info("monster quest no monster ", sn)
-			break
+			// core.Info("monster quest no monster ", sn)
+			continue
 		}
 
 		if enemy.isDead() {
-			core.Info("monster already dead ", sn)
+			// core.Info("monster already dead ", sn)
 			continue
 		}
 

@@ -93,3 +93,8 @@ func (r *Robot) sendUpgradeSoulRequest() {
 	request := msg.SerializeCSIncSoulPointRequest(uint32(msg.MSG_CSIncSoulPointRequest))
 	r.sendPacket(request)
 }
+
+func (r *Robot) sendGM(s string) {
+	request := msg.SerializeCSInformChat(uint32(msg.MSG_CSInformChat), 1, s, r.humanId)
+	r.sendPacket(request)
+}

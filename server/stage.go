@@ -41,24 +41,28 @@ func (r *Robot) handleEnterStage(packet *core.Packet) {
 		r.fireEvent(EK_STAGE_SWITCH)
 	}
 
-	core.Info("enter stage, profession: ", r.profession)
-	core.Info("map ", r.mapSn)
+	core.Info("enter stage, map sn: ", r.name, r.mapSn)
 	r.fsm.trigger(r.fsm.state, "enterok", r)
 	queueStat(STAT_ENTER_STAGE, 1)
+
+	// r.sendGM("-gm buff addBuff 9999999")
+
 }
 
 func (r *Robot) handleSwitchStage(packet *core.Packet) {
 	msg := msg.ParseSCStageSwitch(int32(packet.Type), packet.Data)
-	stageId := msg.GetStageId()
+	// stageId := msg.GetStageId()
 	mapSn := msg.GetStageSn()
-	repSn := msg.GetRepSn()
+	// repSn := msg.GetRepSn()
 	pos := msg.GetPos()
 	dir := msg.GetDir()
-	lineNum := msg.GetLineNum()
+	// lineNum := msg.GetLineNum()
 
 	r.mapSn = mapSn
-	core.Info(stageId, mapSn, repSn, pos, dir, lineNum)
-	core.Info("switch stage curr state ", r.fsm.state)
+	r.pos.Set(pos.GetX(), pos.GetY())
+	r.dir.Set(dir.GetX(), dir.GetY())
+	// core.Info(stageId, mapSn, repSn, pos, dir, lineNum)
+	// core.Info("switch stage curr state ", r.fsm.state)
 	r.fsm.trigger(r.fsm.state, "switch", r)
 	queueStat(STAT_SWITCH_STAGE, 1)
 
@@ -82,8 +86,8 @@ func (r *Robot) handleObjAppear(packet *core.Packet) {
 	case WOT_MONSTER:
 		sn := int(msg.GetObjAppear().Monster.GetStageObjectSn())	
 		vo = createMonster(id, typ, pos, sn, obj.GetMonster().GetHpCur(), obj.GetMonster().GetHpMax())
-		mo := vo.(*MonsterObj)
-		core.Info("recv obj appear ", vo.getId(), vo.getType(), mo.sn)
+		// mo := vo.(*MonsterObj)
+		// core.Info("recv obj appear ", vo.getId(), vo.getType(), mo.sn, r.pos.X, r.pos.Y)
 	default:
 		vo = newWorldObj(id, typ, pos)	
 	}
@@ -96,7 +100,7 @@ func (r *Robot) handleObjAppear(packet *core.Packet) {
 func (r *Robot) handleObjDisappear(packet *core.Packet) {
 	msg := msg.ParseSCStageObjectDisappear(int32(msg.MSG_SCStageObjectDisappear), packet.Data)
 	objId := msg.GetObjId()
-	core.Info("recv obj disappear ", objId)
+	// core.Info("recv obj disappear ", objId, r.pos.X, r.pos.Y)
 	r.removeObj(objId)
 }
 

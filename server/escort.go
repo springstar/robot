@@ -60,7 +60,7 @@ func (d *EscortQuestData) getEscortPos() *core.Vec2 {
 }
 
 func (d *EscortQuestData) onStatusUpdate(e *RobotQuestExecutor, sn int, status QuestStatus) {
-	core.Info("esocrt data onStatusUpdate ", sn, status)
+	// core.Info("esocrt data onStatusUpdate ", sn, status)
 	if status == QSTATE_COMPLETED {
 		core.Info("commit escort quest ", sn)
 		e.commitQuest(sn)
@@ -75,7 +75,6 @@ func (d *EscortQuestData) dumpPath() {
 }
 
 func (d *EscortQuestData) resume(e *RobotQuestExecutor) {
-	core.Info("EscortQuestData resume")
 	pos := d.getEscortPos()
 	if pos == nil {
 		d.dumpPath()
@@ -84,7 +83,7 @@ func (d *EscortQuestData) resume(e *RobotQuestExecutor) {
 
 	ret := e.move(pos)
 	if ret == -1 {
-		core.Info("resume escort moving ", pos.X, pos.Y, e.pos.X, e.pos.Y)
+		// core.Info("resume escort moving ", pos.X, pos.Y, e.pos.X, e.pos.Y)
 		return
 	}
 

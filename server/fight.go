@@ -112,8 +112,6 @@ func (r *Robot) fight(enemyId int64) {
 	spos.Y = r.pos.Y
 
 	distance := r.pos.DistanceTo(tarPos)
-	core.Info("fighting robot pos ", r.pos.X, r.pos.Y, distance)
-	core.Info("fighting target pos ", tarPos.X, tarPos.Y, distance)
 
 	confSkill := config.FindConfSkill(int(sn))
 	if confSkill.TargetType == STT_FRIEND {
@@ -121,13 +119,20 @@ func (r *Robot) fight(enemyId int64) {
 		tarPos = r.pos
 	}
 
+	if distance > float32(confSkill.Range) + 1.5 {
+		return
+	}
+
+	// core.Info("fighting robot pos ", r.pos.X, r.pos.Y, distance)
+	// core.Info("fighting target pos ", tarPos.X, tarPos.Y, distance)
+
 	tpos := &pb.DVector2{}
 	tpos.X = tarPos.X
 	tpos.Y = tarPos.Y
 	
 	msg := msg.SerializeCSFightAtk(uint32(msg.MSG_CSFightAtk), r.humanId, sn, tarId, tpos, 0, false, dir, spos, 1)
 	r.sendPacket(msg)
-	core.Info("send CSFightAtk to attack ", tarId)
+	// core.Info("send CSFightAtk to attack ", sn, tarId)
 }
 
 func (r *Robot) dumpSkills() {
