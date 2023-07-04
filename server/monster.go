@@ -72,8 +72,6 @@ func (d *MonsterQuestData) next() {
 	}
 }
 
-
-
 func (d *MonsterQuestData) lockEnemy(e *RobotQuestExecutor) int64 {
 	pos := d.getEnemyPos()
 	sn := d.getEnemySn()
@@ -94,6 +92,7 @@ func (d *MonsterQuestData) lockEnemy(e *RobotQuestExecutor) int64 {
 		return 0
 	}
 
+	d.next()
 	core.Info("lock monster ", sn , enemy.getId())
 	return enemy.getId()
 
