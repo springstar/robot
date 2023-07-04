@@ -8,15 +8,15 @@ import (
 type MonsterQuestData struct {
 	questSn int
 	count int
-	monsterSn int
-	monsters map[int]*core.Vec2
+	snList []int
+	posList []*core.Vec2
 	curEnemy int64
+	idx int
 }
 
 func newMonsterQuestData(sn int) *MonsterQuestData {
 	return &MonsterQuestData{
 		questSn: sn,
-		monsters: make(map[int]*core.Vec2),
 	}
 }
 
@@ -49,31 +49,54 @@ func (d *MonsterQuestData) resume(e *RobotQuestExecutor) {
 
 }
 
-func (d *MonsterQuestData) lockEnemy(e *RobotQuestExecutor) int64 {
-	for sn, pos := range d.monsters {
-		ret := e.move(pos)
-		if ret == -1 {
-			break
-		}
-
-		// core.Info("MonsterQuestData locking enemy ", sn)
-		enemy := e.findMonsterObj(sn)
-		if enemy == nil {
-			// core.Info("monster quest no monster ", sn)
-			continue
-		}
-
-		if enemy.isDead() {
-			// core.Info("monster already dead ", sn)
-			continue
-		}
-
-		core.Info("lock monster ", sn , enemy.getId())
-		return enemy.getId()
-
+func (d *MonsterQuestData) getEnemyPos() *core.Vec2 {
+	if d.idx < 0 || d.idx > len(d.posList) - 1 {
+		return nil
 	}
 
-	return 0
+	return d.posList[d.idx]
+}
+
+func (d *MonsterQuestData) getEnemySn() int {
+	if d.idx < 0 || d.idx > len(d.snList) - 1 {
+		return 0
+	}
+
+	return d.snList[d.idx]
+}
+
+func (d *MonsterQuestData) next() {
+	d.idx = d.idx + 1
+	if d.idx > len(d.snList) - 1 {
+		d.idx = 0
+	}
+}
+
+
+
+func (d *MonsterQuestData) lockEnemy(e *RobotQuestExecutor) int64 {
+	pos := d.getEnemyPos()
+	sn := d.getEnemySn()
+
+	ret := e.move(pos)
+	if ret == -1 {
+		return 0
+	}
+
+	enemy := e.findMonsterObj(sn)
+	if enemy == nil {
+		d.next()
+		return 0
+	}
+
+	if enemy.isDead() {
+		d.next()
+		return 0
+	}
+
+	core.Info("lock monster ", sn , enemy.getId())
+	return enemy.getId()
+
 }
 
 func (d *MonsterQuestData) getQuestSn() int {
@@ -103,8 +126,6 @@ func (d *MonsterQuestData) genMonsterInfo(confQuest *config.ConfQuest) {
 		return
 	}
 
-	d.monsterSn = monsterSn
-
 	mapSn, err := core.Str2Int(confQuest.Target)
 	if err != nil {
 		core.Error(err)
@@ -114,7 +135,7 @@ func (d *MonsterQuestData) genMonsterInfo(confQuest *config.ConfQuest) {
 	confs := config.GetAllConfSceneCharacter()
 	for _, c := range confs {
 		if mapSn != c.SceneID {
-			if len(d.monsters) == d.count {
+			if len(d.snList) == d.count {
 				break
 			} else {
 				continue
@@ -131,8 +152,8 @@ func (d *MonsterQuestData) genMonsterInfo(confQuest *config.ConfQuest) {
 		}
 
 		pos := core.Str2Float32Slice(c.Position)
-		d.monsters[c.Sn] = core.NewVec2(pos[0], pos[2])
-		
+		d.posList = append(d.posList, core.NewVec2(pos[0], pos[2]))
+		d.snList = append(d.snList, c.Sn)
 	}
 }
 
