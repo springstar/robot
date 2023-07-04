@@ -112,7 +112,7 @@ func (r *Robot) move(target *core.Vec2) int{
 	
 	now := core.GetCurrentTime()
 
-	delta := 5
+	delta := 3.6 
 	// delta = delta * int(m.r.speed)
 
 	if r.lastPos == nil {

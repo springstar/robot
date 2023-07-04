@@ -316,8 +316,9 @@ func (q *RobotQuestExecutor) execWaitQuest(confQuest *config.ConfQuest) ExecStat
 		return q.getState()
 	}
 
-	if quest.status == QSTATE_COMPLETED {
-		q.commitQuest(confQuest.Sn)
+	if quest.data == nil {
+		qd := newSkillQuestData()
+		quest.attach(qd)
 	}
 	
 	return q.getState()

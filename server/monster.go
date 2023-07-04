@@ -41,7 +41,7 @@ func (d *MonsterQuestData) resume(e *RobotQuestExecutor) {
 
 	enemyId := d.lockEnemy(e)	
 	if enemyId == 0 {
-		core.Info("monster quest no enemy locked")
+		// core.Info("monster quest no enemy locked")
 		return
 	}
 
@@ -51,16 +51,16 @@ func (d *MonsterQuestData) resume(e *RobotQuestExecutor) {
 
 func (d *MonsterQuestData) lockEnemy(e *RobotQuestExecutor) int64 {
 	for sn, pos := range d.monsters {
-		core.Info("MonsterQuestData locking enemy ", sn)
 		ret := e.move(pos)
 		if ret == -1 {
-			continue
+			break
 		}
 
+		core.Info("MonsterQuestData locking enemy ", sn)
 		enemy := e.findMonsterObj(sn)
 		if enemy == nil {
 			core.Info("monster quest no monster ", sn)
-			continue
+			break
 		}
 
 		if enemy.isDead() {

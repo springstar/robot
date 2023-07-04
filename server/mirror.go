@@ -10,6 +10,7 @@ type StageClearQuestData struct {
 	clearCount int
 	enemysInfo map[int]*core.Vec2
 	curEnemy int64
+	idx int
 }
 
 func newStageClearQuestData(sn int) *StageClearQuestData {
@@ -131,7 +132,7 @@ func (d *StageClearQuestData) resume(e *RobotQuestExecutor) {
 
 	enemyId := d.lockEnemy(e)	
 	if enemyId == 0 {
-		core.Info("stageclear quest no enemy locked")
+		// core.Info("stageclear quest no enemy locked")
 		return
 	}
 
@@ -148,8 +149,8 @@ func (d *StageClearQuestData) lockEnemy(e *RobotQuestExecutor) int64 {
 
 		enemy := e.findMonsterObj(sn)
 		if enemy == nil {
-			core.Info("no monster ", sn)
-			continue
+			core.Info("no monster ", sn, pos.X, pos.Y, e.pos.X, e.pos.Y)
+			break
 		}
 
 		if enemy.isDead() {

@@ -96,6 +96,7 @@ func (r *Robot) handleObjAppear(packet *core.Packet) {
 func (r *Robot) handleObjDisappear(packet *core.Packet) {
 	msg := msg.ParseSCStageObjectDisappear(int32(msg.MSG_SCStageObjectDisappear), packet.Data)
 	objId := msg.GetObjId()
+	core.Info("recv obj disappear ", objId)
 	r.removeObj(objId)
 }
 

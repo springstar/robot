@@ -94,6 +94,12 @@ func (r *Robot) fight(enemyId int64) {
 		return
 	}
 
+	sn := r.pickSkill()
+	if sn == 0 {
+		core.Info("no skill pick, enemy id ", enemyId)
+		return
+	}
+
 	tarId := enemyId
 	tarPos := enemy.getPos()
 	dirX := tarPos.X - r.pos.X
@@ -105,15 +111,9 @@ func (r *Robot) fight(enemyId int64) {
 	spos.X = r.pos.X
 	spos.Y = r.pos.Y
 
-	sn := r.pickSkill()
-	if sn == 0 {
-		core.Info("no skill pick, enemy id ", enemyId)
-		return
-	}
-
-	// distance := r.pos.DistanceTo(tarPos)
-	// core.Info("fighting robot pos ", r.pos.X, r.pos.Y)
-	// core.Info("fighting target pos ", tarPos.X, tarPos.Y)
+	distance := r.pos.DistanceTo(tarPos)
+	core.Info("fighting robot pos ", r.pos.X, r.pos.Y, distance)
+	core.Info("fighting target pos ", tarPos.X, tarPos.Y, distance)
 
 	confSkill := config.FindConfSkill(int(sn))
 	if confSkill.TargetType == STT_FRIEND {
