@@ -45,7 +45,7 @@ func (r *Robot) handleEnterStage(packet *core.Packet) {
 	r.fsm.trigger(r.fsm.state, "enterok", r)
 	queueStat(STAT_ENTER_STAGE, 1)
 
-	// r.sendGM("-gm buff addBuff 9999999")
+	r.sendGM("-gm buff addBuff 9999999")
 
 }
 

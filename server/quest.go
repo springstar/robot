@@ -629,12 +629,14 @@ func (q *RobotQuestExecutor) updateStatus(sn int, status QuestStatus) {
 		core.Info("update status ", sn, status)
 		quest.status = int32(status)	
 	} else {
-		core.Info("new quest ", sn, status)
+		core.Info("new quest ", sn, status, q.getState())
 
 		quest = newQuest()
 		quest.sn = int32(sn)
 		quest.status = int32(status)
 		q.addQuest(quest)
+		
+		q.setCompleted()
 	}
 
 	if quest.data != nil {

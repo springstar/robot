@@ -23,7 +23,7 @@ func (r *Robot) registerMsgHandler() {
 	r.Register(msg.MSG_SCStageObjectDisappear, r)
 	r.Register(msg.MSG_SCMatchEnrollResponse, r)
 	r.Register(msg.MSG_SCMatchResult, r)
-	// r.Register(msg.MSG_SCInformMsg, r)
+	r.Register(msg.MSG_SCInformMsg, r)
 	r.Register(msg.MSG_SCTeamMine, r)
 	r.Register(msg.MSG_SCPlatTeamListResponse, r)
 	r.Register(msg.MSG_SCFightHpChg, r)
