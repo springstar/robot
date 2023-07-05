@@ -8,15 +8,15 @@ import (
 type StageClearQuestData struct {
 	questSn int
 	clearCount int
-	enemysInfo map[int]*core.Vec2
 	curEnemy int64
+	snList []int
+	posList []*core.Vec2
 	idx int
 }
 
 func newStageClearQuestData(sn int) *StageClearQuestData {
 	return &StageClearQuestData{
 		questSn: sn,
-		enemysInfo: make(map[int]*core.Vec2),
 		curEnemy: 0,
 	}
 }
@@ -28,12 +28,6 @@ func getStageClearTarget(confQuest *config.ConfQuest) (count int, repSn int){
 		return count, repSn
 	}
 	return infos[0], infos[1]
-}
-
-func (d *StageClearQuestData) dumpEnemyList() {
-	for sn, pos := range d.enemysInfo {
-		core.Info("stageclear ", sn, pos)
-	}
 }
 
 func (d *StageClearQuestData) genEnemyPosList(confQuest *config.ConfQuest) {
@@ -85,7 +79,9 @@ func (d *StageClearQuestData) genEnemyPosList(confQuest *config.ConfQuest) {
 
 				if confCharacterMonster.Camp == CAMP_ENEMY || confCharacterMonster.Camp == CAPM_MONSTER {
 					enemyPos := core.Str2Float32Slice(confSceneCharacter.Position)
-					d.enemysInfo[smid] = core.NewVec2(enemyPos[0], enemyPos[2])
+					d.posList = append(d.posList, core.NewVec2(enemyPos[0], enemyPos[2]))
+					d.snList = append(d.snList, smid)
+					
 				}
 			}
 		}
@@ -140,27 +136,52 @@ func (d *StageClearQuestData) resume(e *RobotQuestExecutor) {
 
 }
 
-func (d *StageClearQuestData) lockEnemy(e *RobotQuestExecutor) int64 {
-	for sn, pos := range d.enemysInfo {
-		ret := e.move(pos)
-		if ret == -1 {
-			// core.Info("move to ", pos.X, pos.Y, e.pos.X, e.pos.Y)
-			break
-		}
-
-		enemy := e.findMonsterObj(sn)
-		if enemy == nil {
-			continue
-		}
-
-		if enemy.isDead() {
-			core.Info("monster is dead ", sn)
-			continue
-		}
-
-		return enemy.getId()
+func (d *StageClearQuestData) getEnemyPos() *core.Vec2 {
+	if d.idx < 0 || d.idx > len(d.posList) - 1 {
+		return nil
 	}
 
-	return 0
+	return d.posList[d.idx]
+}
+
+func (d *StageClearQuestData) getEnemySn() int {
+	if d.idx < 0 || d.idx > len(d.snList) - 1 {
+		return 0
+	}
+
+	return d.snList[d.idx]
+}
+
+func (d *StageClearQuestData) next() {
+	d.idx = d.idx + 1
+	if d.idx > len(d.snList) - 1 {
+		d.idx = 0
+	}
+}
+
+
+func (d *StageClearQuestData) lockEnemy(e *RobotQuestExecutor) int64 {
+	pos := d.getEnemyPos()
+	sn := d.getEnemySn()
+
+	ret := e.move(pos)
+	if ret == -1 {
+		return 0
+	}
+
+	enemy := e.findMonsterObj(sn)
+	if enemy == nil {
+		d.next()
+		return 0
+	}
+
+	if enemy.isDead() {
+		d.next()
+		return 0
+	}
+
+	d.next()
+	core.Info("lock monster ", sn , enemy.getId())
+	return enemy.getId()
 }
 
