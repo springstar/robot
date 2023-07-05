@@ -141,6 +141,10 @@ func (d *MonsterQuestData) genMonsterInfo(confQuest *config.ConfQuest) {
 			}
 		}
 
+		if !c.CanBeAttacked {
+			continue
+		}
+		
 		monster, err := core.Str2Int(c.MonsterSn)
 		if err != nil {
 			continue

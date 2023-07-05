@@ -64,7 +64,6 @@ func (r *Robot) handleSkillUpdate(packet *core.Packet) {
 }
 
 func (r *Robot) handleHpChange(packet *core.Packet) {
-	core.Info("recv hp change")
 	resp := msg.ParseSCFightHpChg(int32(msg.MSG_SCFightHpChg), packet.Data)
 	targets := resp.GetDhpChgTar()
 	for _, t := range targets {
@@ -96,9 +95,14 @@ func (r *Robot) fight(enemyId int64) {
 
 	sn := r.pickSkill()
 	if sn == 0 {
-		core.Info("no skill pick, enemy id ", enemyId)
+		// core.Info("no skill pick, enemy id ", enemyId, r.lastRelease)
+		// for _, s := range r.skills {
+		// 	core.Info("skill nextRelease ", s.sn, s.nextRelease)
+		// }
 		return
 	}
+
+	confSkill := config.FindConfSkill(int(sn))
 
 	tarId := enemyId
 	tarPos := enemy.getPos()
@@ -113,7 +117,6 @@ func (r *Robot) fight(enemyId int64) {
 
 	distance := r.pos.DistanceTo(tarPos)
 
-	confSkill := config.FindConfSkill(int(sn))
 	if confSkill.TargetType == STT_FRIEND {
 		tarId = r.humanId
 		tarPos = r.pos
@@ -132,7 +135,8 @@ func (r *Robot) fight(enemyId int64) {
 	
 	msg := msg.SerializeCSFightAtk(uint32(msg.MSG_CSFightAtk), r.humanId, sn, tarId, tpos, 0, false, dir, spos, 1)
 	r.sendPacket(msg)
-	// core.Info("send CSFightAtk to attack ", sn, tarId)
+	core.Info("send CSFightAtk to attack ", sn, tarId, r.lastRelease)
+	r.updateLastRelease(int(sn))
 	r.updateSkillCooling(int(sn))
 
 }
@@ -159,6 +163,21 @@ func (r *Robot) resetSkillCooling(sn int) {
 	}
 }
 
+func (r *Robot) updateLastRelease(sn int) {
+	confSkill := config.FindConfSkill(sn)
+	r.lastRelease = core.GetCurrentTime()
+	r.commonCooolTime = confSkill.PublicCoolTime
+	if confSkill.GroupType == 1 {
+		r.commonCooolTime = 3000
+	}
+	core.Info("update last release ", r.lastRelease)
+
+}
+
+func (r *Robot) resetLastRelease() {
+
+}
+
 func (r *Robot) updateSkillCooling(sn int) {
 	confSkill := config.FindConfSkill(sn)
 	coolInfo, _ := core.Str2IntSlice(confSkill.CoolTime)
@@ -170,6 +189,7 @@ func (r *Robot) updateSkillCooling(sn int) {
 	sk := r.findSkill(sn) 
 	if sk != nil {
 		sk.nextRelease = core.GetCurrentTime() + int64(coolTime)
+		core.Info("update next release ", sn, sk.nextRelease)
 	}
 }
 
@@ -179,7 +199,6 @@ func (r *Robot) pickSkill() int32 {
 	for sn, skill := range r.skills {
 		confSkill := config.FindConfSkill(int(sn))
 		if confSkill == nil {
-			core.Info("no config for skill ", sn)
 			continue
 		}
 
@@ -187,7 +206,19 @@ func (r *Robot) pickSkill() int32 {
 			continue
 		}
 
-		if skill.nextRelease > 0 && skill.nextRelease < now {
+		if confSkill.TargetType == STT_FRIEND {
+			continue
+		}
+
+		if skill.level == 0 {
+			continue
+		}
+
+		if r.lastRelease > 0 && r.lastRelease + int64(r.commonCooolTime) > now {
+			continue
+		}
+
+		if skill.nextRelease > 0 && skill.nextRelease > now {
 			continue
 		}
 
@@ -219,10 +250,10 @@ func (r *Robot) handleDeath(packet *core.Packet) {
 }
 
 func (r *Robot) handleFightResult(packet *core.Packet) {
-	resp := msg.ParseSCFightAtkResult(int32(msg.MSG_SCFightAtkResult), packet.Data)
-	code := resp.GetResultCode()
-	sn := resp.GetSkillSn()
-	if code == -1 {
-		r.resetSkillCooling(int(sn))
-	}
+	// resp := msg.ParseSCFightAtkResult(int32(msg.MSG_SCFightAtkResult), packet.Data)
+	// code := resp.GetResultCode()
+	// sn := resp.GetSkillSn()
+	// if code == -1 {
+	// 	r.resetSkillCooling(int(sn))
+	// }
 }

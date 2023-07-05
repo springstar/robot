@@ -38,6 +38,9 @@ type Robot struct {
 	lastSyncTime int64
 
 	skills map[int32]*Skill
+
+	lastRelease int64
+	commonCooolTime int
 }
 
 func newRobot(account *Account, robotMgr *RobotManager, fsm *RobotFsm) *Robot {

@@ -70,6 +70,10 @@ func (d *StageClearQuestData) genEnemyPosList(confQuest *config.ConfQuest) {
 					continue
 				}
 
+				if !confSceneCharacter.CanBeAttacked {
+					continue
+				}
+
 				monsterSn := confSceneCharacter.MonsterSn
 				confCharacterMonster := config.FindConfCharacterMonster(monsterSn)
 				if confCharacterMonster == nil {
