@@ -27,6 +27,7 @@ func (r *Robot) registerMsgHandler() {
 	r.Register(msg.MSG_SCTeamMine, r)
 	r.Register(msg.MSG_SCPlatTeamListResponse, r)
 	r.Register(msg.MSG_SCFightHpChg, r)
+	r.Register(msg.MSG_SCFightAtkResult, r)
 	r.Register(msg.MSG_SCQuestInfo, r)
 	r.Register(msg.MSG_SCGatherFirst, r)
 	r.Register(msg.MSG_SCGatherSecond, r)
@@ -80,6 +81,8 @@ func (r *Robot) HandleMessage(packet *core.Packet) {
 			r.handleTeamList(packet)		
 		case msg.MSG_SCFightHpChg:
 			r.handleHpChange(packet)
+		case msg.MSG_SCFightAtkResult:	
+			r.handleFightResult(packet)
 		case msg.MSG_SCQuestInfo:
 			r.handleQuestInfo(packet)
 		case msg.MSG_SCRemoveQuest:

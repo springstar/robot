@@ -144,6 +144,21 @@ func (r *Robot) dumpSkills() {
 	}
 }
 
+func (r *Robot) findSkill(sn int) *Skill {
+	if sk, ok := r.skills[int32(sn)]; ok {
+		return sk
+	}
+
+	return nil
+}
+
+func (r *Robot) resetSkillCooling(sn int) {
+	sk := r.findSkill(sn)
+	if sk != nil {
+		sk.nextRelease = 0
+	}
+}
+
 func (r *Robot) updateSkillCooling(sn int) {
 	confSkill := config.FindConfSkill(sn)
 	coolInfo, _ := core.Str2IntSlice(confSkill.CoolTime)
@@ -152,11 +167,10 @@ func (r *Robot) updateSkillCooling(sn int) {
 		coolTime += coolInfo[i]
 	}
 
-	if sk, ok := r.skills[int32(sn)]; ok {
+	sk := r.findSkill(sn) 
+	if sk != nil {
 		sk.nextRelease = core.GetCurrentTime() + int64(coolTime)
 	}
-
-
 }
 
 func (r *Robot) pickSkill() int32 {
@@ -202,6 +216,13 @@ func (r *Robot) handleDeath(packet *core.Packet) {
 		monsterObj := obj.(*MonsterObj)
 		monsterObj.curHp = 0
 	}
+}
 
-
+func (r *Robot) handleFightResult(packet *core.Packet) {
+	resp := msg.ParseSCFightAtkResult(int32(msg.MSG_SCFightAtkResult), packet.Data)
+	code := resp.GetResultCode()
+	sn := resp.GetSkillSn()
+	if code == -1 {
+		r.resetSkillCooling(int(sn))
+	}
 }
