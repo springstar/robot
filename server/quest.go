@@ -161,7 +161,7 @@ func (qs *RobotQuestSet) findQuestToAccept() int32 {
 	}
 
 	sort.Ints(canAccepts)
-	core.Info("sorted canAccepts ", canAccepts)
+	// core.Info("sorted canAccepts ", canAccepts)
 	if len(canAccepts) > 0 {
 		quest := canAccepts[0]
 		if qs.isPreCompleted(quest) {
@@ -234,8 +234,10 @@ func (q *RobotQuestExecutor) execQuest(quest int) ExecState {
 	switch confQuest.Type {
 	case QT_DIALOG:
 		q.execDialogQuest(confQuest)
-	case QT_EXPLORE, QT_GATHER:
+	case QT_EXPLORE:
 		q.execGatherQuest(confQuest)
+	case QT_GATHER:
+		q.execGatherQuest(confQuest)	
 	case QT_ESCORT:
 		q.execEscortQuest(confQuest)
 	case QT_STAGECLEAR:
