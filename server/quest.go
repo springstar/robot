@@ -97,10 +97,16 @@ func newQuestSet() *RobotQuestSet{
 func (qs *RobotQuestSet) initQuest(quests []*pb.DQuest) {
 	// 临时处理，忽略非主线任务
 	for _, quest := range quests {
-		core.Info("init quest ", quest.Sn, quest.Status)
 		if quest.Status == 0 {
 			continue
 		}
+
+		confQuest := config.FindConfQuest(int(quest.Sn))
+		if confQuest.Group != 1 {
+			continue
+		}
+
+		core.Info("init quest ", quest.Sn, quest.Status)
 
 		q := newQuest()		
 		q.sn = quest.Sn
@@ -709,7 +715,7 @@ func (r *Robot) handleQuestInfo(packet *core.Packet) {
 		if confQuest.Group != 1 {
 			continue
 		}
-		
+
 		core.Info("recv quest info ", q.GetSn(), q.GetStatus())
 		executor.updateStatus(int(q.GetSn()), QuestStatus(q.GetStatus()))
 	}

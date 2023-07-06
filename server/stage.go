@@ -86,6 +86,8 @@ func (r *Robot) handleObjAppear(packet *core.Packet) {
 	case WOT_MONSTER:
 		sn := int(msg.GetObjAppear().Monster.GetStageObjectSn())	
 		vo = createMonster(id, typ, pos, sn, obj.GetMonster().GetHpCur(), obj.GetMonster().GetHpMax())
+		// core.Info("recv obj ", id, typ, sn)
+
 		// mo := vo.(*MonsterObj)
 		// core.Info("recv obj appear ", vo.getId(), vo.getType(), mo.sn, r.pos.X, r.pos.Y)
 	default:
@@ -100,6 +102,7 @@ func (r *Robot) handleObjAppear(packet *core.Packet) {
 func (r *Robot) handleObjDisappear(packet *core.Packet) {
 	msg := msg.ParseSCStageObjectDisappear(int32(msg.MSG_SCStageObjectDisappear), packet.Data)
 	objId := msg.GetObjId()
+
 	// core.Info("recv obj disappear ", objId, r.pos.X, r.pos.Y)
 	r.removeObj(objId)
 }

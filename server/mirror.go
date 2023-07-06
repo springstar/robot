@@ -174,6 +174,7 @@ func (d *StageClearQuestData) lockEnemy(e *RobotQuestExecutor) int64 {
 
 	enemy := e.findMonsterObj(sn)
 	if enemy == nil {
+		core.Info("no monster found ", sn)
 		d.next()
 		return 0
 	}

@@ -135,7 +135,7 @@ func (r *Robot) fight(enemyId int64) {
 	
 	msg := msg.SerializeCSFightAtk(uint32(msg.MSG_CSFightAtk), r.humanId, sn, tarId, tpos, 0, false, dir, spos, 1)
 	r.sendPacket(msg)
-	core.Info("send CSFightAtk to attack ", sn, tarId, r.lastRelease)
+	// core.Info("send CSFightAtk to attack ", sn, tarId, r.lastRelease)
 	r.updateLastRelease(int(sn))
 	r.updateSkillCooling(int(sn))
 
@@ -170,7 +170,7 @@ func (r *Robot) updateLastRelease(sn int) {
 	if confSkill.GroupType == 1 {
 		r.commonCooolTime = 3000
 	}
-	core.Info("update last release ", r.lastRelease)
+	// core.Info("update last release ", r.lastRelease)
 
 }
 
@@ -189,7 +189,7 @@ func (r *Robot) updateSkillCooling(sn int) {
 	sk := r.findSkill(sn) 
 	if sk != nil {
 		sk.nextRelease = core.GetCurrentTime() + int64(coolTime)
-		core.Info("update next release ", sn, sk.nextRelease)
+		// core.Info("update next release ", sn, sk.nextRelease)
 	}
 }
 
