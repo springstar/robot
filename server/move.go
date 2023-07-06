@@ -66,7 +66,7 @@ func (r *Robot) updateSyncTime(now int64) {
 }
 
 func (r *Robot) isTimeToSync(now int64) bool {
-	if r.lastSyncTime == 0 || r.lastSyncTime + 40 < now {
+	if r.lastSyncTime == 0 || r.lastSyncTime + 150 < now {
 		return true
 	}
 
@@ -112,7 +112,7 @@ func (r *Robot) move(target *core.Vec2) int{
 	
 	now := core.GetCurrentTime()
 
-	delta := 0.12
+	delta := 0.1
 	// delta = delta * int(m.r.speed)
 
 	if r.lastPos == nil {

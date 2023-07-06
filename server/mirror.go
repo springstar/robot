@@ -174,7 +174,7 @@ func (d *StageClearQuestData) lockEnemy(e *RobotQuestExecutor) int64 {
 
 	enemy := e.findMonsterObj(sn)
 	if enemy == nil {
-		core.Info("no monster found ", sn)
+		// core.Info("no monster found ", sn)
 		d.next()
 		return 0
 	}
@@ -185,7 +185,7 @@ func (d *StageClearQuestData) lockEnemy(e *RobotQuestExecutor) int64 {
 	}
 
 	d.next()
-	core.Info("lock monster ", sn , enemy.getId())
+	// core.Info("lock monster ", sn , enemy.getId())
 	return enemy.getId()
 }
 

@@ -167,7 +167,7 @@ func (qs *RobotQuestSet) findQuestToAccept() int32 {
 	}
 
 	sort.Ints(canAccepts)
-	core.Info("sorted canAccepts ", canAccepts)
+	// core.Info("sorted canAccepts ", canAccepts)
 	if len(canAccepts) > 0 {
 		quest := canAccepts[0]
 		if qs.isPreCompleted(quest) {
@@ -312,7 +312,7 @@ func (q *RobotQuestExecutor) execDialogQuest(confQuest *config.ConfQuest) ExecSt
 		q.completeQuest(confQuest.Sn)
 	}
 
-	core.Info("dialog quest ongoing ", confQuest.Sn)
+	// core.Info("dialog quest ongoing ", confQuest.Sn)
 
 	q.setRepeated()
 	
@@ -554,14 +554,14 @@ func (q *RobotQuestExecutor) execEscort() {
 }
 
 func (q *RobotQuestExecutor) execGatherQuest(confQuest *config.ConfQuest)  {
-	core.Info("exec gather quest ", confQuest.Sn)
+	// core.Info("exec gather quest ", confQuest.Sn)
 	quest := q.findQuest(confQuest.Sn)
 	if quest == nil {
 		return
 	}
 
 	if quest.data == nil {
-		core.Info("attach gather quest data ", confQuest.Sn)
+		// core.Info("attach gather quest data ", confQuest.Sn)
 		qd := newGatherQuestData(confQuest.Sn)
 		qd.genGatherInfo(confQuest)
 		quest.attach(qd)

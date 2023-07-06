@@ -41,6 +41,8 @@ type Robot struct {
 
 	lastRelease int64
 	commonCooolTime int
+
+	accumulateTime int64
 }
 
 func newRobot(account *Account, robotMgr *RobotManager, fsm *RobotFsm) *Robot {
@@ -172,8 +174,14 @@ func (r *Robot) dispatch(packets []*core.Packet) {
 }
 
 func (r *Robot) sendPulse() {
+	r.accumulateTime += int64(ROBOT_PULSE)
+	if r.accumulateTime < int64(HEART_BEAT) {
+		return
+	}
+
 	packet := msg.SerializeCSPing(msg.MSG_CSPing)
 	r.sendPacket(packet)
+	r.accumulateTime = 0
 }
 
 func (r *Robot)mainLoop() {

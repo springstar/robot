@@ -65,7 +65,7 @@ func (c *Character) onInit(human *pb.DHuman, stage *pb.DInitDataStage) {
 	c.speed = human.Prop.Speed
 	c.mapSn = stage.GetSn()
 
-	core.Info("speed is ", c.speed)
+	// core.Info("speed is ", c.speed)
 
 	c.pos = core.NewVec2(stage.PosNow.GetX(), stage.PosNow.GetY())
 	c.dir = core.NewVec2(stage.DirNow.GetX(), stage.DirNow.GetY())

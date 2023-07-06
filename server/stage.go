@@ -45,7 +45,7 @@ func (r *Robot) handleEnterStage(packet *core.Packet) {
 	r.fsm.trigger(r.fsm.state, "enterok", r)
 	queueStat(STAT_ENTER_STAGE, 1)
 
-	r.sendGM("-gm buff addBuff 9999999")
+	// r.sendGM("-gm buff addBuff 9999999")
 
 }
 
@@ -163,6 +163,10 @@ func (r *Robot) sendMoveStop(x, y float32) {
 
 func (r *Robot) handleMoveStop(packet *core.Packet) {
 	msg := msg.ParseSCStageMoveStop(int32(msg.MSG_SCStageMoveStop), packet.Data)
+	if msg.GetPosEnd() == nil {
+		return
+	}
+	
 	r.pos.X = msg.GetPosEnd().GetX()
 	r.pos.Y = msg.GetPosEnd().GetY()
 	r.dir.X = msg.GetDir().GetX()

@@ -134,5 +134,5 @@ func (r *Robot)handleInitData(packet *core.Packet) {
 
 func (r *Robot)handleKick(packet *core.Packet) {
 	msg := msg.ParseSCHumanKick(int32(packet.Type), packet.Data)
-	fmt.Println(msg.GetReason())
+	core.Info(msg.GetReason())
 }

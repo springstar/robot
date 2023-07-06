@@ -93,7 +93,7 @@ func (d *MonsterQuestData) lockEnemy(e *RobotQuestExecutor) int64 {
 	}
 
 	d.next()
-	core.Info("lock monster ", sn , enemy.getId())
+	// core.Info("lock monster ", sn , enemy.getId())
 	return enemy.getId()
 
 }
@@ -103,7 +103,7 @@ func (d *MonsterQuestData) getQuestSn() int {
 }
 
 func (d *MonsterQuestData) onStatusUpdate(e *RobotQuestExecutor, sn int, status QuestStatus) {
-	core.Info("MonsterQuestData data onStatusUpdate ", sn, status)
+	// core.Info("MonsterQuestData data onStatusUpdate ", sn, status)
 	if status == QSTATE_COMPLETED {
 		core.Info("MonsterQuestData commit quest ", sn)
 		e.commitQuest(sn)
