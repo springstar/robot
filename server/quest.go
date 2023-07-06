@@ -705,6 +705,11 @@ func (r *Robot) handleQuestInfo(packet *core.Packet) {
 
 	quests := resp.GetQuest()
 	for _, q := range quests {
+		confQuest := config.FindConfQuest(int(q.GetSn())) 
+		if confQuest.Group != 1 {
+			continue
+		}
+		
 		core.Info("recv quest info ", q.GetSn(), q.GetStatus())
 		executor.updateStatus(int(q.GetSn()), QuestStatus(q.GetStatus()))
 	}
