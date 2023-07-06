@@ -161,7 +161,7 @@ func (qs *RobotQuestSet) findQuestToAccept() int32 {
 	}
 
 	sort.Ints(canAccepts)
-	// core.Info("sorted canAccepts ", canAccepts)
+	core.Info("sorted canAccepts ", canAccepts)
 	if len(canAccepts) > 0 {
 		quest := canAccepts[0]
 		if qs.isPreCompleted(quest) {
@@ -291,13 +291,26 @@ func (q *RobotQuestExecutor) execDialogQuest(confQuest *config.ConfQuest) ExecSt
 		return q.getState()
 	}
 
-	if confQuest.CommitType == 1 {
-		msg := msg.SerializeCSCompleteQuest(uint32(msg.MSG_CSCompleteQuest), int32(confQuest.Sn))
-		q.sendPacket(msg)
+	quest := q.findQuest(confQuest.Sn)
+	if quest == nil {
+		q.setCompleted()
+		return q.getState()
 	}
 
-	q.setOngoing()
-	return EXEC_ONGOING
+	if quest.data == nil {
+		qd := newSkillQuestData()
+		quest.attach(qd)
+	}
+
+	if quest.status == QSTATE_ONGOING {
+		q.completeQuest(confQuest.Sn)
+	}
+
+	core.Info("dialog quest ongoing ", confQuest.Sn)
+
+	q.setRepeated()
+	
+	return q.getState()
 }
 
 func (q *RobotQuestExecutor) execDeliverQuest(confQuest *config.ConfQuest) ExecState {
@@ -535,6 +548,7 @@ func (q *RobotQuestExecutor) execEscort() {
 }
 
 func (q *RobotQuestExecutor) execGatherQuest(confQuest *config.ConfQuest)  {
+	core.Info("exec gather quest ", confQuest.Sn)
 	quest := q.findQuest(confQuest.Sn)
 	if quest == nil {
 		return
@@ -580,6 +594,7 @@ func (q *RobotQuestExecutor) commitQuest(sn int) {
 
 
 func (q *RobotQuestExecutor) exec(params []string, delta int) {
+	// core.Info("RobotQuestExecutor exec")
 	quest := q.findQuestToExec()
 	if quest > 0 {
 		q.execQuest(int(quest))
@@ -635,7 +650,7 @@ func (q *RobotQuestExecutor) updateStatus(sn int, status QuestStatus) {
 		quest.sn = int32(sn)
 		quest.status = int32(status)
 		q.addQuest(quest)
-		
+
 		q.setCompleted()
 	}
 

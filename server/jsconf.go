@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 	"github.com/springstar/robot/config"
+	_ "github.com/springstar/robot/core"
 )
 
 type JsonConfig struct {
@@ -79,6 +80,7 @@ func (m *JsonConfigManager) addConf(name string, conf *JsonConfig) {
 	}
 
 	m.confs[name] = conf
+
 }
 
 func (m *JsonConfigManager) findConf(name string, sn int) interface{} {
