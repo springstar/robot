@@ -11,7 +11,7 @@ import (
 
 func (r *Robot) sendLoginRequest() {
 	// fmt.Println("send login")
-	packet := msg.SerializeCSLogin(msg.MSG_CSLogin, r.account.name, "123456", "", 1001, 1)
+	packet := msg.SerializeCSLogin(msg.MSG_CSLogin, r.account.name, "123456", "", 1, "", 2012, 2023)
 	r.sendPacket(packet)
 }
 
@@ -71,12 +71,15 @@ func (r *Robot) createChar() {
 		return
 	}
 
-	avatars, err := core.Str2Int32Slice(confModel.PresetAvatar)
+	presetAvatas, err := core.Str2IntSlice(confModel.PresetAvatar)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
+	confPresetAvata := config.FindConfPresetAvatar(presetAvatas[0])
+
+	avatars, err := core.Str2Int32Slice(confPresetAvata.Appearance)
 	name := serv.getNameManager().randomGenName(conf.RoleSex)
 	r.setName(name)
 	

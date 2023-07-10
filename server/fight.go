@@ -53,7 +53,6 @@ func newSkill(sn int32, lv int32, pos int32, nextRelease int64) *Skill {
 }
 
 func (r *Robot) handleSkillUpdate(packet *core.Packet) {
-	core.Info("recv skill change")
 	msg := msg.ParseSCSkillUpdate(int32(msg.MSG_SCSkillUpdate), packet.Data)
 	changes := msg.GetChanges()
 	for _, c := range changes {
@@ -64,11 +63,11 @@ func (r *Robot) handleSkillUpdate(packet *core.Packet) {
 }
 
 func (r *Robot) handleHpChange(packet *core.Packet) {
-	resp := msg.ParseSCFightHpChg(int32(msg.MSG_SCFightHpChg), packet.Data)
-	targets := resp.GetDhpChgTar()
-	for _, t := range targets {
-		core.Info("hp chg ", t.Id)
-	}
+	// resp := msg.ParseSCFightHpChg(int32(msg.MSG_SCFightHpChg), packet.Data)
+	// targets := resp.GetDhpChgTar()
+	// for _, t := range targets {
+	// 	core.Info("hp chg ", t.Id)
+	// }
 }
 
 func (r *Robot) initSkills(skillA []*pb.DSkill, skillB []*pb.DSkill) {

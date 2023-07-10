@@ -57,6 +57,9 @@ func (r *Robot) handleSwitchStage(packet *core.Packet) {
 	pos := msg.GetPos()
 	dir := msg.GetDir()
 	// lineNum := msg.GetLineNum()
+	if r.pos == nil || pos == nil {
+		return
+	}
 
 	r.mapSn = mapSn
 	r.pos.Set(pos.GetX(), pos.GetY())
@@ -166,7 +169,11 @@ func (r *Robot) handleMoveStop(packet *core.Packet) {
 	if msg.GetPosEnd() == nil {
 		return
 	}
-	
+
+	if r.pos == nil {
+		return
+	}
+
 	r.pos.X = msg.GetPosEnd().GetX()
 	r.pos.Y = msg.GetPosEnd().GetY()
 	r.dir.X = msg.GetDir().GetX()
