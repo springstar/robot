@@ -105,7 +105,7 @@ func (d *MonsterQuestData) getQuestSn() int {
 func (d *MonsterQuestData) onStatusUpdate(e *RobotQuestExecutor, sn int, status QuestStatus) {
 	// core.Info("MonsterQuestData data onStatusUpdate ", sn, status)
 	if status == QSTATE_COMPLETED {
-		core.Info("MonsterQuestData commit quest ", sn)
+		// core.Info("MonsterQuestData commit quest ", sn)
 		e.commitQuest(sn)
 	}
 }

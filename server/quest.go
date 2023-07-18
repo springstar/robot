@@ -216,7 +216,7 @@ func newQuestExecutor(r *Robot) *RobotQuestExecutor {
 }
 
 func (q *RobotQuestExecutor) acceptQuest(quest int) ExecState {
-	core.Info("accept quest ", quest)
+	// core.Info("accept quest ", quest)
 	request := msg.SerializeCSAcceptQuest(uint32(msg.MSG_CSAcceptQuest), int32(quest))
 	q.sendPacket(request)
 	q.setOngoing()
@@ -431,7 +431,7 @@ func (q *RobotQuestExecutor) execMonsterQuest(confQuest *config.ConfQuest) ExecS
 	}
 
 	if quest.data == nil {
-		core.Info("attach kill monster quest data ", confQuest.Sn, q.getState(), q.mapSn)
+		// core.Info("attach kill monster quest data ", confQuest.Sn, q.getState(), q.mapSn)
 		qd := newMonsterQuestData(confQuest.Sn)
 		qd.genMonsterInfo(confQuest)
 		quest.attach(qd)
@@ -439,7 +439,7 @@ func (q *RobotQuestExecutor) execMonsterQuest(confQuest *config.ConfQuest) ExecS
 	
 	q.moveToQuestPos(confQuest)
 	if q.getState() == EXEC_PAUSE {
-		core.Info("monster quest attach ctx function ", q.mapSn)
+		// core.Info("monster quest attach ctx function ", q.mapSn)
 		q.attachCtxFun(asyncKillMonster, q)
 	} else {
 		quest.data.resume(q)
@@ -455,7 +455,7 @@ func (q *RobotQuestExecutor) execStageClearQuest(confQuest *config.ConfQuest) Ex
 	}
 
 	if quest.data == nil {
-		core.Info("attach stage clear quest data ", confQuest.Sn, q.getState())
+		// core.Info("attach stage clear quest data ", confQuest.Sn, q.getState())
 		qd := newStageClearQuestData(confQuest.Sn)
 		qd.genEnemyPosList(confQuest)
 		quest.attach(qd)
@@ -647,7 +647,7 @@ func (q *RobotQuestExecutor) onStageSwitch() {
 func (q *RobotQuestExecutor) updateStatus(sn int, status QuestStatus) {
 	quest := q.findQuest(sn)
 	if quest != nil {
-		core.Info("update status ", sn, status)
+		// core.Info("update status ", sn, status)
 		quest.status = int32(status)	
 	} else {
 		core.Info("new quest ", sn, status, q.getState())
@@ -716,7 +716,7 @@ func (r *Robot) handleQuestInfo(packet *core.Packet) {
 			continue
 		}
 
-		core.Info("recv quest info ", q.GetSn(), q.GetStatus())
+		// core.Info("recv quest info ", q.GetSn(), q.GetStatus())
 		executor.updateStatus(int(q.GetSn()), QuestStatus(q.GetStatus()))
 	}
 

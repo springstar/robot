@@ -91,7 +91,7 @@ func (d *EscortQuestData) resume(e *RobotQuestExecutor) {
 		d.next()
 	} else {
 		e.setCompleted()
-		core.Info("escort finished")
+		// core.Info("escort finished")
 	}
 }
 

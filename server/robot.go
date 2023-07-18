@@ -77,6 +77,7 @@ func (r *Robot) loadModules() {
 	r.executors["quest"] = newQuestExecutor(r)
 	r.executors["match"] = newMatchExecutor(r)
 	r.executors["team"] = newTeamExecutor(r)
+	r.executors["wild"] = newWildExecutor(r)
 }
 
 func (r *Robot) startup() {

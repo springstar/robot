@@ -56,11 +56,7 @@ func (m *MatchExecutor) resume(params []string, delta int) {
 
 
 func (m *MatchExecutor) isPVEMatch(t MatchType) bool {
-	if t == MT_REP {
-		return true
-	}
-
-	return false
+	return (t == MT_REP)
 }
 
 func (m *MatchExecutor) isPVPMatch(t MatchType) bool {
@@ -72,7 +68,7 @@ func (m *MatchExecutor) isPVPMatch(t MatchType) bool {
 }
 
 func (m *MatchExecutor) startPVPMatch(mt MatchType) {
-	core.Info("start pvp match")
+	// core.Info("start pvp match")
 	request := msg.SerializeCSMatchEnrollRequest(msg.MSG_CSMatchEnrollRequest, int32(mt))
 	m.sendPacket(request)
 	m.markMatching(mt)

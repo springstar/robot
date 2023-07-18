@@ -56,7 +56,7 @@ func (r *Robot) sendCharacterLogin() {
 }
 
 func (r *Robot) createChar() {
-	fmt.Println("create char ", r.account.name)
+	core.Info("create char ", r.account.name)
 	conf := randomRole()
 	souls := strings.Split(conf.MatchingSoul, ",")
 	soul := souls[core.GenRandomInt(len(souls))]
