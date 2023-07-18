@@ -12,6 +12,11 @@ func (r *Robot) enterStage() {
 	queueMsgStat(STAT_SEND_PACKETS, int32(msg.MSG_CSStageEnter), int32(len(packet)))
 }
 
+func (r *Robot) switchStage(typ int, mapSn int, sceneSn int) {
+	packet := msg.SerializeCSStageSwitch(msg.MSG_CSStageSwitch, int32(typ), int32(mapSn), int32(sceneSn))
+	r.sendPacket(packet)
+}
+
 func (r *Robot) handleEnterStage(packet *core.Packet) {
 	msg := msg.ParseSCStageEnterResult(int32(packet.Type), packet.Data)
 	stageObjs := msg.GetObj()
