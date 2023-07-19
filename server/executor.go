@@ -80,6 +80,7 @@ func (e *Executor) getState() ExecState {
 type AsyncContext struct {
 	ctxFunc func(iExecutor)
 	e iExecutor
+	para interface{}
 }
 
 func newAsyncContext() *AsyncContext {
@@ -88,9 +89,10 @@ func newAsyncContext() *AsyncContext {
 	}
 }
 
-func (ac *AsyncContext) attachCtxFun(f func(iExecutor), e iExecutor) {
+func (ac *AsyncContext) attachCtxFun(f func(iExecutor), e iExecutor, para interface{}) {
 	ac.ctxFunc = f
 	ac.e = e
+	ac.para = para
 }
 
 func (ac *AsyncContext) resume() {

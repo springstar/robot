@@ -440,7 +440,7 @@ func (q *RobotQuestExecutor) execMonsterQuest(confQuest *config.ConfQuest) ExecS
 	q.moveToQuestPos(confQuest)
 	if q.getState() == EXEC_PAUSE {
 		// core.Info("monster quest attach ctx function ", q.mapSn)
-		q.attachCtxFun(asyncKillMonster, q)
+		q.attachCtxFun(asyncKillMonster, q, nil)
 	} else {
 		quest.data.resume(q)
 	}
@@ -463,7 +463,7 @@ func (q *RobotQuestExecutor) execStageClearQuest(confQuest *config.ConfQuest) Ex
 
 	q.moveToQuestPos(confQuest)
 	if q.getState() == EXEC_PAUSE {	
-		q.attachCtxFun(asyncStageClear, q)
+		q.attachCtxFun(asyncStageClear, q, nil)
 	} else {
 		quest.data.resume(q)
 	}
@@ -489,7 +489,7 @@ func (q *RobotQuestExecutor) execEscortQuest(confQuest *config.ConfQuest) ExecSt
 
 	q.moveToQuestPos(confQuest)
 	if q.getState() == EXEC_PAUSE {
-		q.attachCtxFun(asyncEscort, q)
+		q.attachCtxFun(asyncEscort, q, nil)
 	}
 
 	return q.getState()

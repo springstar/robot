@@ -31,7 +31,7 @@ func (q *WildExecutor) exec(params []string, delta int) {
 
 	if q.getState() == EXEC_PAUSE {
 		// core.Info("monster quest attach ctx function ", q.mapSn)
-		q.attachCtxFun(asyncWild, q)
+		// q.attachCtxFun(asyncWild, q)
 	} else {
 
 	}
@@ -52,5 +52,19 @@ func (q *WildExecutor) execWildFight() {
 
 }
 
+func (q *WildExecutor) onEvent(k EventKey) {
+	switch (k) {
+	case EK_STAGE_SWITCH:
+		q.onStageSwitch()
+	default:
+		break	
+	}
+}
+
+func (q *WildExecutor) onStageSwitch() {
+	if q.getState() == EXEC_PAUSE {
+		q.setResume()
+	}
+}
 
 
