@@ -495,7 +495,7 @@ func (q *RobotQuestExecutor) execEscortQuest(confQuest *config.ConfQuest) ExecSt
 	return q.getState()
 }
 
-func asyncKillMonster(e iExecutor) {
+func asyncKillMonster(e iExecutor, i interface{}) {
 	q := e.(*RobotQuestExecutor)
 	q.execKillMonster()
 }
@@ -515,7 +515,7 @@ func (q *RobotQuestExecutor) execKillMonster() {
 	}
 }
 
-func asyncStageClear(e iExecutor) {
+func asyncStageClear(e iExecutor, i interface{}) {
 	q := e.(*RobotQuestExecutor)
 	q.execStageClear()
 }
@@ -534,7 +534,7 @@ func (q *RobotQuestExecutor) execStageClear() {
 	}
 }
 
-func asyncEscort(e iExecutor) {
+func asyncEscort(e iExecutor, i interface{}) {
 	q := e.(*RobotQuestExecutor)
 	q.execEscort()
 }
