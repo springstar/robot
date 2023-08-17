@@ -43,6 +43,7 @@ func defaultTransitions() []fsm.Transition {
 		fsm.Transition{From: "clogin", Event: "cloginok", To: "waitinit", Action: "waitForInit"},
 		fsm.Transition{From: "creatok", Event: "cloginok", To: "waitinit", Action: "waitForInit"},
 		fsm.Transition{From: "waitinit", Event: "initok", To: "enterstage", Action: "enterStage"},
+		fsm.Transition{From: "waitinit", Event: "waitsoul", To: "ready", Action: "waitsoul"},
 		fsm.Transition{From: "enterstage", Event: "enterok", To: "ready", Action: "ready"},
 		fsm.Transition{From: "ready", Event: "switch", To: "enterstage", Action: "enterStage"},
 		// fsm.Transition{From: "ready", Event: "enterinst", To: "waitenterinst", Action: "enterInst"},

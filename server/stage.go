@@ -6,6 +6,10 @@ import (
 	"github.com/springstar/robot/msg"
 )
 
+func (r *Robot) waitSoul() {
+	
+}
+
 func (r *Robot) enterStage() {
 	packet := msg.SerializeCSStageEnter(msg.MSG_CSStageEnter)	
 	r.sendPacket(packet)

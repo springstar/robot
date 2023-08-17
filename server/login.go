@@ -132,7 +132,11 @@ func (r *Robot)handleInitData(packet *core.Packet) {
 	// r.initSkills(msg.Skill)
 	executor := r.findExecutor("quest").(*RobotQuestExecutor)
 	executor.initQuest(msg.QuestInfo)
-	r.fsm.trigger(r.fsm.state, "initok", r)
+	if (r.soul == 0) {
+		r.fsm.trigger(r.fsm.state, "waitsoul", r)
+	} else {
+		r.fsm.trigger(r.fsm.state, "initok", r)
+	}
 }
 
 func (r *Robot)handleKick(packet *core.Packet) {

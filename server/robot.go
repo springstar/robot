@@ -102,6 +102,8 @@ func (r *Robot) doAction(action string) {
 		r.sendCharacterLogin()
 	case "waitForInit":
 		r.waitForInit()
+	case "waitsoul":
+		r.waitSoul()
 	case "enterStage":
 		r.enterStage()
 	case "ready":
